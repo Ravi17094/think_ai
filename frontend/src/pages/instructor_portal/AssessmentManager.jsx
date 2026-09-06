@@ -595,7 +595,9 @@ function AssessmentForm({ initial, saving, onCancel, onSave }) {
 
             onSave({
               title: title.trim(),
-              description: description.trim(),
+              // Description is optional. Do not send an empty string because the
+              // backend correctly treats a supplied description as meaningful text.
+              description: description.trim() || undefined,
               type: assessmentType,
               totalMarks: Number(totalMarks),
               duration: duration ? Number(duration) : null,

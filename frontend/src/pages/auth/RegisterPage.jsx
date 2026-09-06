@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('Learner');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -21,10 +22,15 @@ export default function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const result = await dispatch(
-      registerUser({ name, email, password })
+      registerUser({ name, email, password, role })
     );
     if (registerUser.fulfilled.match(result)) {
-      navigate('/learner');
+      const roleHome = {
+        Learner: '/learner',
+        TA: '/ta',
+        Instructor: '/instructor/dashboard',
+      };
+      navigate(roleHome[role] || '/learner');
     }
   };
 
@@ -104,6 +110,19 @@ export default function RegisterPage() {
               autoComplete="new-password"
               required
             />
+            <div className="space-y-1.5">
+              <label htmlFor="role" className="block text-sm font-medium text-slate-200">Role</label>
+              <select
+                id="role"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-white outline-none focus:border-cyan-400"
+              >
+                <option value="Learner" className="text-slate-900">Learner</option>
+                <option value="TA" className="text-slate-900">Teaching Assistant (TA)</option>
+                <option value="Instructor" className="text-slate-900">Instructor</option>
+              </select>
+            </div>
             <Button
               type="submit"
               disabled={loading}

@@ -165,50 +165,23 @@ const validateAssessmentCreate = (req, res, next) => {
             // MCQ VALIDATION
             // ====================================================
             if (questionType === "MCQ") {
-                if (
-                    question.order !== undefined &&
-                    (
-                        !Number.isInteger(
-                            Number(question.order)
-                        ) ||
-                        Number(question.order) < 0
-                    )
-                ) {
-                    errors.push(
-                        `questions[${index}].order must be a non-negative integer`
-                    );
+                if (!Array.isArray(question.options) || question.options.length < 2) {
+                    errors.push(`questions[${index}].options must contain at least two options`);
                 } else {
                     let correctOptionCount = 0;
 
                     question.options.forEach((option, optionIndex) => {
-                        if (
-                            !option ||
-                            typeof option !== "object" ||
-                            Array.isArray(option)
-                        ) {
-                            errors.push(
-                                `questions[${index}].options[${optionIndex}] must be a valid object`
-                            );
+                        if (!option || typeof option !== "object" || Array.isArray(option)) {
+                            errors.push(`questions[${index}].options[${optionIndex}] must be a valid object`);
                             return;
                         }
 
-                        if (
-                            !option.optionText ||
-                            typeof option.optionText !== "string" ||
-                            !option.optionText.trim()
-                        ) {
-                            errors.push(
-                                `questions[${index}].options[${optionIndex}].optionText is required`
-                            );
+                        if (!option.optionText || typeof option.optionText !== "string" || !option.optionText.trim()) {
+                            errors.push(`questions[${index}].options[${optionIndex}].optionText is required`);
                         }
 
-                        if (
-                            option.isCorrect !== undefined &&
-                            typeof option.isCorrect !== "boolean"
-                        ) {
-                            errors.push(
-                                `questions[${index}].options[${optionIndex}].isCorrect must be a boolean`
-                            );
+                        if (option.isCorrect !== undefined && typeof option.isCorrect !== "boolean") {
+                            errors.push(`questions[${index}].options[${optionIndex}].isCorrect must be a boolean`);
                         }
 
                         if (option.isCorrect === true) {
@@ -217,16 +190,10 @@ const validateAssessmentCreate = (req, res, next) => {
                     });
 
                     if (correctOptionCount !== 1) {
-                        errors.push(
-                            `Coding question ${index + 1} must contain at least one test case`
-                        );
+                        errors.push(`questions[${index}].options must have exactly one correct option`);
                     }
                 }
-
             }
-        );
-    }
-
 
             // ====================================================
             // CODING QUESTION VALIDATION

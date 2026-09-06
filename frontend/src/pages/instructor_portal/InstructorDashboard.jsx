@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../features/auth/authSlice';
+import apiClient from '../../services/apiClient';
 
 function StatCard({ title, count, description, color }) {
   return (
@@ -16,6 +17,13 @@ function StatCard({ title, count, description, color }) {
 export default function InstructorDashboard() {
   const navigate = useNavigate();
   const user = useSelector(selectUser);
+  const [report, setReport] = useState(null);
+
+  useEffect(() => {
+    apiClient.get('/attendance/ta/report')
+      .then((response) => setReport(response.data?.data || null))
+      .catch(() => setReport(null));
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 bg-slate-50 dark:bg-[#151821] text-slate-900 dark:text-[#f1f3f9] min-h-screen transition-colors duration-300">
@@ -50,20 +58,20 @@ export default function InstructorDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <StatCard 
           title="Active Modules" 
-          count="6" 
-          description="Core curriculum units" 
+          count={report?.coursework?.activeModules ?? '—'}
+          description="Modules in the database"
           color="text-purple-600 dark:text-purple-400" 
         />
         <StatCard 
           title="Module Assignments" 
-          count="12" 
-          description="Equipped with MCQs & answer keys" 
+          count={report?.coursework?.activeAssessments ?? '—'}
+          description="Active assessments in the database"
           color="text-indigo-600 dark:text-indigo-400" 
         />
         <StatCard 
           title="Pending Submissions" 
-          count="7" 
-          description="Requires instructor grading review" 
+          count={report?.grading?.pending ?? '—'}
+          description="Submitted assessments awaiting grading"
           color="text-emerald-500" 
         />
       </div>
@@ -112,6 +120,27 @@ export default function InstructorDashboard() {
           </div>
         </div>
 
+      </div>
+
+      <div className="bg-white dark:bg-[#1a1e2b] border border-slate-200 dark:border-[#262b38] p-6 rounded-3xl shadow-xl space-y-4">
+        <div>
+          <h3 className="text-lg font-bold">Instructor tools & reports</h3>
+          <p className="mt-1 text-xs text-slate-500 dark:text-[#94a3b8]">Review learner submissions and monitor certificate progress.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            onClick={() => navigate('/instructor/student-submissions')}
+            className="rounded-xl bg-slate-100 dark:bg-[#222736] hover:bg-slate-200 dark:hover:bg-[#2b3244] px-4 py-3 text-left text-sm font-bold border border-slate-200 dark:border-[#3e4658]"
+          >
+            Student Submissions →
+          </button>
+          <button
+            onClick={() => navigate('/instructor/certificates')}
+            className="rounded-xl bg-slate-100 dark:bg-[#222736] hover:bg-slate-200 dark:hover:bg-[#2b3244] px-4 py-3 text-left text-sm font-bold border border-slate-200 dark:border-[#3e4658]"
+          >
+            Certificates Report →
+          </button>
+        </div>
       </div>
 
     </div>

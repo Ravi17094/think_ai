@@ -71,18 +71,6 @@ model Batch {
 }
 
 // ====================================================
-// USER
-// ====================================================
-
-model User {
-  id             Int      @id @default(autoincrement())
-  email          String   @unique
-  hashedPassword String
-  role           String   @default("USER")
-  createdAt      DateTime @default(now())
-}
-
-// ====================================================
 // ENROLLMENT
 // ====================================================
 
@@ -101,12 +89,37 @@ model Enrollment {
 
   lessonProgress        LessonProgress[]
   assessmentSubmissions AssessmentSubmission[]
+  attendanceRecords     AttendanceRecord[]
   certificate           Certificate?
 
   @@index([batchId])
   @@index([studentEmail])
   @@index([enrollmentStatus])
   @@index([courseAccess])
+}
+
+// ====================================================
+// ATTENDANCE
+// ====================================================
+
+model AttendanceRecord {
+  id Int @id @default(autoincrement())
+
+  enrollmentId Int
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+
+  sessionTitle String
+  sessionDate  DateTime
+  status       String   @default("PRESENT")
+  notes        String?
+  recordedBy   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([enrollmentId, sessionDate, sessionTitle])
+  @@index([sessionDate])
+  @@index([status])
 }
 
 // ====================================================
@@ -430,6 +443,10 @@ model AssessmentSubmission {
 
   status String @default("SUBMITTED")
 
+  feedback String?
+  gradedBy String?
+  gradedAt DateTime?
+
   submittedAt DateTime @default(now())
 
   answers SubmissionAnswer[]
@@ -601,6 +618,11 @@ model BreakoutRoom {
   status String @default("active")
 
   members BreakoutRoomMember[]
+
+  @@index([sessionId])
+  @@index([status])
+}
+
 // CODING TEST CASE EXECUTION
 // ====================================================
 
@@ -648,8 +670,9 @@ model CodingTestCaseExecution {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([sessionId])
-  @@index([status])
+  @@index([submissionId])
+  @@index([questionId])
+  @@index([testCaseId])
 }
 
 model BreakoutRoomMember {
@@ -665,8 +688,4 @@ model BreakoutRoomMember {
   @@unique([roomId, userId])
   @@index([roomId])
   @@index([userId])
-}
-  @@index([submissionId])
-  @@index([questionId])
-  @@index([testCaseId])
 }

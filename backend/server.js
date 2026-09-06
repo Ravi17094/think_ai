@@ -26,26 +26,19 @@ const courseRoutes = require("./routes/courseRoutes");
 const batchRoutes = require("./routes/batchRoutes");
 const enrollmentRoutes = require("./routes/enrollmentRoutes");
 const moduleRoutes = require("./routes/moduleRoutes");
-const enrollmentRoutes = require("./routes/enrollmentRoutes");   // <-- added
-const lessonRoutes = require("./routes/lessonRoutes");           // <-- added
-const adminUsersRoutes = require("./routes/adminUsers");
 const auditLogRoutes = require("./routes/auditLog");
 const notificationPreferenceRoutes = require("./routes/notificationPreferences");
 const assessmentRoutes = require("./routes/assessmentRoutes");
-// ...also add these if you need them and they're missing here too:
 const certificateRoutes = require("./routes/certificateRoutes");
 const lessonRoutes = require("./routes/lessonRoutes");
 const lessonProgressRoutes = require("./routes/lessonProgressRoutes");
-const certificateRoutes = require("./routes/certificateRoutes");
-const assessmentRoutes = require("./routes/assessmentRoutes");
 const codeExecutionRoutes = require("./routes/codeExecutionRoutes");
 const sessionRoutes = require("./routes/sessionRoutes");
 const studioRoutes = require("./routes/studioRoutes"); // Live Class Studio Routes
+const attendanceRoutes = require("./routes/attendanceRoutes");
 
-const auditLogRoutes = require("./routes/auditLog");
 const analyticsRoutes = require("./routes/analytics");
 const adminCodingQuestionRoutes = require("./routes/adminCodingQuestionRoutes");
-const notificationPreferenceRoutes = require("./routes/notificationPreferences");
 
 // ============================================================
 // APP & MIDDLEWARE INITIALIZATION
@@ -125,7 +118,11 @@ app.use("/api/certificates", certificateRoutes);
 app.use("/api/assessments", assessmentRoutes);
 app.use("/api/code", codeExecutionRoutes);
 app.use("/api/sessions", sessionRoutes);
-app.use("/api/studio", studioRoutes); // Live Studio HTTP Endpoints
+// Legacy Studio routes use MongoDB and a separate authentication contract.
+// Keep them isolated so they do not shadow the Prisma-backed Live Studio
+// endpoints mounted below through `./src/routes` at `/api/studio`.
+app.use("/api/legacy-studio", studioRoutes);
+app.use("/api/attendance", attendanceRoutes);
 app.use("/api/audit-logs", auditLogRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/notifications", notificationPreferenceRoutes);
@@ -171,15 +168,6 @@ app.use((error, req, res, next) => {
         message: error.message || "Internal server error"
     });
 });
-
-// ============================================================
-// SERVER & SOCKET.IO INITIALIZATION
-// ============================================================
-const httpServer = http.createServer(app);
-const io = new Server(httpServer, { cors: { origin: "*" } });
-
-// Initialize Real-Time Socket Handlers
-initSockets(io);
 
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {

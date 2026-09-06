@@ -55,5 +55,10 @@ router.post(
     liveValidation.validateBreakoutRoomId,
     liveController.leaveBreakoutRoom
 );
+router.delete(
+    "/breakouts/:roomId/leave",
+    liveValidation.validateBreakoutRoomId,
+    liveController.leaveBreakoutRoom
+);
 
 module.exports = router;

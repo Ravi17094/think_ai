@@ -13,141 +13,6 @@
  */
 const createAssessment = async (data) => {
     if (!data || typeof data !== "object") {
-        throw new Error("Assessment data is required");
-    }
-
-    if (!Array.isArray(data.questions)) {
-        throw new Error("Assessment questions must be an array");
-    }
-
-    if (data.questions.length === 0) {
-        throw new Error("Assessment must contain at least one question");
-    }
-
-    const questions = data.questions.map((question, index) => {
-        if (!question || typeof question !== "object") {
-            throw new Error(`Invalid question at position ${index + 1}`);
-        }
-
-        if (
-            typeof question.questionText !== "string" ||
-            !question.questionText.trim()
-        ) {
-            throw new Error(`Question ${index + 1} text is required`);
-        }
-
-        const questionType = question.questionType || "MCQ";
-
-        if (!["MCQ", "CODING"].includes(questionType)) {
-            throw new Error(`Invalid question type for question ${index + 1}`);
-        }
-
-        const marks = Number(question.marks);
-
-        if (!Number.isFinite(marks) || marks <= 0) {
-            throw new Error(`Question ${index + 1} marks must be greater than 0`);
-        }
-
-        const questionData = {
-            questionText: question.questionText.trim(),
-            questionType,
-            marks,
-            order:
-                question.order !== undefined
-                    ? Number(question.order)
-                    : index
-        };
-
-        if (questionType === "CODING") {
-            if (!Array.isArray(question.testCases)) {
-                throw new Error(`Coding question ${index + 1} must contain testCases`);
-            }
-
-            if (question.testCases.length === 0) {
-                throw new Error(`Coding question ${index + 1} must contain at least one test case`);
-            }
-
-            questionData.title = question.title || null;
-            questionData.difficulty = question.difficulty || null;
-            questionData.problemStatement = question.problemStatement || null;
-            questionData.inputFormat = question.inputFormat || null;
-            questionData.outputFormat = question.outputFormat || null;
-            questionData.constraints = question.constraints || null;
-            questionData.explanation = question.explanation || null;
-            questionData.examples =
-                question.examples !== undefined ? question.examples : null;
-            questionData.supportedLanguages =
-                question.supportedLanguages !== undefined
-                    ? question.supportedLanguages
-                    : null;
-            questionData.starterCode =
-                question.starterCode !== undefined
-                    ? question.starterCode
-                    : null;
-
-            const testCases = question.testCases.map((testCase, testCaseIndex) => {
-                if (!testCase || typeof testCase !== "object") {
-                    throw new Error(
-                        `Invalid test case ${testCaseIndex + 1} for question ${index + 1}`
-                    );
-                }
-
-                if (
-                    testCase.expectedOutput === undefined ||
-                    testCase.expectedOutput === null
-                ) {
-                    throw new Error(
-                        `Expected output is required for test case ${testCaseIndex + 1}`
-                    );
-                }
-
-                const testCaseMarks =
-                    testCase.marks !== undefined ? Number(testCase.marks) : 1;
-
-                if (!Number.isFinite(testCaseMarks) || testCaseMarks <= 0) {
-                    throw new Error(
-                        `Marks for test case ${testCaseIndex + 1} must be greater than 0`
-                    );
-                }
-
-                return {
-                    input:
-                        testCase.input !== undefined && testCase.input !== null
-                            ? String(testCase.input)
-                            : null,
-                    expectedOutput: String(testCase.expectedOutput).trim(),
-                    marks: testCaseMarks,
-                    isHidden: testCase.isHidden === true
-                };
-            });
-
-            questionData.codingTestCases = {
-                create: testCases
-            };
-        }
-
-        if (questionType === "MCQ") {
-            if (
-                question.options !== undefined &&
-                !Array.isArray(question.options)
-            ) {
-                throw new Error(`Options for question ${index + 1} must be an array`);
-            }
-
-            if (Array.isArray(question.options)) {
-                questionData.options = {
-                    create: question.options.map((option) => ({
-                        optionText: option.optionText,
-                        isCorrect: option.isCorrect === true
-                    }))
-                };
-            }
-        }
-
-        return questionData;
-    });
-
-    if (!data || typeof data !== "object") {
         throw new Error(
             "Assessment data is required"
         );
@@ -2247,6 +2112,49 @@ const deleteCodingTestCase = async (testCaseId) => {
     });
 };
 
+const getTaGradingQueue = async () => {
+    return await prisma.assessmentSubmission.findMany({
+        where: { status: "SUBMITTED" },
+        include: {
+            assessment: {
+                select: {
+                    id: true,
+                    title: true,
+                    totalMarks: true,
+                    module: { select: { title: true, course: { select: { title: true } } } }
+                }
+            },
+            enrollment: { select: { studentName: true, studentEmail: true } },
+            answers: { select: { id: true, answerText: true, code: true, marksObtained: true } }
+        },
+        orderBy: { submittedAt: "asc" }
+    });
+};
+
+const gradeSubmission = async (submissionId, { score, feedback, gradedBy }) => {
+    const existing = await prisma.assessmentSubmission.findUnique({
+        where: { id: submissionId },
+        select: { id: true, totalMarks: true }
+    });
+
+    if (!existing) throw new Error("Assessment submission not found");
+    if (!Number.isFinite(score) || score < 0 || score > existing.totalMarks) {
+        throw new Error("score must be between 0 and the assessment total marks");
+    }
+
+    return await prisma.assessmentSubmission.update({
+        where: { id: submissionId },
+        data: {
+            score,
+            percentage: Number(((score / existing.totalMarks) * 100).toFixed(2)),
+            feedback: typeof feedback === "string" && feedback.trim() ? feedback.trim() : null,
+            gradedBy: gradedBy || null,
+            gradedAt: new Date(),
+            status: "GRADED"
+        }
+    });
+};
+
 /*
  * ============================================================
  * EXPORTS
@@ -2286,5 +2194,7 @@ module.exports = {
     createCodingTestCase,
     getCodingTestCases,
     updateCodingTestCase,
-    deleteCodingTestCase
+    deleteCodingTestCase,
+    getTaGradingQueue,
+    gradeSubmission
 };

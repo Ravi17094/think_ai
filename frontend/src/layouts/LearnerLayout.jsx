@@ -75,24 +75,6 @@ export default function LearnerLayout() {
                   </svg>
                 </button>
 
-              {/* Desktop Nav Links with Active Highlighting & Hover Effects */}
-              <nav className="hidden md:flex items-center space-x-2">
-                {NAV_LINKS.map((link) => {
-                  const isActive = link.to === '/forum'
-                    ? location.pathname.startsWith('/forum')
-                    : location.pathname === link.to;
-                  return (
-                    <Link
-                      key={link.to}
-                      to={link.to}
-                      className={`relative px-3 py-2 text-sm font-medium transition-all duration-300 rounded-xl group ${isActive
-                        ? isDarkMode
-                          ? 'text-purple-400 bg-purple-500/10 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.15)]'
-                          : 'text-purple-700 bg-purple-50 border border-purple-200 shadow-sm'
-                        : isDarkMode
-                          ? 'text-[#94a3b8] hover:text-white hover:bg-[#2a3040]'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                        }`}
                 {/* Inline Expanding Search Box */}
                 {isSearchOpen && (
                   <div className="relative flex items-center animate-fadeIn w-48 sm:w-64 md:w-80">
@@ -226,7 +208,6 @@ export default function LearnerLayout() {
                 key={link.to}
                 to={link.to}
                 onClick={handleLinkClick}
-                className={`block px-3 py-2 rounded-lg text-sm font-medium ${(link.to === '/forum' ? location.pathname.startsWith('/forum') : location.pathname === link.to)
                 className={`block px-4 py-2 rounded-full text-sm font-medium ${location.pathname === link.to
                   ? 'text-purple-400 bg-purple-500/10 font-semibold'
                   : isDarkMode ? 'text-[#94a3b8] hover:bg-[#2a3040] hover:text-white' : 'text-slate-600 hover:bg-slate-100'

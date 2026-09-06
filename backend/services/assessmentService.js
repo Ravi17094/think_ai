@@ -357,6 +357,24 @@ const getAssessmentSubmissionResult = async (submissionId) => {
     return await repository.getAssessmentSubmissionResult(id);
 };
 
+const getTaGradingQueue = async () => {
+    return await repository.getTaGradingQueue();
+};
+
+const gradeSubmission = async (submissionId, data) => {
+    const id = validateId(submissionId, "Submission ID");
+    if (!data || typeof data !== "object") throw new Error("Grading data is required");
+
+    const score = Number(data.score);
+    if (!Number.isFinite(score)) throw new Error("score must be a number");
+
+    return await repository.gradeSubmission(id, {
+        score,
+        feedback: data.feedback,
+        gradedBy: data.gradedBy
+    });
+};
+
 // ============================================================
 // EXPORTS
 // ============================================================
@@ -399,5 +417,7 @@ module.exports = {
 
     // Enrollment & Results
     getEnrollmentAssessmentStatus,
-    getAssessmentSubmissionResult
+    getAssessmentSubmissionResult,
+    getTaGradingQueue,
+    gradeSubmission
 };

@@ -593,6 +593,16 @@ const getAssessmentSubmissions = async (req, res) => {
             });
         }
 
+        return sendControllerError(
+            res,
+            error,
+            [
+                "Assessment not found"
+            ]
+        );
+    }
+};
+
 // ============================================================
 // ADMIN - CREATE CODING QUESTION
 // ============================================================
@@ -621,40 +631,6 @@ const createCodingQuestion = async (
 
     } catch (error) {
 
-        console.error(
-            "Create coding question error:",
-            error
-        );
-
-        return sendControllerError(
-            res,
-            error,
-            [
-                "Assessment not found"
-            ]
-        );
-    }
-};
-
-
-// ============================================================
-// ADMIN - CREATE CODING QUESTION
-// ============================================================
-
-const createCodingQuestion = async (req, res) => {
-    try {
-        const question =
-            await service.createCodingQuestion(
-                req.body
-            );
-
-        return res.status(201).json({
-            success: true,
-            message: "Coding question created successfully",
-            data: question
-        });
-
-    } catch (error) {
         console.error(
             "Create coding question error:",
             error
@@ -939,6 +915,27 @@ const deleteCodingTestCase = async (req, res) => {
 };
 
 
+const getTaGradingQueue = async (req, res) => {
+    try {
+        const submissions = await service.getTaGradingQueue();
+        return res.status(200).json({ success: true, data: submissions });
+    } catch (error) {
+        return sendControllerError(res, error);
+    }
+};
+
+const gradeSubmission = async (req, res) => {
+    try {
+        const submission = await service.gradeSubmission(req.params.submissionId, {
+            ...req.body,
+            gradedBy: req.user?.email || req.user?.id || "TA"
+        });
+        return res.status(200).json({ success: true, message: "Submission graded successfully", data: submission });
+    } catch (error) {
+        return sendControllerError(res, error, ["Assessment submission not found"]);
+    }
+};
+
 // ============================================================
 // EXPORTS
 // ============================================================
@@ -969,5 +966,7 @@ module.exports = {
     createCodingTestCase,
     getCodingTestCases,
     updateCodingTestCase,
-    deleteCodingTestCase
+    deleteCodingTestCase,
+    getTaGradingQueue,
+    gradeSubmission
 };

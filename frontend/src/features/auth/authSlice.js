@@ -42,7 +42,12 @@ export const registerUser = createAsyncThunk(
       if (tokenVal) localStorage.setItem("token", tokenVal);
       return { token: tokenVal, user: userVal };
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || err.message || "Registration failed");
+      return rejectWithValue(
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        "Registration failed"
+      );
     }
   }
 );

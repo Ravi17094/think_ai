@@ -9,6 +9,7 @@ import ModuleManager from '../pages/instructor_portal/ModuleManager';
 import InstructorVideoPreview from "../pages/instructor_portal/InstructorVideoPreview";
 import StudentSubmissionsHub from "../pages/instructor_portal/StudentSubmissionsHub";
 import StudentSubmissions from "../pages/instructor_portal/StudentSubmissions";
+import InstructorCertificates from "../pages/instructor_portal/InstructorCertificates";
 
 function InstructorRoutes() {
   return (
@@ -20,10 +21,12 @@ function InstructorRoutes() {
         <Route path="dashboard" element={<InstructorDashboard />} />
         <Route path="modules" element={<ModuleManager />} />
         <Route path="assignments" element={<AssessmentManager />} />
+        <Route path="assignments/create" element={<AssessmentManager />} />
         
         {/* Student Submissions Hub & Individual Report Page */}
         <Route path="student-submissions" element={<StudentSubmissionsHub />} />
         <Route path="courses/:courseId/students/:enrollmentId/submissions" element={<StudentSubmissions />} />
+        <Route path="certificates" element={<InstructorCertificates />} />
         
         <Route path="courses/:courseId/videos/:lessonId" element={<InstructorVideoPreview />} />
       </Route>

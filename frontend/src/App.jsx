@@ -18,6 +18,7 @@ import useSessionTimeout from "./hooks/useSessionTimeout";
 
 import ForumModuleRoutes from "./routes/ForumModuleRoutes";
 import LiveClassStudio from "./pages/liveStudio/LiveClassStudio";
+import TADashboard from "./pages/ta/TADashboard";
 
 function RolePlaceholder({ label }) {
   return (
@@ -44,110 +45,6 @@ function App() {
 
   return (
     <ThemeProvider>
-    <Routes>
-
-      {/* =========================
-          PUBLIC ROUTES
-      ========================= */}
-
-      <Route
-        path="/"
-        element={<LandingPage />}
-      />
-
-      <Route
-        path="/home"
-        element={<LandingPage />}
-      />
-
-      <Route
-        path="/login"
-        element={<LoginPage />}
-      />
-
-      <Route
-        path="/register"
-        element={<RegisterPage />}
-      />
-
-      {/* =========================
-          FORUM MODULE (self-contained — mock auth, no other-module deps)
-      ========================= */}
-
-      <Route
-        path="/forum/*"
-        element={<ForumModuleRoutes />}
-      />
-
-      <Route
-        path="/org-login"
-        element={
-          <RolePlaceholder label="Organization Login" />
-        }
-      />
-
-      {/* =========================
-          ADMIN
-      ========================= */}
-
-      <Route
-        path="/admin/*"
-        element={
-          <ProtectedRoute allowedRoles={["Admin"]}>
-            <AdminRoutes />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* =========================
-          LEARNER
-      ========================= */}
-
-      <Route
-        path="/learner/*"
-        element={
-          <ProtectedRoute allowedRoles={["Learner", "Admin"]}>
-            <LearnerRoutes />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* =========================
-          INSTRUCTOR
-      ========================= */}
-
-      <Route
-        path="/instructor/*"
-        element={
-          <ProtectedRoute allowedRoles={["Instructor"]}>
-            <RolePlaceholder label="Instructor" />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* =========================
-          TA
-      ========================= */}
-
-      <Route
-        path="/ta/*"
-        element={
-          <ProtectedRoute allowedRoles={["TA"]}>
-            <RolePlaceholder label="TA" />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* =========================
-          404
-      ========================= */}
-
-      <Route
-        path="*"
-        element={<Navigate to="/login" replace />}
-      />
-
-    </Routes>
       <Routes>
 
         {/* =========================
@@ -240,8 +137,8 @@ function App() {
         <Route
           path="/ta/*"
           element={
-            <ProtectedRoute allowedRoles={["TA", "Admin"]}>
-              <RolePlaceholder label="TA" />
+          <ProtectedRoute allowedRoles={["TA", "Admin"]}>
+              <TADashboard />
             </ProtectedRoute>
           }
         />
