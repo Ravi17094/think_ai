@@ -44,6 +44,19 @@ function upsertSession(data) {
     });
 }
 
+/** Update the lifecycle state while keeping the full session API response. */
+async function updateSessionStatus(sessionId, status, scheduledAt) {
+    await prisma.liveSession.update({
+        where: { id: sessionId },
+        data: {
+            status,
+            ...(status === "live" ? { startedAt: new Date() } : {}),
+            ...(scheduledAt !== undefined ? { scheduledAt } : {})
+        }
+    });
+    return findSessionWithRelations(sessionId);
+}
+
 function getAttendee(sessionId, userId) {
     return prisma.liveAttendee.findUnique({
         where: { sessionId_userId: { sessionId, userId } }
@@ -235,6 +248,7 @@ function leaveBreakoutRoom(roomId, userId) {
 module.exports = {
     getSession,
     upsertSession,
+    updateSessionStatus,
     getAttendee,
     upsertAttendee,
     updateAttendeePresence,

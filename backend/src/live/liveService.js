@@ -44,6 +44,7 @@ function serializeSession(session) {
         title: session.title,
         hostId: session.hostId,
         status: session.status,
+        scheduledAt: session.scheduledAt ? session.scheduledAt.toISOString() : null,
         startedAt: session.startedAt ? session.startedAt.toISOString() : null,
         attendees: (session.attendees || []).map((attendee) => ({
             userId: attendee.userId,
@@ -121,6 +122,38 @@ function joinSession(sessionId, user) {
         .then(() => repository.upsertAttendee(id, { userId, userName, online: true }))
         .then(() => repository.getSession(id))
         .then(serializeSession);
+}
+
+async function updateSessionStatus(sessionId, status, scheduledAt) {
+    const id = assertStringId(sessionId, "Session id is required");
+    const nextStatus = String(status || "").trim().toLowerCase();
+    if (!["scheduled", "live", "ended"].includes(nextStatus)) {
+        const error = new Error("Session status must be scheduled, live, or ended");
+        error.code = "VALIDATION";
+        throw error;
+    }
+
+    let parsedSchedule;
+    if (scheduledAt !== undefined && scheduledAt !== null && scheduledAt !== "") {
+        if (!/^\d{4}-\d{2}-\d{2}T/.test(String(scheduledAt))) {
+            const error = new Error("Use a four-digit year in the session date and time");
+            error.code = "VALIDATION";
+            throw error;
+        }
+        parsedSchedule = new Date(scheduledAt);
+        if (Number.isNaN(parsedSchedule.getTime())) {
+            const error = new Error("Choose a valid session date and time");
+            error.code = "VALIDATION";
+            throw error;
+        }
+    } else if (nextStatus === "scheduled") {
+        const error = new Error("Choose a session date and time before scheduling");
+        error.code = "VALIDATION";
+        throw error;
+    }
+
+    await ensureSession(id);
+    return serializeSession(await repository.updateSessionStatus(id, nextStatus, parsedSchedule));
 }
 
 function getMessages(sessionId) {
@@ -255,6 +288,7 @@ module.exports = {
     getSessionRecord,
     ensureSession,
     joinSession,
+    updateSessionStatus,
     getMessages,
     sendMessage,
     deleteMessage,

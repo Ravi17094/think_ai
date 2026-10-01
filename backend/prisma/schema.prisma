@@ -509,6 +509,7 @@ model LiveSession {
   title     String
   hostId    String
   status    String   @default("live")
+  scheduledAt DateTime?
   startedAt DateTime @default(now())
 
   attendees LiveAttendee[]

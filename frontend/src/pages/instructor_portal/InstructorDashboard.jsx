@@ -1,148 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../../features/auth/authSlice';
 import apiClient from '../../services/apiClient';
+import SessionPrepChecklist from '../../components/instructor/SessionPrepChecklist';
 
-function StatCard({ title, count, description, color }) {
-  return (
-    <div className="bg-white dark:bg-[#1a1e2b] border border-slate-200 dark:border-[#262b38] p-6 rounded-3xl shadow-xl space-y-2">
-      <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">{title}</span>
-      <h3 className={`text-3xl font-black ${color}`}>{count}</h3>
-      <p className="text-xs text-slate-500 dark:text-[#94a3b8]">{description}</p>
-    </div>
-  );
+function StatCard({ title, count, description }) {
+  return <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"><p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{title}</p><p className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">{count}</p><p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{description}</p></article>;
 }
 
 export default function InstructorDashboard() {
   const navigate = useNavigate();
-  const user = useSelector(selectUser);
   const [report, setReport] = useState(null);
 
   useEffect(() => {
-    apiClient.get('/attendance/ta/report')
-      .then((response) => setReport(response.data?.data || null))
-      .catch(() => setReport(null));
+    apiClient.get('/attendance/ta/report').then((response) => setReport(response.data?.data || null)).catch(() => setReport(null));
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 bg-slate-50 dark:bg-[#151821] text-slate-900 dark:text-[#f1f3f9] min-h-screen transition-colors duration-300">
+    <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
+      <div className="mb-7"><p className="text-sm font-medium text-blue-600">Dashboard</p><h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Instructor Workspace</h1><p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Manage modules, lessons, assessments, live classes, and learner progress.</p></div>
+      <section className="grid gap-4 sm:grid-cols-3"><StatCard title="Active modules" count={report?.coursework?.activeModules ?? '—'} description="Modules in the database" /><StatCard title="Module assignments" count={report?.coursework?.activeAssessments ?? '—'} description="Active assessments in the database" /><StatCard title="Pending submissions" count={report?.grading?.pending ?? '—'} description="Submitted learner assessments" /></section>
 
-      {/* Hero Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-[#262b38] bg-white dark:bg-[#1a1e2b] p-6 md:p-8 backdrop-blur-2xl shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-        <div className="absolute top-0 right-0 -mt-12 -mr-12 w-64 h-64 rounded-full bg-purple-600/10 blur-3xl pointer-events-none" />
-        
-        <div className="space-y-2 relative z-10">
-          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30">
-            Instructor Control Hub
-          </span>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white mt-1">
-            Welcome back, <span className="bg-gradient-to-r from-purple-400 via-indigo-300 to-cyan-400 bg-clip-text text-transparent">{user?.name || 'Instructor'}</span>
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-[#94a3b8] max-w-xl">
-            Manage your curriculum modules, configure lesson topics, build module assignments, and track automated certificate completions.
-          </p>
-        </div>
+      <section className="mt-7"><SessionPrepChecklist /></section>
 
-        <div className="flex items-center gap-3 relative z-10">
-          <button
-            onClick={() => navigate('/instructor/modules')}
-            className="px-6 py-3 text-sm font-bold bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white rounded-2xl shadow-lg shadow-purple-500/25 transition-all cursor-pointer"
-          >
-            + Manage Modules & Lessons
-          </button>
-        </div>
-      </div>
+      <section className="mt-7 grid gap-5 lg:grid-cols-2">
+        <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"><div className="flex items-start justify-between gap-4"><div><h2 className="text-lg font-semibold text-slate-900 dark:text-white">Modules & lessons</h2><p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">Create course modules and manage nested lessons, topics, and videos.</p></div><span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300">Content</span></div><button type="button" onClick={() => navigate('/instructor/modules')} className="mt-5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Manage Modules</button></article>
+        <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"><div className="flex items-start justify-between gap-4"><div><h2 className="text-lg font-semibold text-slate-900 dark:text-white">Module assignments</h2><p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">Create MCQ and coding assessments with answer keys and test cases.</p></div><span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">Assessments</span></div><button type="button" onClick={() => navigate('/instructor/assignments/create')} className="mt-5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Create Assignment</button></article>
+      </section>
 
-      {/* Statistics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <StatCard 
-          title="Active Modules" 
-          count={report?.coursework?.activeModules ?? '—'}
-          description="Modules in the database"
-          color="text-purple-600 dark:text-purple-400" 
-        />
-        <StatCard 
-          title="Module Assignments" 
-          count={report?.coursework?.activeAssessments ?? '—'}
-          description="Active assessments in the database"
-          color="text-indigo-600 dark:text-indigo-400" 
-        />
-        <StatCard 
-          title="Pending Submissions" 
-          count={report?.grading?.pending ?? '—'}
-          description="Submitted assessments awaiting grading"
-          color="text-emerald-500" 
-        />
-      </div>
-
-      {/* Quick Action Navigation Panels */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        {/* Panel 1: Modules & Lessons Management */}
-        <div className="bg-white dark:bg-[#1a1e2b] border border-slate-200 dark:border-[#262b38] p-6 rounded-3xl shadow-xl space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold">Modules & Topics (Lessons)</h3>
-            <button 
-              onClick={() => navigate('/instructor/modules')}
-              className="text-xs font-bold text-purple-600 dark:text-purple-400 hover:underline cursor-pointer"
-            >
-              Open Modules →
-            </button>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-[#94a3b8]">Create course modules and manage multiple nested lesson topics and videos.</p>
-          <div className="pt-2">
-            <button
-              onClick={() => navigate('/instructor/modules')}
-              className="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-[#222736] hover:bg-slate-200 dark:hover:bg-[#2b3244] text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border border-slate-200 dark:border-[#3e4658]"
-            >
-              Configure Module Lessons
-            </button>
-          </div>
-        </div>
-
-        {/* Panel 2: Assignments & Grading */}
-        <div className="bg-white dark:bg-[#1a1e2b] border border-slate-200 dark:border-[#262b38] p-6 rounded-3xl shadow-xl space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold">Module Assignments</h3>
-            <span className="px-2.5 py-1 text-[10px] font-bold rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20">
-              Active Quizzes
-            </span>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-[#94a3b8]">Create module assessments, set correct answer keys, and manage student submissions.</p>
-          <div className="pt-2">
-            <button
-              onClick={() => navigate('/instructor/assignments/create')}
-              className="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-[#222736] hover:bg-slate-200 dark:hover:bg-[#2b3244] text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border border-slate-200 dark:border-[#3e4658]"
-            >
-              + Create New Assignment
-            </button>
-          </div>
-        </div>
-
-      </div>
-
-      <div className="bg-white dark:bg-[#1a1e2b] border border-slate-200 dark:border-[#262b38] p-6 rounded-3xl shadow-xl space-y-4">
-        <div>
-          <h3 className="text-lg font-bold">Instructor tools & reports</h3>
-          <p className="mt-1 text-xs text-slate-500 dark:text-[#94a3b8]">Review learner submissions and monitor certificate progress.</p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <button
-            onClick={() => navigate('/instructor/student-submissions')}
-            className="rounded-xl bg-slate-100 dark:bg-[#222736] hover:bg-slate-200 dark:hover:bg-[#2b3244] px-4 py-3 text-left text-sm font-bold border border-slate-200 dark:border-[#3e4658]"
-          >
-            Student Submissions →
-          </button>
-          <button
-            onClick={() => navigate('/instructor/certificates')}
-            className="rounded-xl bg-slate-100 dark:bg-[#222736] hover:bg-slate-200 dark:hover:bg-[#2b3244] px-4 py-3 text-left text-sm font-bold border border-slate-200 dark:border-[#3e4658]"
-          >
-            Certificates Report →
-          </button>
-        </div>
-      </div>
-
+      <section className="mt-7 grid gap-5 lg:grid-cols-3">
+        <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"><h2 className="text-lg font-semibold text-slate-900 dark:text-white">Student submissions</h2><p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">View submitted assessments and automatic results.</p><button type="button" onClick={() => navigate('/instructor/student-submissions')} className="mt-5 text-sm font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-300">View submissions →</button></article>
+        <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"><h2 className="text-lg font-semibold text-slate-900 dark:text-white">Certificates report</h2><p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">Monitor learner certificate completion and records.</p><button type="button" onClick={() => navigate('/instructor/certificates')} className="mt-5 text-sm font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-300">View certificates →</button></article>
+        <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"><h2 className="text-lg font-semibold text-slate-900 dark:text-white">Live class and breakouts</h2><p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">Manage live classes, polls, chat, and breakout rooms.</p><button type="button" onClick={() => navigate('/forum/studio')} className="mt-5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Open Live Studio</button></article>
+      </section>
     </div>
   );
 }

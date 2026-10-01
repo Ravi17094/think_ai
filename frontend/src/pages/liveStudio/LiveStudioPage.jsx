@@ -15,14 +15,16 @@ import {
   createStudioPoll,
   fetchStudioSession,
   joinStudioSession,
+  updateStudioSessionStatus,
   voteStudioPoll,
 } from "../../services/studioApi";
-import { getCurrentUserId } from "../../services/forumHttpClient";
+import { getCurrentUserId, getCurrentUserRole } from "../../services/forumHttpClient";
 import { useStudioSocket } from "../../hooks/useWebSocket";
 import { STUDIO_EVENTS } from "../../services/websocket";
 
 const DEFAULT_SESSION_ID = "s1";
-const MODERATOR_ROLES = ["Moderator", "Admin"];
+const LIVE_SUPPORT_ROLES = ["INSTRUCTOR", "ADMIN", "TA"];
+const LIVE_SESSION_MANAGER_ROLES = ["INSTRUCTOR", "ADMIN"];
 
 const ACTIVE_PANELS = {
   CAMERA: "camera",
@@ -32,6 +34,21 @@ const ACTIVE_PANELS = {
   BREAKOUT: "breakout",
 };
 
+const SESSION_STATUS = {
+  scheduled: { label: "SCHEDULED", className: "session-status--scheduled" },
+  live: { label: "LIVE", className: "session-status--live" },
+  ended: { label: "ENDED", className: "session-status--ended" },
+};
+const DATE_TIME_LOCAL_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+
+function toDateTimeLocal(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const part = (number) => String(number).padStart(2, "0");
+  return `${date.getFullYear()}-${part(date.getMonth() + 1)}-${part(date.getDate())}T${part(date.getHours())}:${part(date.getMinutes())}`;
+}
+
 /** Live Class Studio (Phase 6/7). */
 export default function LiveStudioPage() {
   const sessionId = DEFAULT_SESSION_ID;
@@ -40,6 +57,8 @@ export default function LiveStudioPage() {
   const [polls, setPolls] = useState([]);
   const [error, setError] = useState(null);
   const [toasts, setToasts] = useState([]);
+  const [isUpdatingSession, setIsUpdatingSession] = useState(false);
+  const [scheduledFor, setScheduledFor] = useState("");
 
   const [muted, setMuted] = useState(true);
   const [cameraOn, setCameraOn] = useState(false);
@@ -51,6 +70,7 @@ export default function LiveStudioPage() {
     () => ({ id: getCurrentUserId(), name: "You" }),
     []
   );
+  const currentRole = useMemo(() => String(getCurrentUserRole()).toUpperCase(), []);
 
   const { mode, subscribe, emit } = useStudioSocket({ sessionId, user });
 
@@ -60,6 +80,7 @@ export default function LiveStudioPage() {
       .then(([fetched]) => {
         if (cancelled) return;
         setSession(fetched);
+        setScheduledFor(toDateTimeLocal(fetched.scheduledAt));
         setMessages(fetched.messages || []);
         setPolls(fetched.polls || []);
       })
@@ -188,6 +209,38 @@ export default function LiveStudioPage() {
     }
   };
 
+  const handleSessionStatus = async (status) => {
+    if (status === "scheduled" && !DATE_TIME_LOCAL_PATTERN.test(scheduledFor)) {
+      pushToast({
+        id: `schedule-error-${Date.now()}`,
+        message: "Use a valid four-digit year, for example 2026.",
+      });
+      return;
+    }
+    setIsUpdatingSession(true);
+    try {
+      const scheduleValue = status === "scheduled" ? new Date(scheduledFor).toISOString() : undefined;
+      const updated = await updateStudioSessionStatus(sessionId, status, scheduleValue);
+      setSession(updated);
+      setScheduledFor(toDateTimeLocal(updated.scheduledAt));
+      pushToast({
+        id: `session-${Date.now()}`,
+        message: status === "live"
+          ? "Live class started."
+          : status === "ended"
+            ? "Live class ended."
+            : "Session prepared and scheduled.",
+      });
+    } catch (err) {
+      pushToast({
+        id: `session-error-${Date.now()}`,
+        message: err.message || "Could not update the session status.",
+      });
+    } finally {
+      setIsUpdatingSession(false);
+    }
+  };
+
   const handleTogglePanel = useCallback((panel) => {
     setActivePanel((previous) => (previous === panel ? null : panel));
   }, []);
@@ -203,9 +256,14 @@ export default function LiveStudioPage() {
     setActivePanel(null);
   }, [patchSelf]);
 
-  const canModerate = MODERATOR_ROLES.includes("Moderator"); // demo identity is moderator-capable host
+  const canModerate = LIVE_SUPPORT_ROLES.includes(currentRole);
+  const canManageSession = LIVE_SESSION_MANAGER_ROLES.includes(currentRole);
   const attendees = session?.attendees || [];
   const onlineCount = attendees.filter((a) => a.online).length;
+  const sessionStatus = SESSION_STATUS[String(session?.status || "scheduled").toLowerCase()] || SESSION_STATUS.scheduled;
+  const formattedSchedule = session?.scheduledAt
+    ? new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(session.scheduledAt))
+    : null;
 
   if (error) {
     return (
@@ -223,11 +281,60 @@ export default function LiveStudioPage() {
       <div className="studio-container">
         <header className="studio-header">
           <h1>{session?.title || "Live Class Studio"}</h1>
-          <span className="live-pill">● LIVE</span>
+          <span className={`session-status ${sessionStatus.className}`} aria-label={`Session status: ${sessionStatus.label}`}>
+            <span aria-hidden="true">●</span> {sessionStatus.label}
+          </span>
           <span className="mode-pill">socket: {mode}</span>
+          {formattedSchedule && (
+            <span className="studio-schedule-time">Starts: {formattedSchedule}</span>
+          )}
+          {canManageSession && sessionStatus.label === "SCHEDULED" && (
+            <button
+              type="button"
+              className="btn btn--small studio-session-action"
+              disabled={isUpdatingSession || !session?.scheduledAt}
+              title={session?.scheduledAt ? "Start the scheduled class" : "Choose a date and time first"}
+              onClick={() => handleSessionStatus("live")}
+            >
+              {isUpdatingSession ? "Starting…" : "Start live class"}
+            </button>
+          )}
+          {canManageSession && sessionStatus.label === "LIVE" && (
+            <button
+              type="button"
+              className="btn btn--small studio-session-action studio-session-action--end"
+              disabled={isUpdatingSession}
+              onClick={() => handleSessionStatus("ended")}
+            >
+              {isUpdatingSession ? "Ending…" : "End session"}
+            </button>
+          )}
           <span style={{ flex: 1 }} />
           <Link to="/forum" className="btn btn--ghost btn--small">← Forum</Link>
         </header>
+
+        {canManageSession && sessionStatus.label !== "LIVE" && (
+          <section className="studio-schedule-form" aria-label="Schedule live class">
+            <label htmlFor="studio-scheduled-for">Class date and time</label>
+            <input
+              id="studio-scheduled-for"
+              type="datetime-local"
+              value={scheduledFor}
+              min="2026-01-01T00:00"
+              max="2099-12-31T23:59"
+              onChange={(event) => setScheduledFor(event.target.value)}
+            />
+            <button
+              type="button"
+              className="btn btn--small studio-session-action"
+              disabled={isUpdatingSession || !scheduledFor}
+              onClick={() => handleSessionStatus("scheduled")}
+            >
+              {isUpdatingSession ? "Saving…" : "Save schedule"}
+            </button>
+            <span>Choose a time, save it, then start the class.</span>
+          </section>
+        )}
 
         {/* Main live class workspace stays compact. */}
         <div className="studio-grid">

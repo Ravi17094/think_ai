@@ -1426,6 +1426,11 @@ const submitCode = async ({
 
             percentage,
 
+            status: updatedSubmission.status,
+
+            autoGraded:
+                updatedSubmission.status === "GRADED",
+
             testCases: {
 
                 total:

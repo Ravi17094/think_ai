@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const { roles } = require("../data/roles");
 const requireRole = require("../middleware/requireRole");
+const { ROLE_HIERARCHY } = require("../config/roleHierarchy");
+const { logPermissionChange } = require("../services/auditLogService");
 
 /**
  * GET /api/roles/matrix
@@ -58,6 +60,7 @@ router.get("/matrix", requireRole(["Admin"]), (req, res) => {
     roles,
     permissions,
     grants,
+    inheritance: ROLE_HIERARCHY,
   });
 });
 /**
@@ -77,6 +80,13 @@ router.patch("/:role/permissions/:permission", requireRole(["Admin"]), (req, res
   granted ? current.add(permission) : current.delete(permission);
   grants[role] = Array.from(current);
 
-  res.status(200).json({ success: true, role, permission, granted });
+  const auditEntry = logPermissionChange({
+    actorRole: req.user.role,
+    role,
+    permission,
+    granted: Boolean(granted),
+  });
+
+  res.status(200).json({ success: true, role, permission, granted, auditEntry });
 });
 module.exports = router;

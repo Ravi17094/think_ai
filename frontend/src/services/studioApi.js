@@ -1,4 +1,4 @@
-import { forumGet, forumPost, forumDelete } from "./forumHttpClient";
+import { forumGet, forumPost, forumPatch, forumDelete } from "./forumHttpClient";
 
 /**
  * Live Class Studio API client.
@@ -15,6 +15,12 @@ export function fetchStudioSession(sessionId) {
 
 export function joinStudioSession(sessionId) {
   return forumPost(`/studio/sessions/${sessionId}/join`).then((payload) => payload.data);
+}
+
+export function updateStudioSessionStatus(sessionId, status, scheduledAt) {
+  return forumPatch(`/studio/sessions/${sessionId}/status`, { status, scheduledAt }).then(
+    (payload) => payload.data
+  );
 }
 
 export function fetchStudioMessages(sessionId) {

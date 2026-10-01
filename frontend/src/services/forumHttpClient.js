@@ -10,6 +10,7 @@ export {
   DEFAULT_USER_ID,
   ForumApiError,
   getCurrentUserId,
+  getCurrentUserRole,
   setCurrentUserId,
   forumGet,
   forumPost,

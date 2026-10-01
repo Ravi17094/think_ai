@@ -693,6 +693,12 @@ const submitAssessment = async (assessmentId, data) => {
         ).toFixed(2)
     );
 
+    // Known-answer MCQ tests can be graded immediately after submission.
+    // Coding questions remain in the grading flow until their test cases run.
+    const isAutoGradable = assessment.questions.every(
+        (question) => question.questionType === "MCQ"
+    );
+
     const submission = await prisma.$transaction(async (tx) => {
         return await tx.assessmentSubmission.create({
             data: {
@@ -701,7 +707,12 @@ const submitAssessment = async (assessmentId, data) => {
                 score,
                 totalMarks: assessment.totalMarks,
                 percentage,
-                status: "SUBMITTED",
+                status: isAutoGradable ? "GRADED" : "SUBMITTED",
+                feedback: isAutoGradable
+                    ? "Automatically graded from the assessment answer key."
+                    : null,
+                gradedBy: isAutoGradable ? "AUTO_GRADER" : null,
+                gradedAt: isAutoGradable ? new Date() : null,
                 answers: {
                     create: answers
                 }
@@ -1452,23 +1463,86 @@ const recalculateCodingQuestionScore = async (submissionId, questionId) => {
         },
         select: {
             questionId: true,
+            code: true,
             marksObtained: true
         }
     });
 
-    const score = answers.reduce((total, answer) => {
-        if (Number(answer.questionId) === parsedQuestionId) {
-            return total;
-        }
-        return total + Number(answer.marksObtained || 0);
-    }, marksObtained);
+    const score = answers.reduce(
+        (total, answer) => total + Number(answer.marksObtained || 0),
+        0
+    );
 
     const percentage =
         submission.totalMarks > 0
             ? Number(((score / submission.totalMarks) * 100).toFixed(2))
             : 0;
 
-    const status = allCompleted ? "COMPLETED" : "IN_PROGRESS";
+    // Do not finalise a multi-question coding assessment after only one
+    // question has finished. A final automatic grade is issued only when
+    // every saved coding answer has completed every configured test case.
+    const codingQuestionIds = [
+        ...new Set(
+            answers
+                .filter((answer) => typeof answer.code === "string")
+                .map((answer) => Number(answer.questionId))
+        )
+    ];
+
+    const expectedTestCases = await prisma.codingTestCase.findMany({
+        where: {
+            questionId: {
+                in: codingQuestionIds
+            }
+        },
+        select: {
+            id: true,
+            questionId: true
+        }
+    });
+
+    const allExecutionRecords = await prisma.codingTestCaseExecution.findMany({
+        where: {
+            submissionId: parsedSubmissionId,
+            questionId: {
+                in: codingQuestionIds
+            }
+        },
+        select: {
+            id: true,
+            questionId: true,
+            testCaseId: true,
+            judge0Status: true
+        },
+        orderBy: {
+            id: "desc"
+        }
+    });
+
+    const latestExecutionByTestCase = new Map();
+
+    for (const execution of allExecutionRecords) {
+        const key = `${execution.questionId}-${execution.testCaseId}`;
+
+        if (!latestExecutionByTestCase.has(key)) {
+            latestExecutionByTestCase.set(key, execution);
+        }
+    }
+
+    const allCodingTestCasesCompleted =
+        codingQuestionIds.length > 0 &&
+        expectedTestCases.length > 0 &&
+        expectedTestCases.every((testCase) => {
+            const execution = latestExecutionByTestCase.get(
+                `${testCase.questionId}-${testCase.id}`
+            );
+
+            return execution && execution.judge0Status !== null;
+        });
+
+    const status = allCodingTestCasesCompleted
+        ? "GRADED"
+        : "IN_PROGRESS";
 
     const updatedSubmission = await prisma.assessmentSubmission.update({
         where: {
@@ -1477,7 +1551,12 @@ const recalculateCodingQuestionScore = async (submissionId, questionId) => {
         data: {
             score,
             percentage,
-            status
+            status,
+            feedback: allCodingTestCasesCompleted
+                ? "Automatically graded after all coding test cases completed."
+                : null,
+            gradedBy: allCodingTestCasesCompleted ? "AUTO_GRADER" : null,
+            gradedAt: allCodingTestCasesCompleted ? new Date() : null
         }
     });
 
@@ -1489,7 +1568,7 @@ const recalculateCodingQuestionScore = async (submissionId, questionId) => {
         totalMarks: updatedSubmission.totalMarks,
         percentage: updatedSubmission.percentage,
         status: updatedSubmission.status,
-        allCompleted,
+        allCompleted: allCodingTestCasesCompleted,
         allPassed
     };
 };

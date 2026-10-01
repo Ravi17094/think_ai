@@ -111,11 +111,17 @@ export default function StudentAssessmentTaker() {
         score: score,
         totalMarks: totalMarks,
         percentage: safePercentage,
-        status: submissionData.status || "SUBMITTED"
+        status: submissionData.status || "SUBMITTED",
+        autoGraded: submissionData.gradedBy === "AUTO_GRADER"
       });
 
       localStorage.removeItem(storageKey);
-      toast.success("Assessment submitted successfully!", { theme: "dark" });
+      toast.success(
+        submissionData.gradedBy === "AUTO_GRADER"
+          ? "Assessment submitted and auto graded successfully!"
+          : "Assessment submitted successfully!",
+        { theme: "dark" }
+      );
     } catch (err) {
       console.error("Failed to submit assessment", err);
       toast.error(err.response?.data?.message || "Failed to submit assessment", { theme: "dark" });
@@ -191,6 +197,13 @@ export default function StudentAssessmentTaker() {
                 Attempt #{attemptNumber}
               </span>
             </div>
+            {result.autoGraded && (
+              <div className="absolute top-6 right-6">
+                <span className="text-xs font-mono px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20">
+                  Auto graded from answer key
+                </span>
+              </div>
+            )}
 
             <div className="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center text-2xl font-bold mt-4">
               <Award size={32} />

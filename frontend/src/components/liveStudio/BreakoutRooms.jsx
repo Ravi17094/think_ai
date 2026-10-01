@@ -5,6 +5,7 @@ import {
   joinBreakoutRoom,
   leaveBreakoutRoom,
 } from "../../services/studioApi";
+import breakoutDefaults from "../../config/breakout-defaults";
 
 /**
  * Breakout rooms — contextual panel backed by the DB `/api/studio/breakouts`
@@ -37,6 +38,10 @@ export default function BreakoutRooms({ sessionId, isHost, currentUserId, onClos
   const handleCreate = async () => {
     const name = roomName.trim();
     if (!name) return;
+    if (rooms.length >= breakoutDefaults.maxRooms) {
+      setError(`A session can have up to ${breakoutDefaults.maxRooms} breakout rooms.`);
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -134,6 +139,9 @@ export default function BreakoutRooms({ sessionId, isHost, currentUserId, onClos
           ? "Loading rooms…"
           : `${rooms.length} room${rooms.length === 1 ? "" : "s"} currently active.`}
       </p>
+      <p className="loading-note">
+        Default: up to {breakoutDefaults.maxRooms} rooms · {breakoutDefaults.autoAssignStrategy} assignment · {breakoutDefaults.durationMinutes} minutes
+      </p>
 
       {loading ? (
         <p className="loading-note">Loading…</p>
@@ -153,8 +161,8 @@ export default function BreakoutRooms({ sessionId, isHost, currentUserId, onClos
                 <div className="breakout-room__row">
                   <div className="breakout-room__info">
                     <span className="breakout-room__name">{room.name}</span>
-                    <span className="breakout-room__meta">
-                      {memberCount} member{memberCount === 1 ? "" : "s"} · {room.status}
+                    <span className="breakout-room__meta" aria-label={`${memberCount} participant${memberCount === 1 ? "" : "s"}, ${room.status}`}>
+                      <strong className="breakout-room__count">{memberCount}</strong> participant{memberCount === 1 ? "" : "s"} · {room.status}
                     </span>
                   </div>
                   {joined ? (

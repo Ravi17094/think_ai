@@ -32,6 +32,26 @@ export function getCurrentUserId() {
   }
 }
 
+/**
+ * The Studio uses the signed-in application role for UI permissions. The
+ * localStorage value is written at login; decoding the token is a fallback
+ * for existing sessions created before that change.
+ */
+export function getCurrentUserRole() {
+  try {
+    const savedRole = localStorage.getItem("role");
+    if (savedRole) return savedRole;
+    const token = localStorage.getItem("token");
+    if (!token) return "";
+    const payload = token.split(".")[1];
+    if (!payload) return "";
+    const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+    return JSON.parse(json).role || "";
+  } catch {
+    return "";
+  }
+}
+
 export function setCurrentUserId(userId) {
   try {
     localStorage.setItem(CURRENT_USER_KEY, userId);
@@ -62,14 +82,18 @@ async function request(path, { method = "GET", body, query } = {}) {
     if (qs) url += `?${qs}`;
   }
 
+  const token = localStorage.getItem("token");
+  const headers = {
+    "Content-Type": "application/json",
+    "x-user-id": getCurrentUserId(),
+  };
+  if (token) headers.Authorization = `Bearer ${token}`;
+
   let response;
   try {
     response = await fetch(url, {
       method,
-      headers: {
-        "Content-Type": "application/json",
-        "x-user-id": getCurrentUserId(),
-      },
+      headers,
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   } catch {

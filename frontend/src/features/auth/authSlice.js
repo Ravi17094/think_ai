@@ -21,6 +21,7 @@ export const loginUser = createAsyncThunk(
       const userVal = payload.user?.user || payload.user || payload; 
 
       if (tokenVal) localStorage.setItem("token", tokenVal);
+      if (userVal?.role) localStorage.setItem("role", String(userVal.role));
       return { token: tokenVal, user: userVal };
     } catch (err) {
       // ✅ Check both .message and .error to match backend response structures
@@ -40,6 +41,7 @@ export const registerUser = createAsyncThunk(
       const userVal = payload.user;
 
       if (tokenVal) localStorage.setItem("token", tokenVal);
+      if (userVal?.role) localStorage.setItem("role", String(userVal.role));
       return { token: tokenVal, user: userVal };
     } catch (err) {
       return rejectWithValue(
@@ -77,6 +79,7 @@ const authSlice = createSlice({
       state.token = null;
       state.isAuthenticated = false;
       localStorage.removeItem("token");
+      localStorage.removeItem("role");
     },
     clearAuthError(state) {
       state.error = null;
@@ -126,6 +129,7 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         localStorage.removeItem("token");
+        localStorage.removeItem("role");
       });
   },
 });

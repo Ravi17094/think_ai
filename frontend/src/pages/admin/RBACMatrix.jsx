@@ -9,6 +9,8 @@ import {
   selectRbacLoading,
   selectRbacToggling,
   selectRbacError,
+  selectRbacInheritance,
+  selectRbacLastUpdated,
 } from '../../features/rbac/rbacSlice';
 
 export default function RBACMatrix() {
@@ -19,6 +21,8 @@ export default function RBACMatrix() {
   const loading = useSelector(selectRbacLoading);
   const toggling = useSelector(selectRbacToggling);
   const error = useSelector(selectRbacError);
+  const inheritance = useSelector(selectRbacInheritance);
+  const lastUpdated = useSelector(selectRbacLastUpdated);
 
   useEffect(() => {
     dispatch(fetchMatrix());
@@ -39,8 +43,18 @@ export default function RBACMatrix() {
           RBAC Permission Matrix
         </h1>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Toggle grants or revokes a permission for a role directly.
+          Toggle direct grants or revocations. Route guards follow the role hierarchy shown below.
         </p>
+        {inheritance.length > 0 && (
+          <p className="mt-3 inline-flex rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-200">
+            Guard inheritance: {inheritance.join(' → ')}
+          </p>
+        )}
+        {lastUpdated && (
+          <p className="mt-3 text-sm font-medium text-emerald-700 dark:text-emerald-300" role="status">
+            Saved: {lastUpdated.permission} for {lastUpdated.role} is {lastUpdated.granted ? 'granted' : 'denied'}.
+          </p>
+        )}
       </div>
 
       <div className="bg-white dark:bg-[#2b2b2b] border border-gray-200 dark:border-[#3f3f3f] rounded-2xl shadow-lg overflow-hidden">
@@ -69,7 +83,8 @@ export default function RBACMatrix() {
                           checked={direct}
                           disabled={toggling}
                           onChange={() => handleToggle(role, perm, direct)}
-                          className={`w-4 h-4 rounded text-purple-600 focus:ring-purple-500 border-gray-300 dark:border-[#3f3f3f] dark:bg-[#212121] ${toggling ? 'cursor-wait opacity-50' : 'cursor-pointer'
+                          aria-label={`${direct ? 'Revoke' : 'Grant'} ${perm} for ${role}`}
+                          className={`h-5 w-5 rounded border-gray-300 text-purple-600 transition duration-200 ease-out focus:ring-purple-500 checked:scale-110 dark:border-[#3f3f3f] dark:bg-[#212121] ${toggling ? 'cursor-wait opacity-50' : 'cursor-pointer'
                             }`}
                         />
                       </td>

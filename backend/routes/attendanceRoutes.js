@@ -3,7 +3,12 @@ const prisma = require("../config/database");
 const requireRole = require("../middleware/requireRole");
 
 const router = express.Router();
-const allowedStatuses = ["PRESENT", "LATE", "ABSENT", "EXCUSED"];
+const allowedStatuses = ["PRESENT", "TARDY", "ABSENT", "EXCUSED"];
+
+function normalizeAttendanceStatus(status) {
+  // Existing local records may still contain the previous policy value, LATE.
+  return status === "LATE" ? "TARDY" : status;
+}
 
 function parseSessionDate(value) {
   const dateText = String(value || "").trim();
@@ -31,7 +36,7 @@ router.get("/ta/register", requireRole(["TA", "Instructor", "Admin"]), async (re
       studentName: enrollment.studentName,
       studentEmail: enrollment.studentEmail,
       courseTitle: enrollment.batch.course.title,
-      status: enrollment.attendanceRecords[0]?.status || "PRESENT",
+      status: normalizeAttendanceStatus(enrollment.attendanceRecords[0]?.status || "PRESENT"),
       notes: enrollment.attendanceRecords[0]?.notes || ""
     }));
     return res.status(200).json({ success: true, data });
@@ -49,7 +54,7 @@ router.put("/ta/record", requireRole(["TA", "Instructor", "Admin"]), async (req,
 
     if (!Number.isInteger(enrollmentId) || enrollmentId <= 0) throw new Error("A valid enrollmentId is required");
     if (!sessionTitle) throw new Error("sessionTitle is required");
-    if (!allowedStatuses.includes(status)) throw new Error("Status must be PRESENT, LATE, ABSENT, or EXCUSED");
+    if (!allowedStatuses.includes(status)) throw new Error("Status must be PRESENT, TARDY, ABSENT, or EXCUSED");
 
     const record = await prisma.attendanceRecord.upsert({
       where: { enrollmentId_sessionDate_sessionTitle: { enrollmentId, sessionDate, sessionTitle } },
@@ -87,8 +92,11 @@ router.get("/ta/report", requireRole(["TA", "Instructor", "Admin"]), async (req,
       prisma.assessment.count({ where: { status: "ACTIVE" } })
     ]);
 
-    const attendance = { PRESENT: 0, LATE: 0, ABSENT: 0, EXCUSED: 0 };
-    attendanceGroups.forEach((group) => { attendance[group.status] = group._count._all; });
+    const attendance = { PRESENT: 0, TARDY: 0, ABSENT: 0, EXCUSED: 0 };
+    attendanceGroups.forEach((group) => {
+      const normalizedStatus = normalizeAttendanceStatus(group.status);
+      attendance[normalizedStatus] = (attendance[normalizedStatus] || 0) + group._count._all;
+    });
 
     return res.status(200).json({
       success: true,

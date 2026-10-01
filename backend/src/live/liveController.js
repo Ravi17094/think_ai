@@ -19,6 +19,9 @@ function handleError(res, error, defaultMessage) {
     if (error && error.code === "VALIDATION") {
         return res.status(400).json({ success: false, message: error.message });
     }
+    if (error && error.code === "FORBIDDEN") {
+        return res.status(403).json({ success: false, message: error.message });
+    }
     console.error(defaultMessage, error);
     return res.status(500).json({ success: false, message: defaultMessage });
 }
@@ -35,6 +38,30 @@ function joinSession(req, res) {
         .joinSession(req.params.id, req.user)
         .then((session) => res.status(200).json({ success: true, data: session }))
         .catch((error) => handleError(res, error, "Failed to join session"));
+}
+
+function canManageSession(user) {
+    return ["INSTRUCTOR", "ADMIN"].includes(String(user && user.role || "").toUpperCase());
+}
+
+function updateSessionStatus(req, res) {
+    if (!canManageSession(req.user)) {
+        const error = new Error("Only an Instructor or Admin can schedule, start, or end a live class");
+        error.code = "FORBIDDEN";
+        return handleError(res, error, "Failed to update session status");
+    }
+    return service
+        .updateSessionStatus(
+            req.params.id,
+            req.body && req.body.status,
+            req.body && req.body.scheduledAt
+        )
+        .then((session) => {
+            const io = req.app.get("io");
+            if (io) io.of("/studio").to(req.params.id).emit("session:state", session);
+            return res.status(200).json({ success: true, data: session });
+        })
+        .catch((error) => handleError(res, error, "Failed to update session status"));
 }
 
 function getMessages(req, res) {
@@ -109,6 +136,7 @@ function leaveBreakoutRoom(req, res) {
 module.exports = {
     getSession,
     joinSession,
+    updateSessionStatus,
     getMessages,
     sendMessage,
     deleteMessage,

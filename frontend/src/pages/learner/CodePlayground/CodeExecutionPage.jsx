@@ -111,7 +111,10 @@ export default function CodeExecutionPage() {
     dispatch(submitSolution({ submissionId, questionId: question?.id, language, code }))
       .unwrap()
       .then((res) => {
-        toast.success(`Submitted! Score: ${res?.score ?? 0}/${res?.totalMarks ?? 10} (${res?.percentage ?? 0}%)`, { theme: "dark" });
+        const message = res?.autoGraded
+          ? `Auto graded! Score: ${res?.score ?? 0}/${res?.totalMarks ?? 10} (${res?.percentage ?? 0}%)`
+          : `Submitted! Score: ${res?.score ?? 0}/${res?.totalMarks ?? 10} (${res?.percentage ?? 0}%)`;
+        toast.success(message, { theme: "dark" });
       })
       .catch((err) => {
         toast.error(err || "Submission evaluation failed", { theme: "dark" });
@@ -310,6 +313,11 @@ export default function CodeExecutionPage() {
                   {submission.verdict === 'ACCEPTED' ? <CheckCircle size={16} className="text-emerald-600 dark:text-emerald-400" /> : <XCircle size={16} className="text-red-600 dark:text-red-400" />}
                   Verdict: {submission.verdict}
                 </div>
+                {submission.autoGraded && (
+                  <div className="inline-flex rounded-full border border-indigo-300 bg-indigo-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-indigo-700 dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-300">
+                    Auto graded after all test cases completed
+                  </div>
+                )}
                 <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 space-y-1 font-mono text-xs">
                   <p>Passed Test Cases: <span className="font-bold text-emerald-700 dark:text-emerald-400">{submission.testCases?.passed ?? 0}/{submission.testCases?.total ?? 0}</span></p>
                   <p>Score Awarded: <span className="font-bold text-emerald-700 dark:text-emerald-400">{submission.score ?? 0} / {submission.totalMarks ?? 10}</span></p>

@@ -8,6 +8,7 @@ const liveValidation = require("../live/liveValidation");
 // Sessions
 router.get("/sessions/:id", liveValidation.validateSessionId, liveController.getSession);
 router.post("/sessions/:id/join", liveValidation.validateSessionId, liveController.joinSession);
+router.patch("/sessions/:id/status", liveValidation.validateSessionId, liveController.updateSessionStatus);
 
 // Messages
 router.get("/sessions/:id/messages", liveValidation.validateSessionId, liveController.getMessages);

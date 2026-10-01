@@ -1,0 +1,9 @@
+{
+  "widgets": [
+    "pending-grading",
+    "upcoming-sessions",
+    "student-alerts",
+    "forum-flags"
+  ],
+  "version": 1
+}
