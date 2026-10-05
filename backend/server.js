@@ -141,8 +141,28 @@ app.use("/api", require("./src/routes"));
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, { cors: { origin: "*" } });
 app.set("io", io);
-initSockets(io);
+const socketState = initSockets(io);
 initLiveSocket(io);
+
+// Operational endpoint for checking the real-time layer during demos and load
+// tests. It exposes counts only, never user details or room membership.
+app.get("/ws/status", (req, res) => {
+    const rooms = Array.from(socketState.roomMembers.entries()).map(([name, members]) => ({
+        name,
+        memberCount: members.size,
+    }));
+
+    return res.status(200).json({
+        success: true,
+        data: {
+            status: "ready",
+            activeConnections: socketState.activeConnections.size,
+            activeRooms: rooms.length,
+            rooms,
+            checkedAt: new Date().toISOString(),
+        },
+    });
+});
 // ============================================================
 // 404 HANDLER
 // ============================================================

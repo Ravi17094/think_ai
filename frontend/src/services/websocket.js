@@ -140,6 +140,12 @@ export function createStudioSocket({ sessionId, user }) {
       transports: ["websocket", "polling"],
       reconnectionAttempts: 2,
       timeout: 2000,
+      auth: {
+        token: localStorage.getItem("token"),
+        demoRole: user?.role || localStorage.getItem("role") || "LEARNER",
+        demoUserId: user?.id || "demo-user",
+        demoName: user?.name || "Demo participant",
+      },
     });
 
     realSocket.on("connect", () => {

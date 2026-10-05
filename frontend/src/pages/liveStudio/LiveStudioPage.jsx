@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import "../../styles/liveStudio.css";
 
 import VideoPlaceholder from "../../components/liveStudio/VideoPlaceholder";
+import JitsiMeeting from "../../components/liveStudio/JitsiMeeting";
 import AttendeeList from "../../components/liveStudio/AttendeeList";
 import ChatPanel from "../../components/liveStudio/ChatPanel";
 import PollPanel from "../../components/liveStudio/PollPanel";
@@ -336,15 +337,24 @@ export default function LiveStudioPage() {
           </section>
         )}
 
+        {mode === "reconnecting" && (
+          <div className="studio-connection-banner" role="status">
+            Connection interrupted. Reconnecting to the live classroom…
+          </div>
+        )}
+
         {/* Main live class workspace stays compact. */}
         <div className="studio-grid">
           <div className="studio-main-col">
-            <VideoPlaceholder
-              title={session?.title || "Waiting for session…"}
-              isSharing={sharing}
-              attendeeCount={onlineCount}
-              onOpenCamera={() => handleOpenPanel(ACTIVE_PANELS.CAMERA)}
-            />
+            <JitsiMeeting sessionId={sessionId} title={session?.title} />
+            {!import.meta.env.VITE_JITSI_DOMAIN && (
+              <VideoPlaceholder
+                title={session?.title || "Waiting for session…"}
+                isSharing={sharing}
+                attendeeCount={onlineCount}
+                onOpenCamera={() => handleOpenPanel(ACTIVE_PANELS.CAMERA)}
+              />
+            )}
           </div>
 
           {/* Contextual side panels open only when activated. */}

@@ -110,6 +110,16 @@
   padding: 3px 10px;
 }
 
+.studio-connection-banner {
+  margin: 0.75rem 0;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(245, 158, 11, 0.55);
+  border-radius: 0.65rem;
+  color: #fde68a;
+  background: rgba(245, 158, 11, 0.1);
+  font-size: 0.86rem;
+}
+
 /* ---------- layout ---------- */
 
 .studio-grid {
@@ -173,6 +183,21 @@
 
 .video-placeholder--sharing {
   border-color: var(--forum-accent, #6366f1);
+}
+
+.jitsi-meeting {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid var(--forum-border, #2a3555);
+  border-radius: 12px;
+  background: #0d1120;
+}
+
+.jitsi-meeting iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
 /* ---------- attendees ---------- */

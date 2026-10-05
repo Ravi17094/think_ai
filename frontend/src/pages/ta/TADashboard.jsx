@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import apiClient from "../../services/apiClient";
 import { logout } from "../../features/auth/authSlice";
 import { ATTENDANCE_STATUSES } from "../../constants/attendance";
+import useTADashboard from "../../hooks/useTADashboard";
 
 const dashboardPreview = {
   courses: ["Java Fundamentals", "React Essentials", "Python for Data"],
@@ -30,50 +31,16 @@ export default function TADashboard() {
   const today = new Date().toISOString().slice(0, 10);
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem("ta-theme") === "dark");
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
-  const [attendance, setAttendance] = useState([]);
   const [attendanceDate, setAttendanceDate] = useState(today);
   const [attendanceSession, setAttendanceSession] = useState("TA session");
-  const [attendanceError, setAttendanceError] = useState("");
-  const [isLoadingAttendance, setIsLoadingAttendance] = useState(true);
   const [savingEnrollmentId, setSavingEnrollmentId] = useState(null);
-  const [report, setReport] = useState(null);
-  const [reportError, setReportError] = useState("");
-  const [isRefreshingReport, setIsRefreshingReport] = useState(false);
-  const [reportUpdatedAt, setReportUpdatedAt] = useState("");
-
-  const loadAttendance = async () => {
-    setIsLoadingAttendance(true);
-    setAttendanceError("");
-    try {
-      const response = await apiClient.get("/attendance/ta/register", {
-        params: { sessionDate: attendanceDate, sessionTitle: attendanceSession }
-      });
-      setAttendance(response.data?.data || []);
-    } catch (error) {
-      setAttendanceError(error.response?.data?.message || "Could not load attendance.");
-    } finally {
-      setIsLoadingAttendance(false);
-    }
-  };
-
-  const loadReport = async () => {
-    setIsRefreshingReport(true);
-    setReportError("");
-    try {
-      const response = await apiClient.get("/attendance/ta/report");
-      setReport(response.data?.data || null);
-      setReportUpdatedAt(new Date().toLocaleTimeString());
-    } catch (error) {
-      setReportError(error.response?.data?.message || "Could not refresh the TA progress report.");
-    } finally {
-      setIsRefreshingReport(false);
-    }
-  };
-
-  useEffect(() => {
-    loadAttendance();
-    loadReport();
-  }, []);
+  const {
+    attendance, setAttendance, attendanceError, isLoadingAttendance,
+    report, reportError, isRefreshingReport, reportUpdatedAt,
+    loadAttendance, loadReport,
+  } = useTADashboard({ initialDate: today, initialSessionTitle: "TA session" });
+  const learnerAlerts = attendance.filter((row) => row.status === "ABSENT" || row.status === "TARDY");
+  const pendingSupportTasks = (report ? 0 : 1) + learnerAlerts.length;
 
   useEffect(() => {
     localStorage.setItem("ta-theme", isDarkMode ? "dark" : "light");
@@ -166,10 +133,12 @@ export default function TADashboard() {
               </div>
             </div>
 
-            <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
               <StatCard label="Assigned courses" value={dashboard.courses.length} helper="Active teaching assignments" />
               <StatCard label="Upcoming sessions" value={dashboard.sessions.length} helper="Next seven days" />
               <StatCard label="Absent today" value={attendance.filter((row) => row.status === "ABSENT").length} helper="Attendance register" />
+              <StatCard label="Auto-graded" value={report?.grading?.graded ?? "—"} helper="Automatic assessment results" />
+              <StatCard label="Support tasks" value={pendingSupportTasks} helper="Attendance and report follow-up" />
             </section>
 
             <section id="attendance" className="mt-7 rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
@@ -181,7 +150,7 @@ export default function TADashboard() {
                 <div className="flex flex-wrap gap-2">
                   <input aria-label="Attendance session title" value={attendanceSession} onChange={(event) => setAttendanceSession(event.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
                   <input aria-label="Attendance date" type="date" value={attendanceDate} onChange={(event) => setAttendanceDate(event.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
-                  <button type="button" onClick={loadAttendance} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Load</button>
+                  <button type="button" onClick={() => loadAttendance({ sessionDate: attendanceDate, sessionTitle: attendanceSession })} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Load</button>
                 </div>
               </div>
               {attendanceError && <p className="px-5 pt-4 text-sm text-rose-600">{attendanceError}</p>}
@@ -226,6 +195,23 @@ export default function TADashboard() {
               <article className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
                 <div className="border-b border-slate-100 px-5 py-4 dark:border-slate-800"><h2 className="text-lg font-semibold text-slate-900 dark:text-white">Upcoming live sessions</h2></div>
                 <div className="divide-y divide-slate-100 dark:divide-slate-800">{dashboard.sessions.map((session) => <div key={session.title} className="flex items-center justify-between gap-4 px-5 py-4"><div><p className="font-medium text-slate-800 dark:text-slate-100">{session.title}</p><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{session.time}</p></div><span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">Scheduled</span></div>)}</div>
+              </article>
+            </section>
+
+            <section className="mt-7 grid gap-5 lg:grid-cols-2">
+              <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Student alerts</h2>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Learners needing follow-up based on the selected attendance register.</p>
+                {learnerAlerts.length === 0 ? <p className="mt-4 text-sm text-emerald-700 dark:text-emerald-300">No attendance alerts for this session.</p> : <ul className="mt-4 space-y-2">{learnerAlerts.map((row) => <li key={row.enrollmentId} className="flex items-center justify-between rounded-lg bg-amber-50 px-3 py-2 text-sm dark:bg-amber-500/10"><span className="font-medium text-slate-800 dark:text-slate-100">{row.studentName}</span><span className="font-semibold text-amber-700 dark:text-amber-300">{row.status}</span></li>)}</ul>}
+              </article>
+              <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">TA support checklist</h2>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">A focused checklist for the next teaching session.</p>
+                <ul className="mt-4 space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                  <li>{report ? "✓ Progress report is current" : "• Refresh the progress report"}</li>
+                  <li>{learnerAlerts.length ? `• Follow up with ${learnerAlerts.length} learner${learnerAlerts.length === 1 ? "" : "s"}` : "✓ No attendance follow-up needed"}</li>
+                  <li>• Review upcoming session details before class</li>
+                </ul>
               </article>
             </section>
           </div>

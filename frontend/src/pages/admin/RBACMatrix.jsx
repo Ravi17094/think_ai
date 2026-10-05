@@ -1,36 +1,10 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  fetchMatrix,
-  toggleRolePermission,
-  selectRoles,
-  selectPermissions,
-  selectGrants,
-  selectRbacLoading,
-  selectRbacToggling,
-  selectRbacError,
-  selectRbacInheritance,
-  selectRbacLastUpdated,
-} from '../../features/rbac/rbacSlice';
+import useRBACMatrix from '../../hooks/useRBACMatrix';
 
 export default function RBACMatrix() {
-  const dispatch = useDispatch();
-  const roles = useSelector(selectRoles);
-  const permissions = useSelector(selectPermissions);
-  const grants = useSelector(selectGrants);
-  const loading = useSelector(selectRbacLoading);
-  const toggling = useSelector(selectRbacToggling);
-  const error = useSelector(selectRbacError);
-  const inheritance = useSelector(selectRbacInheritance);
-  const lastUpdated = useSelector(selectRbacLastUpdated);
-
-  useEffect(() => {
-    dispatch(fetchMatrix());
-  }, [dispatch]);
-
-  const handleToggle = (role, permission, currentlyGranted) => {
-    dispatch(toggleRolePermission({ role, permission, granted: !currentlyGranted }));
-  };
+  const {
+    roles, permissions, grants, loading, saving, error, inheritance,
+    lastSaved, isDirty, changes, toggle, discard, save,
+  } = useRBACMatrix();
 
   if (loading) return <div className="p-6 text-gray-500 dark:text-gray-400">Loading RBAC matrix…</div>;
   if (error) return <div className="p-6 text-red-600 dark:text-red-400 font-medium">Error: {error}</div>;
@@ -50,12 +24,22 @@ export default function RBACMatrix() {
             Guard inheritance: {inheritance.join(' → ')}
           </p>
         )}
-        {lastUpdated && (
+        {lastSaved && (
           <p className="mt-3 text-sm font-medium text-emerald-700 dark:text-emerald-300" role="status">
-            Saved: {lastUpdated.permission} for {lastUpdated.role} is {lastUpdated.granted ? 'granted' : 'denied'}.
+            {lastSaved}
           </p>
         )}
+        {error && <p className="mt-3 text-sm font-medium text-red-700 dark:text-red-300" role="alert">{error}</p>}
       </div>
+
+      <div className="mb-4 flex flex-wrap items-center justify-end gap-3">
+        <span className={`text-sm font-medium ${isDirty ? 'text-amber-700 dark:text-amber-300' : 'text-gray-500 dark:text-gray-400'}`}>
+          {isDirty ? `${changes.length} unsaved change${changes.length === 1 ? '' : 's'}` : 'All changes saved'}
+        </span>
+        <button type="button" onClick={discard} disabled={!isDirty || saving} className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600">Discard</button>
+        <button type="button" onClick={save} disabled={!isDirty || saving} className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">{saving ? 'Saving…' : 'Save changes'}</button>
+      </div>
+      <p className="mb-4 text-xs text-gray-500 dark:text-gray-400">Changes are staged locally until saved. Checked boxes represent direct grants; route guard inheritance is shown above.</p>
 
       <div className="bg-white dark:bg-[#2b2b2b] border border-gray-200 dark:border-[#3f3f3f] rounded-2xl shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
@@ -81,10 +65,10 @@ export default function RBACMatrix() {
                         <input
                           type="checkbox"
                           checked={direct}
-                          disabled={toggling}
-                          onChange={() => handleToggle(role, perm, direct)}
+                          disabled={saving}
+                          onChange={() => toggle(role, perm)}
                           aria-label={`${direct ? 'Revoke' : 'Grant'} ${perm} for ${role}`}
-                          className={`h-5 w-5 rounded border-gray-300 text-purple-600 transition duration-200 ease-out focus:ring-purple-500 checked:scale-110 dark:border-[#3f3f3f] dark:bg-[#212121] ${toggling ? 'cursor-wait opacity-50' : 'cursor-pointer'
+                          className={`h-5 w-5 rounded border-gray-300 text-purple-600 transition duration-200 ease-out focus:ring-purple-500 checked:scale-110 dark:border-[#3f3f3f] dark:bg-[#212121] ${saving ? 'cursor-wait opacity-50' : 'cursor-pointer'
                             }`}
                         />
                       </td>

@@ -23,6 +23,11 @@ export function useStudioSocket({ sessionId, user }) {
       socketRef.current = socket;
       setMode(connectionMode);
 
+      // Make reconnection visible to the page instead of failing silently.
+      socket.on("disconnect", () => setMode("reconnecting"));
+      socket.on("connect_error", () => setMode("reconnecting"));
+      socket.on("connect", () => setMode(connectionMode));
+
       // Re-attach any handler registered before the socket was ready.
       handlersRef.current.forEach((handlers, event) => {
         handlers.forEach((handler) => socket.on(event, handler));

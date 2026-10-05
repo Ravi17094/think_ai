@@ -8,6 +8,8 @@ module.exports = {
   ROOM_LEAVE: 'room:leave',
   ROOM_USER_JOINED: 'room:user_joined',
   ROOM_USER_LEFT: 'room:user_left',
+  ROOM_REPLAY_REQUEST: 'room:replay',
+  ROOM_EVENTS_REPLAYED: 'room:events_replayed',
 
   // ---- Session events (Session API integration) ----
   SESSION_STARTED: 'session:started',
@@ -27,8 +29,10 @@ module.exports = {
   // payload: { roomName, onlineUsers: [{ userId, socketId }] }
 
   // ---- Connection lifecycle ----
- CONNECTION_STATE_CHANGED: 'connection:state_changed',
+  CONNECTION_STATE_CHANGED: 'connection:state_changed',
     // payload: { socketId, userId, status: 'connected' | 'disconnected' | 'reconnected', timestamp }
+
+    NOTIFICATION_NEW: 'notification:new',
 
     // ---- Chat events ----
     CHAT_MESSAGE: 'chat:message',
