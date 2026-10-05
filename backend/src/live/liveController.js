@@ -1,4 +1,5 @@
 const service = require("./liveService");
+const jwt = require("jsonwebtoken");
 
 /**
  * HTTP controllers for the Live Class Studio (self-contained Forum module).
@@ -62,6 +63,21 @@ function updateSessionStatus(req, res) {
             return res.status(200).json({ success: true, data: session });
         })
         .catch((error) => handleError(res, error, "Failed to update session status"));
+}
+
+function createJitsiToken(req, res) {
+    const secret = process.env.JITSI_JWT_SECRET;
+    const appId = process.env.JITSI_APP_ID;
+    const domain = process.env.JITSI_DOMAIN;
+    if (!secret || !appId || !domain) {
+        return res.status(503).json({ success: false, message: "Jitsi is not configured for this environment" });
+    }
+    const room = `thinkz-${String(req.params.id).replace(/[^a-z0-9_-]/gi, "-")}`;
+    const token = jwt.sign({
+        aud: "jitsi", iss: appId, sub: domain, room,
+        context: { user: { id: String(req.user.id), name: req.user.name || "Participant" } },
+    }, secret, { expiresIn: "10m" });
+    return res.status(200).json({ success: true, data: { room, token, expiresInSeconds: 600 } });
 }
 
 function getMessages(req, res) {
@@ -137,6 +153,7 @@ module.exports = {
     getSession,
     joinSession,
     updateSessionStatus,
+    createJitsiToken,
     getMessages,
     sendMessage,
     deleteMessage,
