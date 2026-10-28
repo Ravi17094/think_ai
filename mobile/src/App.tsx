@@ -29,6 +29,11 @@ import { PaymentSuccessScreen } from '@/features/payments/screens/PaymentSuccess
 import { LoginScreen } from '@/screens/auth/LoginScreen';
 import { AssessmentScreen } from '@/screens/learning/AssessmentScreen';
 import { CertificateScreen } from '@/screens/learning/CertificateScreen';
+import { StaffToolsScreen } from '@/screens/staff/StaffToolsScreen';
+import { AttendanceRegisterScreen } from '@/screens/staff/AttendanceRegisterScreen';
+import { GradingQueueScreen } from '@/screens/staff/GradingQueueScreen';
+import { InstructorControlsScreen } from '@/screens/staff/InstructorControlsScreen';
+import { RbacMatrixScreen } from '@/screens/staff/RbacMatrixScreen';
 import { ResultsScreen } from '@/screens/learning/ResultsScreen';
 import { VideoPlayerScreen } from '@/screens/learning/VideoPlayerScreen';
 import { palette } from '@/theme/tokens';
@@ -65,6 +70,11 @@ const VideoPlayerRoute = withErrorBoundary(VideoPlayerScreen, 'video-player');
 const AssessmentRoute = withErrorBoundary(AssessmentScreen, 'assessment');
 const ResultsRoute = withErrorBoundary(ResultsScreen, 'results');
 const CertificateRoute = withErrorBoundary(CertificateScreen, 'certificate');
+const StaffToolsRoute = withErrorBoundary(StaffToolsScreen, 'staff-tools');
+const AttendanceRegisterRoute = withErrorBoundary(AttendanceRegisterScreen, 'attendance-register');
+const GradingQueueRoute = withErrorBoundary(GradingQueueScreen, 'grading-queue');
+const InstructorControlsRoute = withErrorBoundary(InstructorControlsScreen, 'instructor-controls');
+const RbacMatrixRoute = withErrorBoundary(RbacMatrixScreen, 'rbac-matrix');
 
 const navigationTheme = {
   ...DarkTheme,
@@ -187,6 +197,11 @@ export function RootNavigator() {
           name="Certificate"
           options={{ title: 'Certificate' }}
         />
+        <Stack.Screen component={StaffToolsRoute} name="StaffTools" options={{ title: 'Teaching tools' }} />
+        <Stack.Screen component={AttendanceRegisterRoute} name="AttendanceRegister" options={{ title: 'Attendance register' }} />
+        <Stack.Screen component={GradingQueueRoute} name="GradingQueue" options={{ title: 'Grading queue' }} />
+        <Stack.Screen component={InstructorControlsRoute} name="InstructorControls" options={{ title: 'Instructor controls' }} />
+        <Stack.Screen component={RbacMatrixRoute} name="RbacMatrix" options={{ title: 'Role permissions' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

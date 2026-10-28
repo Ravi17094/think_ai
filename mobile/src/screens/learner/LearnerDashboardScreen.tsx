@@ -78,6 +78,13 @@ export function LearnerDashboardScreen({
                 testID="browse-tab">
                 <Text style={styles.browseLabel}>Browse</Text>
               </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => navigation.navigate('StaffTools')}
+                style={styles.browseButton}
+                testID="staff-tools">
+                <Text style={styles.browseLabel}>Teaching</Text>
+              </Pressable>
               <View style={styles.stat} testID="dashboard-enrollment-count">
                 <Text style={styles.statLabel}>Enrolled</Text>
                 <Text style={styles.statValue}>{enrollments.length}</Text>
