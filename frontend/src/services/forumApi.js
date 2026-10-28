@@ -57,6 +57,22 @@ export function getCurrentUserId() {
   }
 }
 
+/** Resolve the signed-in role for Studio and Forum permission checks. */
+export function getCurrentUserRole() {
+  try {
+    const savedRole = localStorage.getItem("role");
+    if (savedRole) return savedRole;
+    const token = localStorage.getItem("token");
+    if (!token) return "";
+    const payload = token.split(".")[1];
+    if (!payload) return "";
+    const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+    return JSON.parse(json).role || "";
+  } catch {
+    return "";
+  }
+}
+
 export function setCurrentUserId(userId) {
   try {
     localStorage.setItem(CURRENT_USER_KEY, userId);
