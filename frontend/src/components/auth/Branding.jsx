@@ -40,7 +40,7 @@ export default function Branding({ size = 'large', showIcon = true, showName = t
       {showName && (
         <span
           className={`font-mono ${currentSize.name} tracking-wide font-bold 
-            bg-gradient-to-r from-[#A435F0] to-[#6D28D9] bg-clip-text text-transparent`}
+            bg-gradient-to-r from-purple-500 to-purple-700 bg-clip-text text-transparent`}
         >
           Thinkz.ai
         </span>

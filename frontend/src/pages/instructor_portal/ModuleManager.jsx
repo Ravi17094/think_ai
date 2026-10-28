@@ -51,7 +51,7 @@ function IconBtn({ onClick, title, tone = "default", disabled, children }) {
     tone === "danger"
       ? "text-red-500 hover:bg-red-500/10"
       : tone === "accent"
-        ? "text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/10"
+        ? "text-purple-700 dark:text-purple-400 hover:bg-purple-500/10"
         : "text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5";
   return (
     <button
@@ -101,7 +101,7 @@ function ItemDetailModal({ title, subtitle, dataItems, onClose }) {
       >
         <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
           <div>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full">
               Detailed Inspector View
             </span>
             <h3 className="text-xl font-bold font-fraunces mt-1">{title}</h3>
@@ -127,7 +127,7 @@ function ItemDetailModal({ title, subtitle, dataItems, onClose }) {
         <div className="flex justify-end pt-2">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-emerald-600 to-green-600 shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-green-500 transition cursor-pointer"
+            className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-purple-600 to-purple-700 shadow-lg shadow-purple-500/20 hover:from-purple-500 hover:to-purple-600 transition cursor-pointer"
           >
             Close
           </button>
@@ -282,7 +282,7 @@ function ModuleForm({ initial, saving, onCancel, onSave }) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="e.g. Foundations of JavaScript"
-          className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white backdrop-blur-md transition-all"
+          className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-purple-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white backdrop-blur-md transition-all"
         />
       </div>
       <div>
@@ -294,14 +294,14 @@ function ModuleForm({ initial, saving, onCancel, onSave }) {
           onChange={(e) => setDescription(e.target.value)}
           placeholder="What will students learn in this module?"
           rows={2}
-          className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500 resize-none bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white backdrop-blur-md transition-all"
+          className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-purple-500 resize-none bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white backdrop-blur-md transition-all"
         />
       </div>
       <div className="flex items-center gap-2 pt-1">
         <button
           disabled={!title.trim() || saving}
           onClick={() => onSave({ title: title.trim(), description: description.trim() })}
-          className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider disabled:opacity-40 flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-green-500 transition cursor-pointer"
+          className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider disabled:opacity-40 flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/20 hover:from-purple-500 hover:to-purple-600 transition cursor-pointer"
         >
           {saving && <Loader2 size={13} className="animate-spin" />}
           Save module
@@ -340,7 +340,7 @@ function LessonForm({ initial, saving, onCancel, onSave }) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Variables & Data Types"
-            className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white backdrop-blur-md transition-all"
+            className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-purple-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white backdrop-blur-md transition-all"
           />
         </div>
         <div>
@@ -351,7 +351,7 @@ function LessonForm({ initial, saving, onCancel, onSave }) {
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
             placeholder="18 min"
-            className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white backdrop-blur-md transition-all"
+            className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-purple-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white backdrop-blur-md transition-all"
           />
         </div>
       </div>
@@ -363,7 +363,7 @@ function LessonForm({ initial, saving, onCancel, onSave }) {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="One line summary shown in the lesson list"
-          className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white backdrop-blur-md transition-all"
+          className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-purple-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white backdrop-blur-md transition-all"
         />
       </div>
       <div>
@@ -374,7 +374,7 @@ function LessonForm({ initial, saving, onCancel, onSave }) {
           value={videoUrl}
           onChange={(e) => setVideoUrl(e.target.value)}
           placeholder="https://example.com/video.mp4"
-          className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white backdrop-blur-md transition-all"
+          className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-purple-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white backdrop-blur-md transition-all"
         />
       </div>
       <div>
@@ -386,7 +386,7 @@ function LessonForm({ initial, saving, onCancel, onSave }) {
           onChange={(e) => setContent(e.target.value)}
           placeholder="Lesson body / notes shown to students"
           rows={3}
-          className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500 resize-none bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white backdrop-blur-md transition-all"
+          className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-purple-500 resize-none bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white backdrop-blur-md transition-all"
         />
       </div>
       <div className="flex items-center gap-2 pt-1">
@@ -401,7 +401,7 @@ function LessonForm({ initial, saving, onCancel, onSave }) {
               content: content.trim(),
             })
           }
-          className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider disabled:opacity-40 flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-green-500 transition cursor-pointer"
+          className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider disabled:opacity-40 flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/20 hover:from-purple-500 hover:to-purple-600 transition cursor-pointer"
         >
           {saving && <Loader2 size={13} className="animate-spin" />}
           Save lesson
@@ -659,7 +659,7 @@ export default function ModuleLessonManager({ initialCourseId = null }) {
       <div className="px-8 pt-8 pb-6 border-b border-slate-200/60 dark:border-slate-800/80 backdrop-blur-md bg-white/40 dark:bg-slate-900/40">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400 font-mono">
+            <div className="text-xs font-bold uppercase tracking-widest text-purple-600 dark:text-purple-400 font-mono">
               Course Management Hub
             </div>
             <h1 className="text-3xl font-black tracking-tight mt-1" style={{ fontFamily: "Fraunces, serif" }}>
@@ -761,7 +761,7 @@ export default function ModuleLessonManager({ initialCourseId = null }) {
                                 setSelectedLessonForAnalytics(null);
                               }}
                               className={`w-full text-left p-3.5 rounded-2xl flex items-start gap-3 group transition-all duration-300 backdrop-blur-md cursor-pointer ${selectedId === m.id
-                                ? "bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-lg shadow-emerald-500/25 border border-white/20 font-medium"
+                                ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/25 border border-white/20 font-medium"
                                 : "bg-white/40 dark:bg-slate-800/40 hover:bg-white/70 dark:hover:bg-slate-800/70 border border-slate-200/50 dark:border-slate-700/50 text-slate-700 dark:text-slate-300 shadow-sm"
                                 }`}
                             >
@@ -827,7 +827,7 @@ export default function ModuleLessonManager({ initialCourseId = null }) {
                   {!modulesLoading && modules.length === 0 && moduleFormMode !== "new" && (
                     <div className="p-6 flex flex-col items-center justify-center rounded-2xl text-center gap-2 border border-dashed border-slate-300 dark:border-slate-700 text-slate-400">
                       <span className="text-xs">No modules yet in this course</span>
-                      <button onClick={() => setModuleFormMode("new")} className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">
+                      <button onClick={() => setModuleFormMode("new")} className="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline">
                         Add the first module
                       </button>
                     </div>
@@ -864,7 +864,7 @@ export default function ModuleLessonManager({ initialCourseId = null }) {
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                        <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
                           {sortedLessons.length} Lessons
                         </span>
                       </div>
@@ -887,7 +887,7 @@ export default function ModuleLessonManager({ initialCourseId = null }) {
                       {!lessonsLoading && sortedLessons.length === 0 && lessonFormMode !== "new" && (
                         <div className="p-8 flex flex-col items-center justify-center rounded-2xl text-center gap-2 border border-dashed border-slate-300 dark:border-slate-700 text-slate-400">
                           <span className="text-xs">No lessons yet in this module</span>
-                          <button onClick={() => setLessonFormMode("new")} className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">
+                          <button onClick={() => setLessonFormMode("new")} className="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline">
                             Add the first lesson
                           </button>
                         </div>
@@ -951,7 +951,7 @@ export default function ModuleLessonManager({ initialCourseId = null }) {
                                 <div className="flex items-center gap-2 self-end sm:self-center">
                                   <button
                                     onClick={() => setViewingLessonDetails(l)}
-                                    className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition flex items-center gap-1 cursor-pointer"
+                                    className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20 transition flex items-center gap-1 cursor-pointer"
                                     title="View full lesson details & notes"
                                   >
                                     <Eye size={13} /> View Details

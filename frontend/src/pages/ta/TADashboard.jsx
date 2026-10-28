@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import apiClient from "../../services/apiClient";
@@ -37,6 +37,7 @@ export default function TADashboard() {
   const dashboard = useMemo(() => dashboardPreview, []);
   const today = localDateInputValue();
   const { isDarkMode, toggleTheme } = useTheme();
+  const [activeSection, setActiveSection] = useState("dashboard");
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [attendanceDate, setAttendanceDate] = useState(today);
   const [attendanceSession, setAttendanceSession] = useState("TA session");
@@ -50,6 +51,34 @@ export default function TADashboard() {
   } = useTADashboard({ initialDate: today, initialSessionTitle: "TA session" });
   const learnerAlerts = attendance.filter((row) => row.status === "ABSENT" || row.status === "TARDY");
   const pendingSupportTasks = (report ? 0 : 1) + learnerAlerts.length;
+
+  const goToSection = (sectionId) => {
+    setActiveSection(sectionId);
+    const target = document.getElementById(sectionId);
+    if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  useEffect(() => {
+    const sectionIds = ["dashboard", "attendance", "reports"];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((left, right) => right.intersectionRatio - left.intersectionRatio)[0];
+        if (visible) setActiveSection(visible.target.id);
+      },
+      { rootMargin: "-20% 0px -65% 0px", threshold: [0.1, 0.5] },
+    );
+    sectionIds.forEach((id) => {
+      const section = document.getElementById(id);
+      if (section) observer.observe(section);
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  const navItemClass = (sectionId) => `flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition ${activeSection === sectionId
+    ? "bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
+    : "text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"}`;
 
   const filtersChanged = Boolean(
     loadedAttendanceFilters && (
@@ -127,7 +156,7 @@ export default function TADashboard() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100">
       <div className="flex min-h-screen">
-        <aside className="hidden w-60 shrink-0 border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 lg:block">
+        <aside className="sticky top-0 hidden h-screen w-60 shrink-0 self-start overflow-y-auto border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 lg:block">
           <div className="flex h-16 items-center gap-3 border-b border-slate-100 px-6 dark:border-slate-800">
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-blue-600 text-sm font-black text-white">tz</span>
             <span className="text-lg font-bold tracking-tight text-slate-800 dark:text-white">Thinkz.ai</span>
@@ -135,10 +164,10 @@ export default function TADashboard() {
           <div className="px-4 py-6">
             <p className="px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">TA Console</p>
             <nav className="mt-3 space-y-1 text-sm font-medium">
-              <Link to="/ta" className="flex items-center gap-3 rounded-lg bg-blue-50 px-3 py-2.5 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"><span>▦</span> Dashboard</Link>
-              <a href="#attendance" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"><span>✓</span> Attendance</a>
-              <a href="#reports" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"><span>▤</span> Progress reports</a>
-              <Link to="/forum/studio" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"><span>◉</span> Live Studio</Link>
+              <button type="button" onClick={() => goToSection("dashboard")} className={navItemClass("dashboard")}><span>▦</span> Dashboard</button>
+              <button type="button" onClick={() => goToSection("attendance")} className={navItemClass("attendance")}><span>✓</span> Attendance</button>
+              <button type="button" onClick={() => goToSection("reports")} className={navItemClass("reports")}><span>▤</span> Student reports</button>
+              <Link to="/forum/studio" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"><span>◉</span> Live Studio</Link>
             </nav>
           </div>
         </aside>
@@ -179,7 +208,7 @@ export default function TADashboard() {
           </header>
 
           <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-            <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div id="dashboard" className="mb-7 scroll-mt-24 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-sm font-medium text-blue-600">Dashboard</p>
                 <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Teaching Assistant Workspace</h1>
@@ -195,7 +224,7 @@ export default function TADashboard() {
               <StatCard label="Support tasks" value={pendingSupportTasks} helper="Attendance and report follow-up" />
             </section>
 
-            <section id="attendance" className="mt-7 rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+            <section id="attendance" className="mt-7 scroll-mt-24 rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
               <div className="flex flex-col gap-4 border-b border-slate-100 p-5 dark:border-slate-800 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Attendance register</h2>
@@ -234,7 +263,7 @@ export default function TADashboard() {
               {!isLoadingAttendance && attendance.length > 0 && <div className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-100 p-5 dark:border-slate-800"><p className="text-sm text-slate-500 dark:text-slate-400">{changedEnrollmentIds.length ? `${changedEnrollmentIds.length} unsaved change${changedEnrollmentIds.length === 1 ? "" : "s"}` : "No unsaved changes"}</p><div className="flex gap-2"><button type="button" onClick={discardAttendanceChanges} disabled={!changedEnrollmentIds.length || isSavingAttendance} className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">Discard</button><button type="button" onClick={saveAttendance} disabled={!changedEnrollmentIds.length || isSavingAttendance || filtersChanged} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">{isSavingAttendance ? "Saving..." : "Save attendance"}</button></div></div>}
             </section>
 
-            <section id="reports" className="mt-7 rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+            <section id="reports" className="mt-7 scroll-mt-24 rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
               <div className="flex items-center justify-between gap-4 border-b border-slate-100 p-5 dark:border-slate-800">
                 <div><h2 className="text-lg font-semibold text-slate-900 dark:text-white">TA progress report</h2><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Attendance and automatic assessment-result summary.</p></div>
                 <button type="button" onClick={loadReport} disabled={isRefreshingReport} className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-blue-500/40 dark:bg-blue-500/10 dark:text-blue-300 dark:hover:bg-blue-500/20">{isRefreshingReport ? "Refreshing..." : "Refresh report"}</button>

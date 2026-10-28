@@ -119,7 +119,7 @@ export default function RegisterPage() {
                 </Link>
               </p>
               <p className="text-sm text-gray-400">
-                <Link to="/" className="text-[#C77DFF] font-semibold hover:text-[#A435F0] transition-colors">
+                <Link to="/" className="text-purple-400 font-semibold hover:text-purple-600 transition-colors">
                   ← Back to Home Page
                 </Link>
               </p>

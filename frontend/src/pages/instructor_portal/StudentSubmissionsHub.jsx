@@ -54,7 +54,10 @@ export default function StudentSubmissionsHub() {
             studentEmail: e.studentEmail || e.user?.email || "student@thinkz.ai",
             courseName: courseName,
             moduleName: e.currentModule || "Module 3: REST API Architecture",
-            isCompleted: e.status === "completed" || e.completed || index % 2 === 0 ? (activeTab === 'completed') : false,
+            // The tab must only filter records. It must never change a learner's
+            // completion state while the instructor is viewing the page.
+            isCompleted:
+              e.completed === true || String(e.status || "").toLowerCase() === "completed",
           };
         });
 
@@ -66,7 +69,7 @@ export default function StudentSubmissionsHub() {
       }
     })();
     return () => { isMounted = false; };
-  }, [activeTab]);
+  }, []);
 
   // Filter and Search Logic
   const filteredEnrollments = useMemo(() => {
@@ -118,7 +121,7 @@ export default function StudentSubmissionsHub() {
               onClick={() => setActiveTab("ongoing")}
               className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition cursor-pointer ${
                 activeTab === "ongoing"
-                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-500/20"
+                  ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md shadow-purple-500/20"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
@@ -128,7 +131,7 @@ export default function StudentSubmissionsHub() {
               onClick={() => setActiveTab("completed")}
               className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition cursor-pointer ${
                 activeTab === "completed"
-                  ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-500/20"
+                  ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md shadow-purple-500/20"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
@@ -153,7 +156,7 @@ export default function StudentSubmissionsHub() {
 
         {/* Enrolled Students Table */}
         <div className="backdrop-blur-2xl bg-white/70 dark:bg-slate-900/60 border border-white/40 dark:border-slate-800 rounded-3xl p-6 shadow-2xl overflow-x-auto min-h-[400px]">
-          <table className="w-full text-left border-collapse text-xs">
+          <table className="w-full min-w-[980px] text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-400 font-mono">
                 <th className="py-3 px-3 w-12">#</th>
@@ -182,10 +185,10 @@ export default function StudentSubmissionsHub() {
                     <td className="py-3.5 px-4 text-slate-500">{enrollment.studentEmail}</td>
                     <td className="py-3.5 px-4 font-medium text-slate-800 dark:text-slate-200">{enrollment.courseName}</td>
                     <td className="py-3.5 px-4 font-mono text-slate-500 flex items-center gap-1.5">
-                      <Layers size={13} className="text-emerald-500 shrink-0" /> {enrollment.moduleName}
+                      <Layers size={13} className="text-purple-500 shrink-0" /> {enrollment.moduleName}
                     </td>
                     <td className="py-3.5 px-4">
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold border ${
+                      <span className={`inline-flex whitespace-nowrap px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold border ${
                         enrollment.isCompleted 
                           ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" 
                           : "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20"

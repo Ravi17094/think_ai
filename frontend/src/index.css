@@ -4,10 +4,10 @@
 
 /* Thinkz AI design tokens: shared website palette. */
 :root {
-  --thinkz-primary: #2563eb;
-  --thinkz-primary-dark: #1d4ed8;
-  --thinkz-primary-soft: #dbeafe;
-  --thinkz-primary-surface: #eff6ff;
+  --thinkz-primary: #7c3aed;
+  --thinkz-primary-dark: #6d28d9;
+  --thinkz-primary-soft: #ede9fe;
+  --thinkz-primary-surface: #f5f3ff;
   --thinkz-background: #f8fafc;
   --thinkz-surface: #ffffff;
   --thinkz-text: #0f172a;

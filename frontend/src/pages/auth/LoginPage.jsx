@@ -137,7 +137,7 @@ export default function LoginPage() {
                 checked={keepAlive}
                 onChange={(e) => setKeepAlive(e.target.checked)}
               />
-              <Link to="/forgot-password" className="text-[#C77DFF] hover:text-[#A435F0] transition-colors hover:drop-shadow-[0_0_8px_rgba(164,53,240,0.5)]">
+              <Link to="/forgot-password" className="text-purple-400 hover:text-purple-600 transition-colors hover:drop-shadow-[0_0_8px_rgba(124,58,237,0.5)]">
                 Reset Password?
               </Link>
             </div>
@@ -157,7 +157,7 @@ export default function LoginPage() {
                 </Link>
               </p>
               <p className="text-sm text-gray-400">
-                <Link to="/" className="text-[#C77DFF] font-semibold hover:text-[#A435F0] transition-colors">
+                <Link to="/" className="text-purple-400 font-semibold hover:text-purple-600 transition-colors">
                   ← Back to Home Page
                 </Link>
               </p>

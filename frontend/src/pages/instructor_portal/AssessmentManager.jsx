@@ -49,7 +49,7 @@ function IconBtn({ onClick, title, tone = "default", disabled, children }) {
     tone === "danger"
       ? "text-red-500 hover:bg-red-500/10"
       : tone === "accent"
-        ? "text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/10"
+        ? "text-purple-700 dark:text-purple-400 hover:bg-purple-500/10"
         : "text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5";
   return (
     <button
@@ -102,7 +102,7 @@ function AssessmentViewModal({ assessment, onClose }) {
       >
         <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
           <div>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full">
               {assessment.type || "MCQ"} Assessment Details
             </span>
             <h3 className="text-lg sm:text-xl font-bold font-fraunces mt-1">{assessment.title}</h3>
@@ -197,7 +197,7 @@ function AssessmentViewModal({ assessment, onClose }) {
         <div className="flex justify-end pt-2">
           <button
             onClick={onClose}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-emerald-600 to-green-600 shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-green-500 transition cursor-pointer"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-purple-600 to-purple-700 shadow-lg shadow-purple-500/20 hover:from-purple-500 hover:to-purple-600 transition cursor-pointer"
           >
             Close
           </button>
@@ -351,7 +351,7 @@ function AssessmentForm({ initial, saving, onCancel, onSave }) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Java Fundamentals Quiz"
-            className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+            className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-purple-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
           />
         </div>
         <div>
@@ -361,7 +361,7 @@ function AssessmentForm({ initial, saving, onCancel, onSave }) {
           <select
             value={assessmentType}
             onChange={(e) => handleAssessmentTypeChange(e.target.value)}
-            className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white cursor-pointer"
+            className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-purple-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white cursor-pointer"
           >
             <option value="MCQ">MCQ Assessment</option>
             <option value="CODING">Coding Assessment</option>
@@ -378,7 +378,7 @@ function AssessmentForm({ initial, saving, onCancel, onSave }) {
             type="number"
             value={totalMarks}
             onChange={(e) => setTotalMarks(Number(e.target.value))}
-            className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+            className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-purple-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
           />
         </div>
         <div>
@@ -390,7 +390,7 @@ function AssessmentForm({ initial, saving, onCancel, onSave }) {
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
             placeholder="e.g. 30"
-            className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+            className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-purple-500 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
           />
         </div>
       </div>
@@ -404,7 +404,7 @@ function AssessmentForm({ initial, saving, onCancel, onSave }) {
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Brief details regarding this assessment..."
           rows={2}
-          className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500 resize-none bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+          className="mt-1.5 w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-purple-500 resize-none bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
         />
       </div>
 
@@ -416,7 +416,7 @@ function AssessmentForm({ initial, saving, onCancel, onSave }) {
           <button
             type="button"
             onClick={addQuestion}
-            className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition cursor-pointer flex items-center gap-1.5"
+            className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20 transition cursor-pointer flex items-center gap-1.5"
           >
             <Plus size={14} /> Add Question
           </button>
@@ -604,7 +604,7 @@ function AssessmentForm({ initial, saving, onCancel, onSave }) {
               questions: validQuestions,
             });
           }}
-          className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider disabled:opacity-40 flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-green-500 transition cursor-pointer"
+          className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider disabled:opacity-40 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/20 hover:from-purple-500 hover:to-purple-600 transition cursor-pointer"
         >
           {saving && <Loader2 size={13} className="animate-spin" />}
           Save Assessment
@@ -734,7 +734,7 @@ function AssessmentAnalyticsView({ assessmentId, courseId, onBack }) {
               value={analyticsSearchQuery}
               onChange={(e) => setAnalyticsSearchQuery(e.target.value)}
               placeholder="Search student..."
-              className="w-full pl-9 pr-4 py-2 rounded-xl text-xs border bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500 transition"
+              className="w-full pl-9 pr-4 py-2 rounded-xl text-xs border bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-purple-500 transition"
             />
           </div>
 
@@ -965,7 +965,7 @@ export default function AssessmentManager({ initialCourseId = null }) {
       <div className="px-4 sm:px-8 pt-6 pb-6 border-b border-slate-200/60 dark:border-slate-800/80 backdrop-blur-md bg-white/40 dark:bg-slate-900/40">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="text-xs font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 font-mono">
+            <div className="text-xs font-bold uppercase tracking-widest text-purple-600 dark:text-purple-400 font-mono">
               Assessment Management Hub
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight mt-1" style={{ fontFamily: "Fraunces, serif" }}>
@@ -1010,7 +1010,7 @@ export default function AssessmentManager({ initialCourseId = null }) {
           <div className="mb-4 flex lg:hidden items-center justify-between">
             <button
               onClick={() => setMobileModulesOpen(!mobileModulesOpen)}
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-md flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-purple-600 text-white shadow-md flex items-center gap-2 cursor-pointer"
             >
               <Menu size={15} />
               {mobileModulesOpen ? "Hide Modules" : "Select Module"}
@@ -1037,7 +1037,7 @@ export default function AssessmentManager({ initialCourseId = null }) {
                         setMobileModulesOpen(false);
                       }}
                       className={`w-full text-left p-3.5 rounded-2xl flex items-center gap-3 transition-all duration-300 backdrop-blur-md cursor-pointer ${selectedModuleId === m.id
-                        ? "bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-lg shadow-emerald-500/25 border border-white/20 font-medium"
+                        ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/25 border border-white/20 font-medium"
                         : "bg-white/40 dark:bg-slate-800/40 hover:bg-white/70 dark:hover:bg-slate-800/70 border border-slate-200/50 dark:border-slate-700/50 text-slate-700 dark:text-slate-300 shadow-sm"
                         }`}
                     >
@@ -1083,7 +1083,7 @@ export default function AssessmentManager({ initialCourseId = null }) {
                       </div>
                       <button
                         onClick={() => setAssessmentFormMode("new")}
-                        className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-md shadow-emerald-500/20 hover:from-emerald-500 hover:to-green-500 transition cursor-pointer flex items-center justify-center gap-1.5"
+                        className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md shadow-purple-500/20 hover:from-purple-500 hover:to-purple-600 transition cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         <Plus size={14} /> Add Assessment
                       </button>
@@ -1159,7 +1159,7 @@ export default function AssessmentManager({ initialCourseId = null }) {
                               <div className="flex flex-wrap items-center gap-2 self-end md:self-center w-full md:w-auto justify-end pt-2 md:pt-0 border-t md:border-t-0 border-slate-200 dark:border-slate-700">
                                 <button
                                   onClick={() => setViewingAssessment(asm)}
-                                  className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition flex items-center gap-1 cursor-pointer"
+                                  className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20 transition flex items-center gap-1 cursor-pointer"
                                 >
                                   <Eye size={13} /> View
                                 </button>

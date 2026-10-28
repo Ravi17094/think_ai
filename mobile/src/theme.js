@@ -1,10 +1,10 @@
 // Shared visual language for the Thinkz AI mobile application.
 // Semantic names keep brand and status colours consistent between screens.
 export const COLORS = Object.freeze({
-  primary: "#2563EB",
-  primaryDark: "#1D4ED8",
-  primarySoft: "#DBEAFE",
-  primarySurface: "#EFF6FF",
+  primary: "#7C3AED",
+  primaryDark: "#6D28D9",
+  primarySoft: "#EDE9FE",
+  primarySurface: "#F5F3FF",
   background: "#F8FAFC",
   surface: "#FFFFFF",
   text: "#0F172A",

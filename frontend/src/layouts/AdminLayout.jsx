@@ -95,7 +95,7 @@ export default function AdminLayout() {
 
             {/* Mobile-only brand mark */}
             <Link to="/admin/dashboard" className="md:hidden flex items-center gap-2 font-bold tracking-tight">
-              <span className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-mono text-[10px] font-bold shadow-[0_0_10px_rgba(37,99,235,0.4)]">tz</span>
+              <span className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-mono text-[10px] font-bold shadow-[0_0_10px_rgba(124,58,237,0.4)]">tz</span>
               <span className={`text-base font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Thinkz<span className="text-blue-600">.ai</span></span>
             </Link>
 
