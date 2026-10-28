@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { loginApi, registerApi, getCurrentUserApi } from "../../api/authApi";
+import api from "../../api/axios";
 
 const token = localStorage.getItem("token");
 

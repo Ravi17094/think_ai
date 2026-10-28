@@ -1,7 +1,28 @@
 {
-  "plugins": [
-    "expo-secure-store",
-    "expo-notifications",
-    "expo-sharing"
-  ]
+  "expo": {
+    "name": "ThinkZai Mobile",
+    "slug": "thinkzai-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "thinkzai",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0B1020"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.thinkzai.mobile"
+    },
+    "android": {
+      "package": "com.thinkzai.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#0B1020"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
 }

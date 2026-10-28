@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { parseTagsInput, validateDiscussionInput } from "../../utils/validation";
+import RichTextEditor from "../moderation/RichTextEditor";
 
 /**
  * Create discussion form with title/body validation (Phase 1).
@@ -76,13 +77,11 @@ export default function CreateDiscussionForm({
 
       <div className="field">
         <label htmlFor="discussion-body">Body</label>
-        <textarea
+        <RichTextEditor
           id="discussion-body"
-          rows={7}
           value={body}
           placeholder="Describe your question in detail. Mention people with @username."
-          onChange={(event) => setBody(event.target.value)}
-          disabled={submitting}
+          onChange={setBody}
         />
         {fieldErrors.body && (
           <p className="field-error" role="alert">

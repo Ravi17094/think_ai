@@ -1,5 +1,10 @@
 const db = require("../data/mockData");
 
+// Forum Performance: a new reply changes reply counts + hot-thread ranking,
+// so the 5-minute cached views for that discussion must be invalidated.
+const { forumPerformanceService } = require("../services/forum/perf/forumPerformanceService");
+const { invalidateForDiscussionSync } = forumPerformanceService;
+
 function serialize(comment) {
     const author = db.users.find((u) => u.id === comment.authorId);
     return {
@@ -38,6 +43,7 @@ function create({ discussionId, parentId, body, authorId }) {
         hidden: false
     };
     db.comments.push(comment);
+    invalidateForDiscussionSync(discussionId); // new reply invalidates relevant cache
     return comment;
 }
 

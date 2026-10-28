@@ -1,0 +1,6 @@
+code,type,value,expiry,maxUses,eligibleDepartments
+WELCOME25,percentage,25,2027-12-31,500,Engineering|Design|Marketing|Sales
+LEARN15,percentage,15,2027-06-30,1000,Engineering|Design
+COHORT50,fixed,50,2026-12-31,200,Engineering
+TEAM10,percentage,10,2027-09-30,300,Engineering|Marketing|Sales
+GRAD20,percentage,20,2026-10-31,750,Career Services|Engineering|Design

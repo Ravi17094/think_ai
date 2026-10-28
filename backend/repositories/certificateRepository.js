@@ -34,6 +34,13 @@ const createCertificate = async (data) => {
  */
 const getActiveCertificateTemplate = async () => {
 
+    // Certificate templates are optional. Some existing databases were
+    // migrated before this model existed, and certificates must still be
+    // generated with the built-in visual defaults in that case.
+    if (!prisma.certificateTemplate) {
+        return null;
+    }
+
     return prisma.certificateTemplate.findFirst({
         where: {
             isActive: true

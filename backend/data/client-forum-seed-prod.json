@@ -1,0 +1,171 @@
+{
+  "source": "client-forum-seed-prod.json",
+  "provider": "clientdomain.com",
+  "contentType": "real",
+  "generated": false,
+  "importedBy": "Forum Developer",
+  "importedAt": "2026-09-20T09:00:00.000Z",
+  "threads": [
+    {
+      "id": "d1",
+      "title": "Welcome to the client learning community \u2014 start here!",
+      "body": "Introduce yourself in the comments and tell us what you are learning this quarter.\n\nOur team guidelines:\n1. Be kind and constructive\n2. Search before posting\n3. Tag posts so others can filter topics\n4. Mark a thread as solved when your question is answered",
+      "authorEmail": "olivia.bennett@clientdomain.com",
+      "category": "Announcements",
+      "tags": ["community", "welcome"],
+      "createdAt": "2026-03-01T09:00:00.000Z",
+      "solved": true,
+      "pinned": false,
+      "views": 4021,
+      "upvotes": 132,
+      "downvotes": 2
+    },
+    {
+      "id": "d2",
+      "title": "How do teams publish release notes to the community?",
+      "body": "We want cross-functional teams to share product updates in the community. What structure works best so posts stay short, searchable and useful to learners?",
+      "authorEmail": "marcus.chen@clientdomain.com",
+      "category": "Q&A",
+      "tags": ["release-notes", "product", "collaboration"],
+      "createdAt": "2026-08-22T10:30:00.000Z",
+      "solved": false,
+      "pinned": false,
+      "views": 128,
+      "upvotes": 14,
+      "downvotes": 0
+    },
+    {
+      "id": "d3",
+      "title": "Progress dashboard: how completion is calculated",
+      "body": "We have been asked how course completion percentages are computed. Here is the short version: percentage = watched content length / total content length, and a module only counts once completed.",
+      "authorEmail": "sofia.almeida@clientdomain.com",
+      "category": "Announcements",
+      "tags": ["progress", "courses", "faq"],
+      "createdAt": "2026-07-18T12:00:00.000Z",
+      "solved": true,
+      "pinned": false,
+      "views": 640,
+      "upvotes": 58,
+      "downvotes": 0
+    },
+    {
+      "id": "d4",
+      "title": "Data reporting errors after the migration window",
+      "body": "Since last week's migration, some dashboards show stale numbers for the first few hours of the day. Is anyone else seeing this? Our data team is investigating and will follow up here.",
+      "authorEmail": "aisha.rahman@clientdomain.com",
+      "category": "Help & Support",
+      "tags": ["reporting", "data", "migration"],
+      "createdAt": "2026-08-23T08:15:00.000Z",
+      "solved": false,
+      "pinned": false,
+      "views": 92,
+      "upvotes": 9,
+      "downvotes": 1
+    },
+    {
+      "id": "d5",
+      "title": "Showcase: internal microlearning channel pilot",
+      "body": "Our Learning team ran a four-week pilot with bite-size daily lessons. Participation grew week over week. Sharing the playbook plus what we would do differently next time.",
+      "authorEmail": "olivia.bennett@clientdomain.com",
+      "category": "Projects",
+      "tags": ["microlearning", "pilot", "learning"],
+      "createdAt": "2026-08-10T14:45:00.000Z",
+      "solved": true,
+      "pinned": false,
+      "views": 310,
+      "upvotes": 41,
+      "downvotes": 0
+    },
+    {
+      "id": "d6",
+      "title": "Recommended reading list for new cohort mentors",
+      "body": "A curated list of onboarding readings for mentors joining our next cohort, including the mentor playbook, facilitation tips and a short checklist for the first session.",
+      "authorEmail": "marcus.chen@clientdomain.com",
+      "category": "General",
+      "tags": ["mentors", "onboarding", "reading-list"],
+      "createdAt": "2026-08-15T11:00:00.000Z",
+      "solved": false,
+      "pinned": false,
+      "views": 205,
+      "upvotes": 22,
+      "downvotes": 0
+    },
+    {
+      "id": "d7",
+      "title": "Vendor security review checklist",
+      "body": "Every vendor engagement should clear our security review before launch. Checklist covers DSAR, data classification, sub-processors and incident response contact details.",
+      "authorEmail": "sofia.almeida@clientdomain.com",
+      "category": "Projects",
+      "tags": ["security", "procurement", "checklist"],
+      "createdAt": "2026-08-05T09:20:00.000Z",
+      "solved": false,
+      "pinned": false,
+      "views": 174,
+      "upvotes": 19,
+      "downvotes": 0
+    },
+    {
+      "id": "d8",
+      "title": "Booking rooms for the annual learning conference",
+      "body": "The learning conference is scheduled for November. Please book breakout rooms through the shared calendar and attach the session brief to the invite.",
+      "authorEmail": "aisha.rahman@clientdomain.com",
+      "category": "Announcements",
+      "tags": ["conference", "events", "booking"],
+      "createdAt": "2026-08-19T16:00:00.000Z",
+      "solved": false,
+      "pinned": false,
+      "views": 87,
+      "upvotes": 6,
+      "downvotes": 0
+    }
+  ],
+  "comments": [
+    {
+      "discussionId": "d1",
+      "authorEmail": "marcus.chen@clientdomain.com",
+      "body": "Welcome everyone! The next onboarding session is on the last Thursday of the month.",
+      "createdAt": "2026-03-02T08:30:00.000Z"
+    },
+    {
+      "discussionId": "d1",
+      "authorEmail": "sofia.almeida@clientdomain.com",
+      "body": "Tagging this under community so it stays easy to find.",
+      "createdAt": "2026-03-03T10:12:00.000Z"
+    },
+    {
+      "discussionId": "d2",
+      "authorEmail": "olivia.bennett@clientdomain.com",
+      "body": "We use a short template: what changed, why it matters, who to contact. Works well so far.",
+      "createdAt": "2026-08-22T12:40:00.000Z"
+    },
+    {
+      "discussionId": "d3",
+      "authorEmail": "aisha.rahman@clientdomain.com",
+      "body": "Can we surface the per-module breakdown in the dashboard as well?",
+      "createdAt": "2026-07-19T09:05:00.000Z"
+    },
+    {
+      "discussionId": "d5",
+      "authorEmail": "marcus.chen@clientdomain.com",
+      "body": "Would love the playbook as a shared doc if you have it handy.",
+      "createdAt": "2026-08-11T15:20:00.000Z"
+    }
+  ],
+  "bookmarks": [
+    {
+      "userId": "u1",
+      "discussionId": "d3",
+      "createdAt": "2026-08-12T13:00:00.000Z"
+    },
+    {
+      "userId": "u1",
+      "discussionId": "d5",
+      "createdAt": "2026-08-06T11:10:00.000Z"
+    },
+    {
+      "userId": "u2",
+      "discussionId": "d1",
+      "createdAt": "2026-08-20T08:00:00.000Z"
+    }
+  ]
+}

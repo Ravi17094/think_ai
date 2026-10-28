@@ -133,7 +133,7 @@ model User {
   name      String?
   role      String   @default("Learner")
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 // ====================================================
@@ -187,19 +187,19 @@ model Lesson {
 // ====================================================
 
 model LessonProgress {
-  id               Int       @id @default(autoincrement())
-  enrollmentId     Int
-  lessonId         Int
-  watchedSeconds   Float     @default(0.0)
-  totalDuration    Float     @default(0.0)
-  watchPercentage  Float     @default(0.0)
-  completed        Boolean   @default(false)
-  completedAt      DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id              Int       @id @default(autoincrement())
+  enrollmentId    Int
+  lessonId        Int
+  watchedSeconds  Float     @default(0.0)
+  totalDuration   Float     @default(0.0)
+  watchPercentage Float     @default(0.0)
+  completed       Boolean   @default(false)
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
-  enrollment       Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
-  lesson           Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  lesson     Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@unique([enrollmentId, lessonId])
 }
@@ -525,7 +525,7 @@ model LiveSession {
 }
 
 model LiveAttendee {
-  id        Int    @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   sessionId String
   session   LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
@@ -546,7 +546,7 @@ model LiveAttendee {
 }
 
 model LiveMessage {
-  id        Int    @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   sessionId String
   session   LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
@@ -562,7 +562,7 @@ model LiveMessage {
 }
 
 model LivePoll {
-  id        Int    @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   sessionId String
   session   LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
@@ -580,12 +580,12 @@ model LivePoll {
 }
 
 model LivePollOption {
-  id     Int    @id @default(autoincrement())
+  id     Int      @id @default(autoincrement())
   pollId Int
   poll   LivePoll @relation(fields: [pollId], references: [id], onDelete: Cascade)
 
   text  String
-  votes Int @default(0)
+  votes Int    @default(0)
 
   pollVotes LivePollVote[]
 
@@ -593,7 +593,7 @@ model LivePollOption {
 }
 
 model LivePollVote {
-  id     Int    @id @default(autoincrement())
+  id     Int      @id @default(autoincrement())
   pollId Int
   poll   LivePoll @relation(fields: [pollId], references: [id], onDelete: Cascade)
 
@@ -611,7 +611,7 @@ model LivePollVote {
 }
 
 model BreakoutRoom {
-  id        Int    @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   sessionId String
   session   LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
@@ -677,9 +677,9 @@ model CodingTestCaseExecution {
 }
 
 model BreakoutRoomMember {
-  id        Int    @id @default(autoincrement())
-  roomId    Int
-  room      BreakoutRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  id     Int          @id @default(autoincrement())
+  roomId Int
+  room   BreakoutRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
 
   userId   String
   userName String

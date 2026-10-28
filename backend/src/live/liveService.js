@@ -111,14 +111,8 @@ async function ensureSession(sessionId) {
         session = await repository.upsertSession({
             id,
             title: "React Hooks Deep Dive — Live Class",
-            hostId: "u3",
+            hostId: "u1",
             status: "live"
-        });
-        await repository.upsertAttendee(id, {
-            userId: "u3", userName: "Rahul Verma", online: true, muted: false, cameraOn: true
-        });
-        await repository.upsertAttendee(id, {
-            userId: "u1", userName: "Aarav Sharma", online: true, muted: true, cameraOn: false
         });
     }
     return serializeSession(await repository.getSession(id));

@@ -26,7 +26,7 @@ function resolveServerUrl() {
   try {
     return new URL(FORUM_API_BASE_URL).origin;
   } catch {
-    return "http://localhost:5000";
+    return window.location.origin;
   }
 }
 

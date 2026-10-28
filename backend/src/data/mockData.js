@@ -1,46 +1,28 @@
 /**
- * Forum module mock data layer (in-memory).
+ * Forum module data layer (in-memory).
  *
- * Everything the Forum / Live Studio / Moderation features need lives here so
- * the module stays fully self-contained from other Thinkz AI modules.
+ * Everything the Forum / Moderation / Checkout-discount features need lives
+ * here so the module stays fully self-contained from other Thinkz AI modules.
+ *
+ * PRODUCTION FORUM CONTENT is seeded exclusively from the client-provided
+ * files (see src/services/forum/forumDataService.js). Zero mock or generated
+ * discussions/comments are allowed — the seed service verifies this on load.
  */
 
 const crypto = require("crypto");
+
+const forumDataService = require("../services/forum/forumDataService");
+const notificationDefaults = require("../../config/notification-defaults");
 
 function makeId(prefix) {
     return `${prefix}_${crypto.randomUUID()}`;
 }
 
 // ---------------------------------------------------------------------------
-// Deterministic pseudo-random generator (stable seed data between restarts)
+// Platform identities (mock auth demo users, NOT forum content)
 // ---------------------------------------------------------------------------
 
-function mulberry32(seed) {
-    let a = seed;
-    return function next() {
-        a |= 0;
-        a = (a + 0x6d2b79f5) | 0;
-        let t = Math.imul(a ^ (a >>> 15), 1 | a);
-        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-}
-
-const rand = mulberry32(20260824);
-
-function pick(list) {
-    return list[Math.floor(rand() * list.length)];
-}
-
-function randInt(min, max) {
-    return min + Math.floor(rand() * (max - min + 1));
-}
-
-// ---------------------------------------------------------------------------
-// Users
-// ---------------------------------------------------------------------------
-
-const users = [
+const platformUsers = [
     { id: "u1", name: "Aarav Sharma", username: "aarav", email: "aarav@thinkz.ai", role: "Learner", banned: false },
     { id: "u2", name: "Priya Nair", username: "priya", email: "priya@thinkz.ai", role: "Learner", banned: false },
     { id: "u3", name: "Rahul Verma", username: "rahul", email: "rahul@thinkz.ai", role: "Instructor", banned: false },
@@ -54,276 +36,120 @@ const users = [
 const AVATAR_COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#06b6d4", "#ef4444", "#8b5cf6"];
 
 // ---------------------------------------------------------------------------
-// Categories
+// Client community members (real client community team + moderators)
 // ---------------------------------------------------------------------------
 
-const categories = [
-    { id: "c-general", name: "General", color: "#6366f1", description: "Community-wide discussions" },
-    { id: "c-announcements", name: "Announcements", color: "#f59e0b", description: "Official platform updates" },
-    { id: "c-qa", name: "Q&A", color: "#10b981", description: "Ask questions and get answers" },
-    { id: "c-projects", name: "Projects", color: "#06b6d4", description: "Show what you are building" },
-    { id: "c-help", name: "Help & Support", color: "#ef4444", description: "Platform help and troubleshooting" }
-];
+const clientModerators = forumDataService.loadClientModerators();
 
-// ---------------------------------------------------------------------------
-// Discussions
-// ---------------------------------------------------------------------------
+/** email (lowercased) -> user record */
+const USER_BY_EMAIL = new Map();
+platformUsers.forEach((user) => USER_BY_EMAIL.set(user.email.toLowerCase(), user));
 
-const TAG_POOL = ["react", "nodejs", "javascript", "css", "api", "database", "testing", "career", "ai", "devtools"];
-const TITLE_TEMPLATES = [
-    "How do I handle %TOPIC% in %STACK%?",
-    "Best practices for %TOPIC% with %STACK%",
-    "Understanding %TOPIC% — a deep dive",
-    "%STACK% %TOPIC% keeps failing, any ideas?",
-    "Showcase: my %TOPIC% project built with %STACK%",
-    "Tips for debugging %TOPIC% in %STACK%",
-    "%TOPIC% vs alternatives in %STACK%",
-    "Getting started with %TOPIC% (%STACK% edition)"
-];
-const TOPICS = ["state management", "pagination", "websockets", "authentication", "caching", "optimistic UI", "server-side filtering", "error boundaries", "responsive layouts", "unit testing"];
-const STACKS = ["React", "Node.js", "Express", "Vite", "PostgreSQL", "Socket.IO"];
-const BODY_SENTENCES = [
-    "I have been experimenting with this for a few days and wanted to share what worked.",
-    "Here is a minimal reproduction of the issue I am running into.",
-    "Would love to hear how others on the platform approach this problem.",
-    "The docs cover the basics but skip the edge cases entirely.",
-    "Profiling shows the bottleneck appears only after a few hundred records.",
-    "Adding proper error handling fixed most of the flakiness for me.",
-    "@priya mentioned this pattern last week and it finally clicked for me.",
-    "Happy to open a pull request if the maintainers agree with the approach.",
-    "Update: downgrading the dependency resolved the crash on startup.",
-    "Any pointers to official documentation would be really appreciated."
-];
+const clientModeratorUsers = clientModerators.map((moderator, index) => {
+    const user = {
+        id: `u-mo-${index + 1}`,
+        name: moderator.name || moderator.email,
+        username: moderator.email ? moderator.email.split("@")[0] : `moderator${index + 1}`,
+        email: moderator.email.toLowerCase(),
+        role: "Moderator",
+        banned: false
+    };
+    USER_BY_EMAIL.set(user.email, user);
+    return user;
+});
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-const NOW = Date.UTC(2026, 7, 24, 12, 0, 0);
-
-function isoAgo(days, hourOffset) {
-    return new Date(NOW - days * DAY_MS + (hourOffset || 0) * 3600 * 1000).toISOString();
-}
-
-const discussions = [];
-
-function addDiscussion(d) {
-    const now = d.createdAt || new Date().toISOString();
-    discussions.push({
-        id: d.id || makeId("d"),
-        title: d.title,
-        body: d.body,
-        authorId: d.authorId,
-        tags: d.tags || [],
-        categoryId: d.categoryId || "c-general",
-        createdAt: now,
-        updatedAt: now,
-        solved: Boolean(d.solved),
-        hidden: Boolean(d.hidden),
-        flagged: Boolean(d.flagged),
-        flagReason: d.flagReason || null,
-        views: d.views != null ? d.views : randInt(12, 900),
-        upvotes: d.upvotes != null ? d.upvotes : randInt(0, 48),
-        downvotes: d.downvotes != null ? d.downvotes : randInt(0, 6)
+const authorEmails = forumDataService.collectAuthorEmails();
+const clientAuthorUsers = authorEmails
+    .filter((email) => !USER_BY_EMAIL.has(email))
+    .map((email, index) => {
+        const localPart = email.split("@")[0];
+        const user = {
+            id: `u-author-${index + 1}`,
+            name: localPart.replace(/[._-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+            username: localPart,
+            email,
+            role: "Learner",
+            banned: false
+        };
+        USER_BY_EMAIL.set(email, user);
+        return user;
     });
-}
 
-// Handcrafted seed threads (referenced by comments below).
-addDiscussion({
-    id: "d1",
-    title: "Welcome to the Thinkz AI Community — start here!",
-    body:
-        "Introduce yourself in the comments and tell us what you are learning.\n\n" +
-        "Community guidelines:\n" +
-        "1. Be kind and constructive\n2. Search before posting\n3. Use tags so others can filter topics\n" +
-        "4. Mark a thread as solved when your question is answered (@moderator will help if not)",
-    authorId: "u8",
-    tags: ["community", "welcome"],
-    categoryId: "c-announcements",
-    createdAt: isoAgo(180),
-    upvotes: 132,
-    downvotes: 2,
-    solved: true,
-    views: 4021
+const users = [...platformUsers, ...clientModeratorUsers, ...clientAuthorUsers];
+
+// ---------------------------------------------------------------------------
+// Role assignment (users <-> roles junction)
+// ---------------------------------------------------------------------------
+
+/**
+ * userRoles maps a userId to the list of role ids granted. The real client
+ * community managers from client-moderators-prod.csv are assigned the
+ * "moderator" role here (permission set defined in config/forum.config.js).
+ */
+const userRoles = {};
+clientModeratorUsers.forEach((user) => {
+    userRoles[user.id] = ["moderator"];
 });
-
-addDiscussion({
-    id: "d2",
-    title: "Optimistic UI for voting — how to roll back cleanly when the API fails?",
-    body:
-        "I am building upvote/downvote buttons with optimistic updates.\n\n" +
-        "The happy path is easy, but what is the cleanest way to revert the UI " +
-        "when POST /vote fails? Snapshotting previous state in a ref feels hacky.",
-    authorId: "u1",
-    tags: ["react", "optimistic-ui", "api"],
-    categoryId: "c-qa",
-    createdAt: isoAgo(2, -3),
-    upvotes: 27,
-    downvotes: 1
-});
-
-addDiscussion({
-    id: "d3",
-    title: "Forum search stays fast at 1000+ posts — sharing our server-side filtering notes",
-    body:
-        "We benchmarked text + tag + author + date filtering with pagination on the server " +
-        "instead of shipping every post to the client. Response times stayed under 30ms for 1200 seeded posts.",
-    authorId: "u5",
-    tags: ["search", "api", "performance"],
-    categoryId: "c-projects",
-    createdAt: isoAgo(6),
-    upvotes: 41,
-    downvotes: 0,
-    solved: true
-});
-
-addDiscussion({
-    id: "d4",
-    title: "Live Class Studio: chat over WebSocket drops messages on reconnect",
-    body: "When the socket reconnects mid-session some chat messages vanish. Should we replay history from the session API after reconnect?",
-    authorId: "u4",
-    tags: ["websocket", "live-studio"],
-    categoryId: "c-help",
-    createdAt: isoAgo(1, -5),
-    upvotes: 9,
-    downvotes: 0
-});
-
-addDiscussion({
-    id: "d5",
-    title: "Spam: BUY CHEAP COURSE ACCESS NOW!!!",
-    body: "Limited offer, click this very suspicious link!!!",
-    authorId: "u7",
-    tags: ["spam"],
-    categoryId: "c-general",
-    createdAt: isoAgo(0, -8),
-    upvotes: 0,
-    downvotes: 14,
-    flagged: true,
-    flagReason: "Spam / advertising"
-});
-
-// Generated archive so search/filter/pagination can be validated at scale.
-for (let i = 0; i < 1120; i += 1) {
-    const template = pick(TITLE_TEMPLATES);
-    const title = template
-        .replace("%TOPIC%", pick(TOPICS))
-        .replace("%STACK%", pick(STACKS));
-    const sentences = [];
-    for (let s = 0; s < randInt(2, 4); s += 1) {
-        sentences.push(pick(BODY_SENTENCES));
-    }
-    addDiscussion({
-        id: `dg${i + 1}`,
-        title: `${title} (#${i + 1})`,
-        body: sentences.join(" "),
-        authorId: pick(users).id,
-        tags: [pick(TAG_POOL), pick(TAG_POOL)].filter((t, idx, arr) => arr.indexOf(t) === idx),
-        categoryId: pick(categories).id,
-        createdAt: isoAgo(randInt(1, 175), randInt(-11, 11)),
-        solved: rand() < 0.22,
-        flagged: rand() < 0.02 ? true : false,
-        flagReason: rand() < 0.02 ? pick(["Spam / advertising", "Off-topic", "Inappropriate language"]) : null
+platformUsers
+    .filter((user) => user.role === "Moderator" || user.role === "Admin")
+    .forEach((user) => {
+        userRoles[user.id] = user.role === "Admin" ? ["administrator", "moderator"] : ["moderator"];
     });
+
+// ---------------------------------------------------------------------------
+// Categories (merged from client seed + announcements)
+// ---------------------------------------------------------------------------
+
+const categories = forumDataService.buildCategories();
+
+const CATEGORY_ID_BY_NAME = {};
+categories.forEach((category) => {
+    CATEGORY_ID_BY_NAME[category.name.toLowerCase()] = category.id;
+});
+
+// ---------------------------------------------------------------------------
+// Discussions + comments (REAL client-provided content only)
+// ---------------------------------------------------------------------------
+
+function resolveUserIdByEmail(email) {
+    const user = USER_BY_EMAIL.get(String(email || "").toLowerCase());
+    return user ? user.id : null;
 }
 
-// ---------------------------------------------------------------------------
-// Comments
-// ---------------------------------------------------------------------------
+const rawDiscussions = forumDataService.buildDiscussions();
+const discussions = rawDiscussions.map((thread) => ({
+    id: thread.id,
+    title: thread.title,
+    body: thread.body,
+    authorId: resolveUserIdByEmail(thread.authorEmail) || "u1",
+    tags: thread.tags,
+    categoryId: CATEGORY_ID_BY_NAME[thread.categoryName.toLowerCase()] || "c-general",
+    createdAt: thread.createdAt,
+    updatedAt: thread.updatedAt,
+    solved: Boolean(thread.solved),
+    hidden: Boolean(thread.hidden),
+    flagged: Boolean(thread.flagged),
+    flagReason: thread.flagReason || null,
+    pinned: Boolean(thread.pinned),
+    views: thread.views || 0,
+    upvotes: thread.upvotes || 0,
+    downvotes: thread.downvotes || 0
+}));
 
-const comments = [
-    {
-        id: "cm1",
-        discussionId: "d1",
-        parentId: null,
-        body: "Hi everyone! @aarav here — excited to learn full-stack development with all of you.",
-        authorId: "u1",
-        createdAt: isoAgo(179),
-        flagged: false,
-        hidden: false
-    },
-    {
-        id: "cm2",
-        discussionId: "d1",
-        parentId: null,
-        body: "Joining from Bengaluru. The Q&A category already saved me twice this week.",
-        authorId: "u2",
-        createdAt: isoAgo(178),
-        flagged: false,
-        hidden: false
-    },
-    {
-        id: "cm3",
-        discussionId: "d2",
-        parentId: null,
-        body: "Snapshot the previous value before you mutate it — then restore it inside the catch block. Works great with useRef.",
-        authorId: "u3",
-        createdAt: isoAgo(1, -2),
-        flagged: false,
-        hidden: false
-    },
-    {
-        id: "cm4",
-        discussionId: "d2",
-        parentId: null,
-        body: "@rahul that is exactly what we ended up doing. Marking this solved, thanks!",
-        authorId: "u1",
-        createdAt: isoAgo(0, -4),
-        flagged: false,
-        hidden: false
-    },
-    {
-        id: "cm5",
-        discussionId: "d3",
-        parentId: null,
-        body: "Server-side filtering plus indexed pagination is the way. Nice write-up @vikram.",
-        authorId: "u6",
-        createdAt: isoAgo(5),
-        flagged: false,
-        hidden: false
-    },
-    {
-        id: "cm6",
-        discussionId: "d4",
-        parentId: null,
-        body: "Yes — refetch history on reconnect and de-duplicate by message id.",
-        authorId: "u5",
-        createdAt: isoAgo(0, -6),
-        flagged: false,
-        hidden: false
-    },
-    {
-        id: "cm7",
-        discussionId: "d2",
-        parentId: null,
-        body: "Totally unrelated promo link here, sorry.",
-        authorId: "u7",
-        createdAt: isoAgo(0, -3),
-        flagged: true,
-        hidden: false
-    }
-];
-
-// A little extra comment traffic on generated threads.
-for (let i = 0; i < 140; i += 1) {
-    const target = `dg${randInt(1, 400)}`;
-    comments.push({
-        id: makeId("cm"),
-        discussionId: target,
-        parentId: null,
-        body: pick([
-            "Following this thread, same question here.",
-            "This helped me unblock a similar issue, thanks!",
-            "Have you tried profiling before and after the change?",
-            "Bookmarking for later — great explanation.",
-            "@priya ran into the same thing yesterday."
-        ]),
-        authorId: pick(users).id,
-        createdAt: isoAgo(randInt(0, 20), randInt(-11, 11)),
-        flagged: false,
-        hidden: false
-    });
-}
+const commentsSeed = forumDataService.buildComments();
+const comments = commentsSeed.map((comment) => ({
+    ...comment,
+    authorId: resolveUserIdByEmail(comment.authorEmail) || "u1"
+}));
 
 // ---------------------------------------------------------------------------
-// Votes (userId -> 'up' | 'down') persisted per discussion
+// Tags (client tag taxonomy)
+// ---------------------------------------------------------------------------
+
+const tags = forumDataService.buildTags();
+
+// ---------------------------------------------------------------------------
+// Votes
 // ---------------------------------------------------------------------------
 
 const votes = new Map();
@@ -335,68 +161,95 @@ function votesFor(discussionId) {
     return votes.get(discussionId);
 }
 
-// Seed a few real user votes so userVote hydration has data.
-votesFor("d2").set("u3", "up");
-votesFor("d3").set("u1", "up");
-votesFor("d5").set("u1", "down");
-
 // ---------------------------------------------------------------------------
-// Bookmarks
+// Bookmarks (client seed + admin pre-bookmarks for new-user onboarding)
 // ---------------------------------------------------------------------------
 
-const bookmarks = [
-    { id: makeId("bk"), userId: "u1", discussionId: "d3", createdAt: isoAgo(4) },
-    { id: makeId("bk"), userId: "u1", discussionId: "d2", createdAt: isoAgo(1) },
-    { id: makeId("bk"), userId: "u2", discussionId: "d1", createdAt: isoAgo(30) }
-];
+// Admin-account pre-bookmarks for the new-user onboarding collection.
+function onboardingBookmarks() {
+    const collection = "new-user-onboarding";
+    const resourceThreadIds = [
+        "d-ann-guidelines",
+        "d-ann-onboarding",
+        "d-ann-ama",
+        "d6"
+    ];
+    const createdAt = "2026-09-15T09:00:00.000Z";
+    return resourceThreadIds.map((discussionId, index) => ({
+        id: makeId("bk"),
+        userId: "u8",
+        discussionId,
+        collection,
+        createdAt: createdAtIndex(createdAt, index)
+    }));
+}
+
+function createdAtIndex(base, index) {
+    return new Date(new Date(base).getTime() + index * 60000).toISOString();
+}
+
+function seededBookmarks() {
+    const seed = require("../../data/client-forum-seed-prod.json").bookmarks || [];
+    return seed.map((b) => ({
+        id: makeId("bk"),
+        userId: b.userId,
+        discussionId: b.discussionId,
+        collection: "personal",
+        createdAt: b.createdAt || new Date().toISOString()
+    }));
+}
+
+const bookmarks = [...seededBookmarks(), ...onboardingBookmarks()];
 
 // ---------------------------------------------------------------------------
 // Notifications + preferences
 // ---------------------------------------------------------------------------
 
-const notifications = [
-    {
-        id: makeId("n"),
-        userId: "u1",
-        type: "mention",
-        message: "rahul mentioned you in “Optimistic UI for voting…”",
-        link: "/forum/d2",
-        read: false,
-        createdAt: isoAgo(1, -2)
-    },
-    {
-        id: makeId("n"),
-        userId: "u1",
-        type: "system",
-        message: "Welcome to the Thinkz AI community!",
-        link: "/forum",
-        read: true,
-        createdAt: isoAgo(170)
-    }
-];
+const notifications = [];
 
 const notificationPrefs = {};
-users.forEach((user, index) => {
-    notificationPrefs[user.id] = {
-        email: index % 2 === 0,
-        inApp: true,
-        sms: index % 3 === 0
-    };
+users.forEach((user) => {
+    notificationPrefs[user.id] = { email: true, inApp: true, sms: false };
+});
+
+// Event-scoped defaults (config/notification-defaults.js): each user inherits
+// the client-mandated channel routing for new-reply / mention / moderator-action.
+const notificationEventPrefs = {};
+users.forEach((user) => {
+    notificationEventPrefs[user.id] = {};
+    Object.keys(notificationDefaults.notificationDefaults).forEach((event) => {
+        notificationEventPrefs[user.id][event] = notificationDefaults.getNotificationDefaults(event);
+    });
 });
 
 // ---------------------------------------------------------------------------
-// Live Class Studio sessions
+// Moderation state
 // ---------------------------------------------------------------------------
+
+/** Resolved reports: { id, contentType, contentId, reporterUserId, reason, createdAt } */
+const reports = [];
+
+/** Email intents for events routed exclusively to email (moderator-action). */
+const pendingEmails = [];
+
+// ---------------------------------------------------------------------------
+// Live Class Studio sessions (owned by the Studio module, unchanged)
+// ---------------------------------------------------------------------------
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function isoAgo(days, hourOffset) {
+    return new Date(Date.UTC(2026, 7, 24, 12, 0, 0) - days * DAY_MS + (hourOffset || 0) * 3600 * 1000).toISOString();
+}
 
 const studioSessions = [
     {
         id: "s1",
         title: "React Hooks Deep Dive — Live Class",
-        hostId: "u3",
+        hostId: "u1",
         status: "live",
         startedAt: isoAgo(0, -1),
         attendees: [
-            { userId: "u3", name: "Rahul Verma", online: true, muted: false, cameraOn: true, raisedHand: false },
             { userId: "u1", name: "Aarav Sharma", online: true, muted: true, cameraOn: false, raisedHand: false },
             { userId: "u2", name: "Priya Nair", online: true, muted: true, cameraOn: true, raisedHand: true },
             { userId: "u4", name: "Sneha Iyer", online: false, muted: true, cameraOn: false, raisedHand: false },
@@ -416,12 +269,21 @@ const studioSessions = [
             }
         ],
         messages: [
-            { id: makeId("msg"), userId: "u3", userName: "Rahul Verma", text: "Welcome everyone! We start with custom hooks.", timestamp: isoAgo(0, -1), deleted: false },
             { id: makeId("msg"), userId: "u2", userName: "Priya Nair", text: "Audio is clear on my side.", timestamp: isoAgo(0, -1), deleted: false },
             { id: makeId("msg"), userId: "u1", userName: "Aarav Sharma", text: "Can we revisit the cleanup function example?", timestamp: isoAgo(0), deleted: false }
         ]
     }
 ];
+
+// ---------------------------------------------------------------------------
+// Runtime sanity check: production forum content MUST come from client files.
+// ---------------------------------------------------------------------------
+
+const mockCheck = forumDataService.verifyZeroMockContent({ discussions, comments });
+if (!mockCheck.ok) {
+    // Loaded module is expected to be safe; guard against regressions loudly.
+    console.error("[forum] ZERO-mock-content check failed:", mockCheck.violations);
+}
 
 module.exports = {
     makeId,
@@ -430,9 +292,19 @@ module.exports = {
     categories,
     discussions,
     comments,
+    tags,
     votesFor,
     bookmarks,
     notifications,
     notificationPrefs,
-    studioSessions
+    notificationEventPrefs,
+    userRoles,
+    reports,
+    pendingEmails,
+    studioSessions,
+    community: {
+        moderators: clientModeratorUsers.map((u) => ({ id: u.id, name: u.name, email: u.email })),
+        pinnedThreadIds: forumDataService.pinnedThreadIds(),
+        seedingReport: forumDataService.seedingReport()
+    }
 };

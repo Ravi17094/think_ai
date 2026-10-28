@@ -57,6 +57,7 @@
 
 .rich-editor__toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
   border: 1px solid var(--forum-border, #2a3555);
@@ -119,11 +120,44 @@
 
 @media (max-width: 375px) {
   .moderation-container { padding: 16px 10px 48px; }
+  .moderation-header h1 { font-size: 1.1rem; }
 }
 
 /* Moderation toasts reuse the shared toast styles; accent the shield type. */
 .notification-toast--moderation {
   border-color: var(--forum-warning, #f59e0b);
+}
+
+/* ---------- audit log ---------- */
+
+.audit-log-list li:hover {
+  background: var(--forum-surface-2, #1c2440);
+  border-radius: 6px;
+}
+
+/* ---------- mention autocomplete ---------- */
+
+.mention-autocomplete {
+  scrollbar-width: thin;
+  scrollbar-color: var(--forum-border, #2a3555) transparent;
+}
+
+.mention-option--active {
+  font-weight: 600;
+}
+
+/* ---------- responsive search bar ---------- */
+
+@media (max-width: 768px) {
+  .search-bar__row--filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-bar__row--filters .select,
+  .search-bar__row--filters .input {
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 /* ---------- confirmation dialog ---------- */
@@ -179,4 +213,33 @@
 
 @media (max-width: 375px) {
   .confirm-dialog { max-width: none; padding: 16px; }
+}
+
+/* ---------- focus visibility (keyboard navigation) ---------- */
+
+.moderation-page a:focus-visible,
+.moderation-page button:focus-visible,
+.moderation-page input:focus-visible,
+.moderation-page select:focus-visible,
+.moderation-page textarea:focus-visible,
+.confirm-dialog button:focus-visible {
+  outline: 2px solid var(--forum-accent, #6366f1);
+  outline-offset: 2px;
+}
+
+/* ---------- 44px touch targets (mobile / coarse pointers) ---------- */
+
+@media (hover: none) and (pointer: coarse) {
+  .moderation-page .btn {
+    min-height: 44px;
+  }
+  .moderation-page .select {
+    min-height: 44px;
+  }
+  .moderation-page input[type="text"] {
+    min-height: 44px;
+  }
+  .confirm-dialog .btn {
+    min-height: 44px;
+  }
 }

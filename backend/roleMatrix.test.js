@@ -7,10 +7,9 @@ const roleMatrixRoutes = require("./routes/roleMatrix");
 function buildTestApp() {
   const app = express();
   app.use(express.json());
-  // Bypass requireRole for this isolated route test by injecting the header
-  // the real middleware expects.
+  // Provide the development authentication header understood by requireRole.
   app.use((req, res, next) => {
-    req.headers["x-user-role"] = req.headers["x-user-role"] || "Admin";
+    req.headers["x-demo-role"] = req.headers["x-demo-role"] || "Admin";
     next();
   });
   app.use("/api/roles", roleMatrixRoutes);
@@ -32,7 +31,7 @@ async function withServer(fn) {
 test("GET /api/roles/matrix returns roles, permissions, and grants for Admin", async () => {
   await withServer(async (base) => {
     const res = await fetch(`${base}/api/roles/matrix`, {
-      headers: { "x-user-role": "Admin" },
+      headers: { "x-demo-role": "Admin" },
     });
     assert.equal(res.status, 200);
     const body = await res.json();
@@ -47,7 +46,7 @@ test("GET /api/roles/matrix returns roles, permissions, and grants for Admin", a
 test("GET /api/roles/matrix is blocked for non-Admin roles", async () => {
   await withServer(async (base) => {
     const res = await fetch(`${base}/api/roles/matrix`, {
-      headers: { "x-user-role": "Learner" },
+      headers: { "x-demo-role": "Learner" },
     });
     assert.equal(res.status, 403);
   });
@@ -57,7 +56,7 @@ test("PATCH /api/roles/:role/permissions/:permission grants a permission", async
   await withServer(async (base) => {
     const res = await fetch(`${base}/api/roles/Learner/permissions/view_courses`, {
       method: "PATCH",
-      headers: { "x-user-role": "Admin", "Content-Type": "application/json" },
+      headers: { "x-demo-role": "Admin", "Content-Type": "application/json" },
       body: JSON.stringify({ granted: true }),
     });
     assert.equal(res.status, 200);
@@ -72,7 +71,7 @@ test("PATCH /api/roles/:role/permissions/:permission returns 404 for unknown rol
   await withServer(async (base) => {
     const res = await fetch(`${base}/api/roles/Nonexistent/permissions/view_courses`, {
       method: "PATCH",
-      headers: { "x-user-role": "Admin", "Content-Type": "application/json" },
+      headers: { "x-demo-role": "Admin", "Content-Type": "application/json" },
       body: JSON.stringify({ granted: true }),
     });
     assert.equal(res.status, 404);

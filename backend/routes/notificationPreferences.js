@@ -11,8 +11,15 @@ const {
  * Returns a user's notification preferences.
  * Used by Karthik's notification dropdown UI to load current settings.
  */
-router.get("/preferences/:userId", (req, res) => {
-  const userId = parseInt(req.params.userId);
+router.get("/preferences/:userId", (req, res, next) => {
+  const userId = parseInt(req.params.userId, 10);
+
+  // Non-numeric ids (e.g. the Forum module's "u1") are owned by the Forum
+  // notification router, mounted later at `/api`. Pass the request through.
+  if (Number.isNaN(userId)) {
+    return next();
+  }
+
   const prefs = getPreferencesByUserId(userId);
 
   if (!prefs) {
@@ -31,8 +38,14 @@ router.get("/preferences/:userId", (req, res) => {
  * Body: { emailEnabled, smsEnabled, pushEnabled, categories: {...} }
  * Any fields omitted are left unchanged (or defaulted, if new user).
  */
-router.put("/preferences/:userId", (req, res) => {
-  const userId = parseInt(req.params.userId);
+router.put("/preferences/:userId", (req, res, next) => {
+  const userId = parseInt(req.params.userId, 10);
+
+  // Forum-style string ids are handled by the Forum notification router.
+  if (Number.isNaN(userId)) {
+    return next();
+  }
+
   const updates = req.body;
 
   const updated = upsertPreferences(userId, updates);

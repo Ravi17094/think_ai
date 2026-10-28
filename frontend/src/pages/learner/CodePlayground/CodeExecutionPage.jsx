@@ -138,14 +138,14 @@ export default function CodeExecutionPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-slate-600 dark:text-slate-300 font-mono text-xs bg-slate-100 dark:bg-[#0b0f17]">
+      <div className="min-h-full flex items-center justify-center text-slate-600 dark:text-slate-300 font-mono text-xs bg-slate-100 dark:bg-[#0b0f17]">
         <Loader2 className="animate-spin mr-2 text-emerald-500" size={16} /> Loading Judge0 workspace...
       </div>
     );
   }
 
   return (
-    <div className="flex h-[calc(100vh-5rem)] flex-col gap-4 p-4 md:p-6 bg-slate-100 dark:bg-[#0b0f17] text-slate-900 dark:text-slate-100 transition-colors duration-300" style={{ fontFamily: "Inter, sans-serif" }}>
+    <div className="flex h-full min-h-0 flex-col gap-4 p-4 md:p-6 bg-slate-100 dark:bg-[#0b0f17] text-slate-900 dark:text-slate-100 transition-colors duration-300" style={{ fontFamily: "Inter, sans-serif" }}>
       
       {/* Top Header & Question Banner */}
       <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-800">

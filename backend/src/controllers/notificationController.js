@@ -15,6 +15,12 @@ function markRead(req, res) {
     res.status(200).json({ success: true, data: Notification.serialize(notification) });
 }
 
+function markAllRead(req, res) {
+    const userId = req.body.userId ? String(req.body.userId) : resolveUserId(req);
+    const marked = Notification.markAllRead(userId);
+    res.status(200).json({ success: true, data: { userId, marked: marked.length } });
+}
+
 function getPrefs(req, res) {
     res.status(200).json({ success: true, data: Notification.getPrefs(req.params.userId || resolveUserId(req)) });
 }
@@ -24,4 +30,4 @@ function savePrefs(req, res) {
     res.status(200).json({ success: true, data: saved });
 }
 
-module.exports = { list, markRead, getPrefs, savePrefs };
+module.exports = { list, markRead, markAllRead, getPrefs, savePrefs };

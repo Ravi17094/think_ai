@@ -20,10 +20,12 @@ const FORUM_SERVICES = [
     "bookmarkApi.js",
     "moderationApi.js",
     "studioApi.js",
-    "websocket.js"
+    "tagApi.js",
+    "websocket.js",
+    "forumSocketClient.js"
 ];
 
-const FORUM_HOOKS = ["useDiscussions.js", "useVoting.js", "useBookmarks.js", "useWebSocket.js"];
+const FORUM_HOOKS = ["useDiscussions.js", "useVoting.js", "useBookmarks.js", "useWebSocket.js", "useForumSocket.js"];
 
 const MODULE_DIRS = [
     path.join(SRC_ROOT, "components", "forum"),
@@ -42,10 +44,12 @@ const FORBIDDEN = [
     /^react-redux/,
     /^@reduxjs/,
     /(pages|components)\/(auth|admin|learner|public)/,
-    /store\//
+    /store\//,
+    /payment|billing|stripe|razorpay|paypal|subscription/i,
+    /email.*transport|sms.*twilio|sendgrid|nodemailer|mailer/i,
 ];
 
-const ALLOWED_PREFIXES = ["react", "react-dom", "react-router", "socket.io-client"];
+const ALLOWED_PREFIXES = ["react", "react-dom", "react-router", "socket.io-client", "lucide-react"];
 
 function collectFiles(target, acc = []) {
     const stat = statSync(target);

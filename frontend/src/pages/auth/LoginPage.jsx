@@ -7,7 +7,7 @@ import Button from '../../components/common/Button';
 import Checkbox from '../../components/common/Checkbox';
 import Branding from '../../components/auth/Branding';
 import FeedbackHeader from '../../components/auth/FeedbackHeader';
-import ErrorAlert from '../../components/auth/ErrorAlert';
+import ErrorAlert from '../../components/auth/Erroralert';
 import { getLoginErrorMessage } from '../../utils/authErrors';
 
 const ROLE_HOME = {

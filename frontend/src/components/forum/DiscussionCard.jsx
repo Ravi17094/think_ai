@@ -25,6 +25,24 @@ function relativeTime(isoDate) {
   return `${days}d ago`;
 }
 
+function escapeRegex(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function highlightText(text, searchTerm) {
+  if (!searchTerm || !text) return text;
+  const escaped = escapeRegex(searchTerm);
+  const regex = new RegExp(`(${escaped})`, "gi");
+  const parts = text.split(regex);
+  return parts.map((part, index) =>
+    regex.test(part) ? (
+      <mark key={index} className="search-highlight">{part}</mark>
+    ) : (
+      part
+    )
+  );
+}
+
 /** Single discussion row used by the list and bookmark pages. */
 export default function DiscussionCard({
   discussion,
@@ -34,6 +52,7 @@ export default function DiscussionCard({
   isBookmarked,
   onToggleBookmark,
   votePending = false,
+  searchTerm,
 }) {
   const d = discussion;
   return (
@@ -63,7 +82,7 @@ export default function DiscussionCard({
           <span>
             <span
               className="avatar"
-              style={{ background: d.authorColor || "var(--forum-accent)" }}
+              style={{ background: d.authorColor || "var(--forum-accent-solid)" }}
               aria-hidden="true"
             >
               {initials(d.author?.name)}
@@ -73,11 +92,11 @@ export default function DiscussionCard({
           <span>· {relativeTime(d.createdAt)}</span>
         </div>
 
-        <h3 className="discussion-card__title">
-          <Link to={`/forum/${d.id}`}>{d.title}</Link>
-        </h3>
+        <h2 className="discussion-card__title">
+          <Link to={`/forum/${d.id}`}>{highlightText(d.title, searchTerm)}</Link>
+        </h2>
 
-        <p className="discussion-card__excerpt">{String(d.body || "").slice(0, 180)}</p>
+        <p className="discussion-card__excerpt">{highlightText(String(d.body || "").slice(0, 180), searchTerm)}</p>
 
         <div className="card-footer">
           <span>💬 {d.replyCount ?? 0} replies</span>

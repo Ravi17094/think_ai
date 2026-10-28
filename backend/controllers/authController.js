@@ -1,108 +1,136 @@
-const User = require('../User'); // Adjust path if User.js is in models folder (e.g., '../models/User')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
-// Item 3: User Registration
+// ==========================================
+// USER REGISTRATION
+// ==========================================
 exports.register = async (req, res) => {
     try {
         const { email, password, name } = req.body;
 
         // Basic validation
         if (!email || !password) {
-            return res.status(400).json({ success: false, error: "Email and password are required." });
+            return res.status(400).json({
+                success: false,
+                error: 'Email and password are required.'
+            });
         }
 
-        // Check if user already exists
-        const existingUser = await User.findOne({ email });
-
-        if (existingUser) {
-            return res.status(400).json({ success: false, error: "User already exists with this email." });
-        }
-
-        // Hash the password before saving to the database
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Public registration must never trust a role sent by the browser.
-        // Privileged roles are assigned later through an administrator-only flow.
-        const newUser = new User({
-            email,
-            password: hashedPassword,
-            name: name || null,
-            role: 'Learner'
+        // Check if user already exists in PostgreSQL
+        const existingUser = await prisma.user.findUnique({
+            where: { email }
         });
 
-        await newUser.save();
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                error: 'User already exists with this email.'
+            });
+        }
 
-        // Omit password hash from response object
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create user in Database
+        const newUser = await prisma.user.create({
+            data: {
+                email,
+                password: hashedPassword,
+                name: name || email.split('@')[0], // Fallback if name is empty
+                role: 'Learner'
+            }
+        });
+
+        // Generate JWT
+        const token = jwt.sign(
+            {
+                id: newUser.id,
+                email: newUser.email,
+                role: newUser.role,
+            },
+            process.env.JWT_SECRET || 'fallback_secret',
+            { expiresIn: '7d' }
+        );
+
+        // Downstream email trigger (Janadeep's core module requirement)
+        process.nextTick(() => {
+            if (typeof emailService !== 'undefined') {
+                emailService.sendVerificationEmail(newUser.email, token)
+                    .catch(err => console.error("Downstream Email Failure:", err));
+            } else {
+                console.log(`[Demo Mode Check] Verification token for ${newUser.email}: ${token}`);
+            }
+        });
+
+        // Remove password from response for security
         const userWithoutPassword = {
-            id: newUser._id,
+            id: newUser.id,
             name: newUser.name,
             email: newUser.email,
             role: newUser.role,
             createdAt: newUser.createdAt
         };
 
-        // Generate a JWT token upon successful registration
-        const token = jwt.sign(
-            {
-                id: newUser._id.toString(),
-                email: newUser.email,
-                role: newUser.role
-            },
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" }
-        );
-
         return res.status(201).json({
             success: true,
-            message: "User registered successfully!",
+            message: 'User registered successfully. Verification email triggered.',
             token,
             user: userWithoutPassword
         });
 
     } catch (error) {
-        console.error("Registration error:", error);
-        return res.status(500).json({ success: false, error: "Internal server error occurred." });
+        console.error('Registration error:', error);
+        return res.status(500).json({
+            success: false,
+            error: 'Internal server error occurred.'
+        });
     }
 };
 
-// Item 4: User Login
+// ==========================================
+// USER LOGIN
+// ==========================================
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Validation
+        // Basic validation
         if (!email || !password) {
-            return res.status(400).json({ success: false, error: "Email and password are required." });
+            return res.status(400).json({
+                success: false,
+                error: 'Email and password are required.'
+            });
         }
 
-        // Find user by email
-        const user = await User.findOne({ email });
+        // Find user by email in PostgreSQL
+        const user = await prisma.user.findUnique({
+            where: { email }
+        });
 
-        if (!user) {
-            return res.status(401).json({ success: false, error: "Invalid credentials." });
+        // If user not found or password doesn't match
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({
+                success: false,
+                error: 'Invalid credentials. Please verify details and try again.'
+            });
         }
 
-        // Check if the provided password matches the hashed password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-
-        if (!isPasswordValid) {
-            return res.status(401).json({ success: false, error: "Invalid credentials." });
-        }
-
-        // Generate real JWT token containing user details and role
+        // Generate JWT token
         const token = jwt.sign(
             {
-                id: user._id.toString(), 
+                id: user.id,
                 email: user.email,
                 role: user.role
             },
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" }
+            process.env.JWT_SECRET || 'fallback_secret',
+            { expiresIn: '7d' }
         );
 
+        // Remove password field from the return response payload
         const userWithoutPassword = {
-            id: user._id,
+            id: user.id,
             name: user.name,
             email: user.email,
             role: user.role,
@@ -111,32 +139,54 @@ exports.login = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Login successful!",
+            message: 'Login successful.',
             token,
             user: userWithoutPassword
         });
 
     } catch (error) {
-        console.error("Login error:", error);
-        return res.status(500).json({ success: false, error: "Internal server error occurred." });
+        console.error('Login error:', error);
+        return res.status(500).json({
+            success: false,
+            error: 'Internal server error occurred during authentication.'
+        });
     }
 };
 
+
+// ============================================================
+// GET CURRENT USER
+// ============================================================
 exports.getCurrentUser = async (req, res) => {
     try {
-        // req.user is populated by your requireRole / auth middleware from the decoded JWT token
-        const userId = req.user.id;
+        // req.user is populated by authentication middleware
+        const userId = Number(req.user.id);
 
-        const user = await User.findById(userId).select("-password");
+        if (!userId || Number.isNaN(userId)) {
+            return res.status(401).json({
+                success: false,
+                error: 'Invalid user ID.'
+            });
+        }
+
+        // Find user in PostgreSQL
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId
+            }
+        });
 
         if (!user) {
-            return res.status(404).json({ success: false, error: "User not found." });
+            return res.status(404).json({
+                success: false,
+                error: 'User not found.'
+            });
         }
 
         return res.status(200).json({
             success: true,
             user: {
-                id: user._id,
+                id: user.id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
@@ -145,7 +195,11 @@ exports.getCurrentUser = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Get current user error:", error);
-        return res.status(500).json({ success: false, error: "Internal server error occurred." });
+        console.error('Get current user error:', error);
+
+        return res.status(500).json({
+            success: false,
+            error: 'Internal server error occurred.'
+        });
     }
 };

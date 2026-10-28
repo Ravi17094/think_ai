@@ -1,0 +1,237 @@
+{
+  "generatedAt": "2026-09-18T12:03:46.633Z",
+  "baseUrl": "http://localhost:5173",
+  "browser": "chromium (channel: chrome)",
+  "summary": {
+    "passed": 45,
+    "failed": 0,
+    "total": 45
+  },
+  "checks": [
+    {
+      "name": "browser:mobile-375 visit /forum",
+      "ok": true,
+      "detail": "(2989ms)"
+    },
+    {
+      "name": "browser:mobile-375 no-horizontal-overflow /forum",
+      "ok": true,
+      "detail": "{\"doc\":375,\"client\":375,\"body\":375,\"meta\":\"width=device-width, initial-scale=1.0\"}"
+    },
+    {
+      "name": "browser:mobile-375 screenshot /forum",
+      "ok": true,
+      "detail": "e2e-artifacts/screenshots/mobile-375_forum.png"
+    },
+    {
+      "name": "browser:mobile-375 44px-hit-targets /forum",
+      "ok": true,
+      "detail": "ok 64 controls sampled"
+    },
+    {
+      "name": "browser:mobile-375 visit /forum/notifications",
+      "ok": true,
+      "detail": "(1877ms)"
+    },
+    {
+      "name": "browser:mobile-375 no-horizontal-overflow /forum/notifications",
+      "ok": true,
+      "detail": "{\"doc\":375,\"client\":375,\"body\":375,\"meta\":\"width=device-width, initial-scale=1.0\"}"
+    },
+    {
+      "name": "browser:mobile-375 screenshot /forum/notifications",
+      "ok": true,
+      "detail": "e2e-artifacts/screenshots/mobile-375_forum_notifications.png"
+    },
+    {
+      "name": "browser:mobile-375 44px-hit-targets /forum/notifications",
+      "ok": true,
+      "detail": "ok 3 controls sampled"
+    },
+    {
+      "name": "browser:mobile-375 visit /forum/moderation",
+      "ok": true,
+      "detail": "(2030ms)"
+    },
+    {
+      "name": "browser:mobile-375 no-horizontal-overflow /forum/moderation",
+      "ok": true,
+      "detail": "{\"doc\":375,\"client\":375,\"body\":375,\"meta\":\"width=device-width, initial-scale=1.0\"}"
+    },
+    {
+      "name": "browser:mobile-375 screenshot /forum/moderation",
+      "ok": true,
+      "detail": "e2e-artifacts/screenshots/mobile-375_forum_moderation.png"
+    },
+    {
+      "name": "browser:mobile-375 44px-hit-targets /forum/moderation",
+      "ok": true,
+      "detail": "ok 75 controls sampled"
+    },
+    {
+      "name": "browser:mobile-375 axe color-contrast violations",
+      "ok": true,
+      "detail": "0 contrast violations"
+    },
+    {
+      "name": "browser:tablet-768 visit /forum",
+      "ok": true,
+      "detail": "(2665ms)"
+    },
+    {
+      "name": "browser:tablet-768 no-horizontal-overflow /forum",
+      "ok": true,
+      "detail": "{\"doc\":768,\"client\":768,\"body\":768,\"meta\":\"width=device-width, initial-scale=1.0\"}"
+    },
+    {
+      "name": "browser:tablet-768 screenshot /forum",
+      "ok": true,
+      "detail": "e2e-artifacts/screenshots/tablet-768_forum.png"
+    },
+    {
+      "name": "browser:tablet-768 visit /forum/notifications",
+      "ok": true,
+      "detail": "(2073ms)"
+    },
+    {
+      "name": "browser:tablet-768 no-horizontal-overflow /forum/notifications",
+      "ok": true,
+      "detail": "{\"doc\":768,\"client\":768,\"body\":768,\"meta\":\"width=device-width, initial-scale=1.0\"}"
+    },
+    {
+      "name": "browser:tablet-768 screenshot /forum/notifications",
+      "ok": true,
+      "detail": "e2e-artifacts/screenshots/tablet-768_forum_notifications.png"
+    },
+    {
+      "name": "browser:tablet-768 visit /forum/moderation",
+      "ok": true,
+      "detail": "(1990ms)"
+    },
+    {
+      "name": "browser:tablet-768 no-horizontal-overflow /forum/moderation",
+      "ok": true,
+      "detail": "{\"doc\":768,\"client\":768,\"body\":768,\"meta\":\"width=device-width, initial-scale=1.0\"}"
+    },
+    {
+      "name": "browser:tablet-768 screenshot /forum/moderation",
+      "ok": true,
+      "detail": "e2e-artifacts/screenshots/tablet-768_forum_moderation.png"
+    },
+    {
+      "name": "browser:tablet-768 axe color-contrast violations",
+      "ok": true,
+      "detail": "0 contrast violations"
+    },
+    {
+      "name": "browser:desktop-1440 visit /forum",
+      "ok": true,
+      "detail": "(2571ms)"
+    },
+    {
+      "name": "browser:desktop-1440 no-horizontal-overflow /forum",
+      "ok": true,
+      "detail": "{\"doc\":1440,\"client\":1440,\"body\":1440,\"meta\":\"width=device-width, initial-scale=1.0\"}"
+    },
+    {
+      "name": "browser:desktop-1440 screenshot /forum",
+      "ok": true,
+      "detail": "e2e-artifacts/screenshots/desktop-1440_forum.png"
+    },
+    {
+      "name": "browser:desktop-1440 visit /forum/notifications",
+      "ok": true,
+      "detail": "(2099ms)"
+    },
+    {
+      "name": "browser:desktop-1440 no-horizontal-overflow /forum/notifications",
+      "ok": true,
+      "detail": "{\"doc\":1440,\"client\":1440,\"body\":1440,\"meta\":\"width=device-width, initial-scale=1.0\"}"
+    },
+    {
+      "name": "browser:desktop-1440 screenshot /forum/notifications",
+      "ok": true,
+      "detail": "e2e-artifacts/screenshots/desktop-1440_forum_notifications.png"
+    },
+    {
+      "name": "browser:desktop-1440 visit /forum/moderation",
+      "ok": true,
+      "detail": "(1996ms)"
+    },
+    {
+      "name": "browser:desktop-1440 no-horizontal-overflow /forum/moderation",
+      "ok": true,
+      "detail": "{\"doc\":1440,\"client\":1440,\"body\":1440,\"meta\":\"width=device-width, initial-scale=1.0\"}"
+    },
+    {
+      "name": "browser:desktop-1440 screenshot /forum/moderation",
+      "ok": true,
+      "detail": "e2e-artifacts/screenshots/desktop-1440_forum_moderation.png"
+    },
+    {
+      "name": "browser:desktop-1440 axe color-contrast violations",
+      "ok": true,
+      "detail": "0 contrast violations"
+    },
+    {
+      "name": "staging: forum list loads with discussions",
+      "ok": true,
+      "detail": "(1351ms)"
+    },
+    {
+      "name": "staging: search finds results",
+      "ok": true,
+      "detail": "(1641ms)"
+    },
+    {
+      "name": "staging: open thread and post comment",
+      "ok": true,
+      "detail": "(1726ms)"
+    },
+    {
+      "name": "staging: back to list and toggle bookmark",
+      "ok": true,
+      "detail": "(1791ms)"
+    },
+    {
+      "name": "staging: notification center renders",
+      "ok": true,
+      "detail": "(1164ms)"
+    },
+    {
+      "name": "staging: moderation dashboard shows flagged content",
+      "ok": true,
+      "detail": "(1568ms)"
+    },
+    {
+      "name": "staging: create a discussion Publish",
+      "ok": true,
+      "detail": "(922ms)"
+    },
+    {
+      "name": "staging: checkout loads for seeded course",
+      "ok": true,
+      "detail": "(3096ms)"
+    },
+    {
+      "name": "staging: checkout success card → receipt",
+      "ok": true,
+      "detail": "(2400ms)"
+    },
+    {
+      "name": "staging: declined card → FAILED → retry returns to checkout",
+      "ok": true,
+      "detail": "(2495ms)"
+    },
+    {
+      "name": "staging: network-error card → FAILED screen",
+      "ok": true,
+      "detail": "(2265ms)"
+    },
+    {
+      "name": "staging: timeout card resolves to FAILED",
+      "ok": true,
+      "detail": "(10527ms)"
+    }
+  ]
+}

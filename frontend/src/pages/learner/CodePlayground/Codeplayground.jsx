@@ -70,7 +70,7 @@ export default function CodePlayground({ mode = 'practice', submissionId, questi
   const submission = execution.submission;
 
   return (
-    <div className="flex h-[calc(100vh-8.5rem)] flex-col gap-4">
+    <div className="flex h-full min-h-0 flex-col gap-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-[var(--accent-to)]/80">

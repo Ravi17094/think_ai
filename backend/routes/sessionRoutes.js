@@ -20,6 +20,9 @@ const { validateSessionInput } = require("../validations/sessionValidation");
 // Added validateSessionInput here to protect session creation requests
 router.post("/sessions", validateSessionInput, sessionController.createSession);
 
+router.get("/sessions", sessionController.getSessions);
+router.post("/sessions/:id/start", sessionController.startSession); 
+router.get("/sessions/:id/join-token", sessionController.getJoinToken);
 /**
  * @swagger
  * /api/v1/sessions/callback/recording:
@@ -28,6 +31,7 @@ router.post("/sessions", validateSessionInput, sessionController.createSession);
  *     tags: [Sessions]
  */
 // Connects to your controller endpoint handling recording completion events
+router.post("/sessions/:id/start", sessionController.startSession);
 router.post("/sessions/callback/recording", sessionController.saveRecordingCallback);
 
 module.exports = router;

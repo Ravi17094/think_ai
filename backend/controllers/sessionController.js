@@ -1,3 +1,6 @@
+const NodeCache = require("node-cache");
+const sessionCache = new NodeCache({ stdTTL: 300});
+
 // Local mock data store (No database)
 let sessions = [];
 let attendance = [];
@@ -164,9 +167,136 @@ const saveRecordingCallback = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
+// ==========================================
+// FETCH ALL SESSIONS (With Cache Layer)
+// ==========================================
+const getSessions = async (req, res) => {
+    try {
+        const cacheKey = "live_sessions_list";
+
+        // 1. Check if data is already inside the memory cache store
+        const cachedData = sessionCache.get(cacheKey);
+        if (cachedData) {
+            // Immediate cache hit: Returns instantly in < 5ms!
+            return res.status(200).json({
+                success: true,
+                fromCache: true,
+                data: cachedData
+            });
+        }
+
+        // 2. If cache is empty, pull data from your storage array
+        const currentSessions = sessions;
+
+        // 3. Save the results into memory for future request cycles
+        sessionCache.set(cacheKey, currentSessions);
+
+        return res.status(200).json({
+            success: true,
+            fromCache: false,
+            data: currentSessions
+        });
+    } catch (error) {
+        console.error("Fetch sessions optimization error:", error);
+        return res.status(500).json({
+            success: false,
+            error: "Internal server optimization failure occurred."
+        });
+    }
+};
+// ==========================================
+// START LIVE SESSION (Generates Unique Jitsi Room)
+// ==========================================
+const startSession = async (req, res) => {
+    const { id } = req.params;
+    
+    try {
+        const uniqueRoomName = `thinkz-room-${id}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+        const sessionIndex = sessions.findIndex(s => s.id === parseInt(id) || s.id === id);
+        
+        if (sessionIndex !== -1) {
+            sessions[sessionIndex].roomName = uniqueRoomName;
+            sessions[sessionIndex].status = "ACTIVE";
+        } else {
+            sessions.push({ id: id, roomName: uniqueRoomName, status: "ACTIVE" });
+        }
+
+        if (typeof sessionCache !== 'undefined') {
+            sessionCache.del("live_sessions_list");
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Live classroom session initialized successfully.",
+            roomName: uniqueRoomName,
+            status: "ACTIVE"
+        });
+
+    } catch (error) {
+        console.error("Critical error inside session initialization block:", error);
+        return res.status(500).json({
+            success: false,
+            error: "Failed to allocate target live classroom system assets."
+        });
+    }
+};
+// ==========================================
+// GET LIVE SESSION AUTHORIZATION JOIN TOKEN
+// ==========================================
+const getJoinToken = async (req, res) => {
+    const { id } = req.params;
+    
+    try {
+        // Find the active session room inside your mock database storage array
+        const session = sessions.find(s => s.id === parseInt(id) || s.id === id);
+        
+        if (!session || session.status !== "ACTIVE") {
+            return res.status(404).json({
+                success: false,
+                error: "No active live session found matching this identification signature."
+            });
+        }
+
+        // Generate a time-limited token payload block for room verification (1 hour expiry)
+        // Uses a fallback token generation pattern matching your auth token controller setup
+        const jitsiToken = jwt.sign(
+            {
+                context: {
+                    user: {
+                        name: req.user?.name || "Janadeep Validator",
+                        email: req.user?.email || "janadeep@thinkzai.com",
+                        id: req.user?.id || 101,
+                        role: req.user?.role || "Learner"
+                    }
+                },
+                aud: "jitsi",
+                iss: "think_ai",
+                room: session.roomName
+            },
+            process.env.JWT_SECRET || 'fallback_secret',
+            { expiresIn: '1h' }
+        );
+
+        return res.status(200).json({
+            success: true,
+            token: jitsiToken,
+            roomName: session.roomName
+        });
+
+    } catch (error) {
+        console.error("Critical error generating authorization access signature:", error);
+        return res.status(500).json({
+            success: false,
+            error: "Failed to compile room authentication security token."
+        });
+    }
+};
 // Export all the middleware handlers globally
 module.exports = {
     createSession,
+    startSession,
+    getJoinToken,
+    getSessions, 
     getSessionById,
     updateSession,
     deleteSession,

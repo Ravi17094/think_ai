@@ -1,6 +1,9 @@
+import { Hand, Mic, MicOff, Video } from "lucide-react";
+
 /**
- * Attendee list with online/offline indicators, mic/camera state and
- * raised hands (Phase 6/7).
+ * Attendee panel with online/offline indicators, mic/camera state and
+ * raised hands (Phase 6/7). Rendered Google Meet-style with SVG status
+ * icons instead of emojis.
  */
 export default function AttendeeList({ attendees = [], hostId, currentUserId, onClose }) {
   return (
@@ -16,7 +19,20 @@ export default function AttendeeList({ attendees = [], hostId, currentUserId, on
             onClick={onClose}
             aria-label="Close attendees"
           >
-            ✕
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         )}
       </div>
@@ -34,12 +50,13 @@ export default function AttendeeList({ attendees = [], hostId, currentUserId, on
             {attendee.userId === hostId && <span className="attendee-host">HOST</span>}
             <span className="attendee-icons" aria-hidden="true">
               {attendee.raisedHand && (
-                <span className="attendee-hand" role="img" aria-label={`${attendee.name} raised hand`}>
-                  ✋
+                <span className="attendee-hand" title="Raised hand">
+                  <Hand size={14} />
                 </span>
               )}
-              {!attendee.muted && <span role="img" aria-label="mic on">🎙</span>}
-              {attendee.cameraOn && <span role="img" aria-label="camera on">📷</span>}
+              {attendee.muted && <span title="Microphone off"><MicOff size={14} /></span>}
+              {!attendee.muted && <span title="Microphone on"><Mic size={14} /></span>}
+              {attendee.cameraOn && <span title="Camera on"><Video size={14} /></span>}
             </span>
           </li>
         ))}

@@ -16,6 +16,17 @@ export default function FlaggedPosts({ items = [], onToggleHidden, onResolve, bu
             <div className="comment__meta">
               <span className="badge badge--pinned">{item.type}</span>
               <span>{item.authorName}</span>
+              {item.reporterName && (
+                <span>
+                  <span aria-hidden="true">· flagged by </span>
+                  <span className="flag-reporter">{item.reporterName}</span>
+                </span>
+              )}
+              {item.flaggedAt && (
+                <span className="flag-time" title={item.flaggedAt}>
+                  {new Date(item.flaggedAt).toLocaleString()}
+                </span>
+              )}
               {item.reason && (
                 <span style={{ color: "#fda4af" }}>
                   <span aria-hidden="true">· reason: </span>
@@ -24,8 +35,6 @@ export default function FlaggedPosts({ items = [], onToggleHidden, onResolve, bu
               )}
               {item.hidden && <span className="badge badge--solved">hidden</span>}
             </div>
-
-            <h3 style={{ margin: "4px 0 6px", fontSize: "0.95rem" }}>{item.title}</h3>
             <p className="comment__body">{item.excerpt}</p>
 
             <div className="card-footer" style={{ marginTop: 10 }}>

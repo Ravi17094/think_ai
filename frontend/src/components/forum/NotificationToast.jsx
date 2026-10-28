@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const DEFAULT_AUTO_DISMISS_MS = 5000;
 
@@ -9,6 +9,9 @@ const DEFAULT_AUTO_DISMISS_MS = 5000;
  * `autoDismissMs`/`autoCloseMs` for the auto-dismiss delay. Pass `null` to
  * disable auto-dismissing entirely. Each notification:
  *   { id, message, link?, type? }
+ *
+ * Supports pause-on-hover: hovering pauses the auto-dismiss timer and
+ * resuming restarts it with the full delay.
  */
 export default function NotificationToast({
   toasts,
@@ -21,14 +24,50 @@ export default function NotificationToast({
   const items = useMemo(() => toasts || notifications || [], [toasts, notifications]);
   const delay =
     autoDismissMs !== undefined ? autoDismissMs : autoCloseMs !== undefined ? autoCloseMs : DEFAULT_AUTO_DISMISS_MS;
+  const progressMs =
+    !delay ? null : Math.max(Math.min(Number(delay) || 0, 15000), 1500);
+  const [pausedIds, setPausedIds] = useState(() => new Set());
+  const timersRef = useRef(new Map());
 
   useEffect(() => {
     if (!delay || !onDismiss) return undefined;
-    const timers = items.map((notification) =>
-      setTimeout(() => onDismiss(notification.id), delay)
-    );
-    return () => timers.forEach(clearTimeout);
-  }, [items, delay, onDismiss]);
+
+    const timers = timersRef.current;
+
+    const startTimer = (notification) => {
+      if (pausedIds.has(notification.id)) return;
+      const timer = setTimeout(() => onDismiss(notification.id), delay);
+      timers.set(notification.id, timer);
+    };
+
+    items.forEach(startTimer);
+
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer));
+      timers.clear();
+    };
+  }, [items, delay, onDismiss, pausedIds]);
+
+  const handleMouseEnter = useCallback((id) => {
+    setPausedIds((previous) => {
+      const next = new Set(previous);
+      next.add(id);
+      return next;
+    });
+    const timer = timersRef.current.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      timersRef.current.delete(id);
+    }
+  }, []);
+
+  const handleMouseLeave = useCallback((id) => {
+    setPausedIds((previous) => {
+      const next = new Set(previous);
+      next.delete(id);
+      return next;
+    });
+  }, []);
 
   if (!items || items.length === 0) return null;
 
@@ -40,6 +79,8 @@ export default function NotificationToast({
           className={`notification-toast${notification.type === "moderation" ? " notification-toast--moderation" : ""}`}
           data-testid="toast"
           data-notification-id={notification.id}
+          onMouseEnter={() => handleMouseEnter(notification.id)}
+          onMouseLeave={() => handleMouseLeave(notification.id)}
         >
           <span aria-hidden="true">{notification.type === "moderation" ? "🛡" : "🔔"}</span>
           <span className="notification-toast__message">{notification.message}</span>
@@ -59,6 +100,13 @@ export default function NotificationToast({
           >
             ✕
           </button>
+          {progressMs ? (
+            <span
+              className="notification-toast__progress"
+              style={{ animationDuration: `${progressMs}ms` }}
+              aria-hidden="true"
+            />
+          ) : null}
         </div>
       ))}
     </div>

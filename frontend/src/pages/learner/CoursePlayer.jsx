@@ -155,7 +155,7 @@ export default function CoursePlayer() {
       const totalDuration = video.duration;
 
       const response = await axios.post(
-        `http://localhost:5000/api/lesson-progress/lesson/${lId}/track`,
+        (`/api/lesson-progress/lesson/${lId}/track`),
         {
           enrollmentId: Number(enrollmentId),
           watchedSeconds,
@@ -211,19 +211,19 @@ export default function CoursePlayer() {
   };
 
   if (!user?.email) {
-    return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#151821] text-slate-400">Loading your account…</div>;
+    return <div className="min-h-full flex items-center justify-center bg-slate-50 dark:bg-[#151821] text-slate-400">Loading your account…</div>;
   }
   if (enrollments.length > 0 && !enrollment) {
-    return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#151821] text-rose-500">You're not enrolled in this course.</div>;
+    return <div className="min-h-full flex items-center justify-center bg-slate-50 dark:bg-[#151821] text-rose-500">You're not enrolled in this course.</div>;
   }
   if (!enrollment || modulesLoading) {
-    return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#151821] text-slate-400">Loading course…</div>;
+    return <div className="min-h-full flex items-center justify-center bg-slate-50 dark:bg-[#151821] text-slate-400">Loading course…</div>;
   }
 
   const currentLessonId = currentLesson?.id || currentLesson?._id;
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-[#151821] text-slate-900 dark:text-[#f1f3f9] font-sans transition-colors duration-300 py-4 sm:py-8">
+    <div className="min-h-full bg-slate-50 dark:bg-[#151821] text-slate-900 dark:text-[#f1f3f9] font-sans transition-colors duration-300 py-4 sm:py-8">
       
       {/* Mobile Sidebar Toggle Bar */}
       <div className="max-w-[90rem] mx-auto px-4 sm:px-6 mb-4 flex lg:hidden items-center justify-between">

@@ -11,6 +11,7 @@
   --forum-text: #e6eaf5;
   --forum-text-dim: #93a0bf;
   --forum-accent: #6366f1;
+  --forum-accent-solid: #4f46e5;
   --forum-accent-soft: rgba(99, 102, 241, 0.16);
   --forum-success: #10b981;
   --forum-danger: #ef4444;
@@ -76,8 +77,8 @@
 .btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .btn--primary {
-  background: var(--forum-accent);
-  border-color: var(--forum-accent);
+  background: var(--forum-accent-solid);
+  border-color: var(--forum-accent-solid);
   color: #fff;
 }
 .btn--primary:hover:not(:disabled) { background: #4f52e0; }
@@ -548,6 +549,15 @@ button.tag-chip { cursor: pointer; }
   font-weight: 600;
 }
 
+/* ---------- search highlighting ---------- */
+
+.search-highlight {
+  background: rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
 /* ---------- notifications toast stack ---------- */
 
 .notification-toast-stack {
@@ -562,6 +572,7 @@ button.tag-chip { cursor: pointer; }
 }
 
 .notification-toast {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -570,27 +581,216 @@ button.tag-chip { cursor: pointer; }
   border-radius: var(--forum-radius);
   padding: 11px 13px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-  animation: forum-toast-in 0.25s ease;
+  overflow: hidden;
+  animation: forum-toast-in 0.28s cubic-bezier(0.21, 1.02, 0.73, 1) both;
 }
 
 @keyframes forum-toast-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .notification-toast__message {
   font-size: 0.83rem;
   line-height: 1.4;
   flex: 1;
+  min-width: 0;
 }
 
+.notification-toast__action,
 .notification-toast__close {
   background: none;
-  border: none;
+  border: 1px solid var(--forum-border);
+  border-radius: 6px;
   color: var(--forum-text-dim);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  flex-shrink: 0;
+}
+
+.notification-toast__close:hover { color: var(--forum-text); }
+
+.notification-toast__progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--forum-accent), var(--forum-success));
+  animation-name: forum-toast-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.notification-toast--moderation .notification-toast__progress {
+  background: linear-gradient(90deg, var(--forum-warning), var(--forum-danger));
+}
+
+@keyframes forum-toast-progress {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notification-toast {
+    animation: none;
+  }
+  .notification-toast__progress {
+    animation: none;
+  }
+}
+
+/* ---------- notification center ---------- */
+
+.notification-list {
+  list-style: none;
+  margin: 0;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notification-item {
+  background: var(--forum-surface);
+  border: 1px solid var(--forum-border);
+  border-radius: var(--forum-radius);
+  padding: 0;
+  display: flex;
+  align-items: stretch;
+}
+
+.notification-item--unread {
+  border-color: var(--forum-accent);
+  background: var(--forum-accent-soft);
+}
+
+.notification-item__link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 12px 14px;
+  cursor: pointer;
+  border-radius: var(--forum-radius);
+  font: inherit;
+}
+
+.notification-item__open {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 14px;
+  margin: 6px;
+  border: 1px solid var(--forum-border);
+  border-radius: var(--forum-radius);
+  color: var(--forum-accent);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.notification-item__open:hover {
+  background: var(--forum-accent-soft);
+}
+
+.notification-item__icon {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.notification-item__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-item__message {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--forum-text);
+}
+
+.notification-item__time {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.74rem;
+  color: var(--forum-text-dim);
+}
+
+.notification-item__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--forum-accent);
+  flex-shrink: 0;
+}
+
+.notification-item__link:hover { background: var(--forum-surface-2); }
+
+/* ---------- focus visibility (keyboard navigation) ---------- */
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--forum-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- 44px touch targets (mobile / coarse pointers) ---------- */
+
+@media (hover: none) and (pointer: coarse) {
+  .vote-button {
+    width: 44px;
+    height: 44px;
+  }
+  .bookmark-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .pagination button {
+    min-width: 44px;
+    height: 44px;
+  }
+  .btn--small {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 16px;
+  }
+  .btn {
+    min-height: 44px;
+  }
+  .tag-chip {
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+  .search-bar input,
+  .search-bar .input,
+  .select {
+    min-height: 44px;
+  }
+  .empty-state .btn {
+    min-height: 44px;
+  }
 }
 
 /* ---------- categories page ---------- */
@@ -660,6 +860,9 @@ button.tag-chip { cursor: pointer; }
   }
   .vote-score { order: -1; margin-right: 6px; }
   .forum-header h1 { font-size: 1.2rem; }
+  .notification-item { flex-wrap: wrap; }
+  .notification-item__link { min-width: 100%; }
+  .notification-item__open { width: 100%; margin: 0 8px 8px; }
 }
 
 /* --- SearchBar filter panel (Phase 9) + categories table (Phase 5) --- */

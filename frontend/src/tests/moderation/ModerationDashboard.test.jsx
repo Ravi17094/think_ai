@@ -10,8 +10,11 @@ import {
 vi.mock("../../services/moderationApi", () => ({
   fetchFlaggedQueue: vi.fn(),
   fetchModerationUsers: vi.fn(),
+  fetchAuditLog: vi.fn(),
   banUser: vi.fn(),
   unbanUser: vi.fn(),
+  warnUser: vi.fn(),
+  muteUser: vi.fn(),
   setContentVisibility: vi.fn(),
   resolveContent: vi.fn(),
 }));
@@ -20,9 +23,11 @@ import {
   banUser,
   fetchFlaggedQueue,
   fetchModerationUsers,
+  fetchAuditLog,
   resolveContent,
   setContentVisibility,
   unbanUser,
+  warnUser,
 } from "../../services/moderationApi";
 
 function renderPage() {
@@ -50,6 +55,7 @@ beforeEach(() => {
     moderationUserFixture({ id: "u2", name: "Priya Nair", username: "priya", banned: true }),
     moderationUserFixture({ id: "u3", name: "Rahul Verma", username: "rahul", role: "Instructor" }),
   ]);
+  fetchAuditLog.mockResolvedValue([]);
 });
 
 describe("ModerationDashboard (Phase 8)", () => {
@@ -155,5 +161,40 @@ describe("ModerationDashboard (Phase 8)", () => {
     await waitFor(() => {
       expect(screen.getByRole("alert")).toHaveTextContent("Failed to load moderation data");
     });
+  });
+
+  it("shows warn and mute buttons for active users", async () => {
+    renderPage();
+
+    await waitFor(() => expect(screen.getByText("@devpatel")).toBeInTheDocument());
+    expect(screen.getAllByText("Warn").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Mute").length).toBeGreaterThan(0);
+  });
+
+  it("warns a user after confirmation", async () => {
+    warnUser.mockResolvedValue(moderationUserFixture({ warned: true }));
+    renderPage();
+
+    await waitFor(() => expect(screen.getAllByText("Warn").length).toBeGreaterThan(0));
+    fireEvent.click(screen.getAllByText("Warn")[0]);
+    const confirm = screen.getByTestId("confirm-dialog");
+    fireEvent.click(within(confirm).getByRole("button", { name: "Warn" }));
+    await waitFor(() => expect(warnUser).toHaveBeenCalledWith("u7"));
+    await waitFor(() => {
+      const toast = document.querySelector('[data-notification-id]');
+      expect(toast).toHaveTextContent("warned");
+    });
+  });
+
+  it("loads audit log entries", async () => {
+    fetchAuditLog.mockResolvedValue([
+      { id: "a1", type: "ban_user", targetUserId: "u7", detail: "Dev Patel", timestamp: "2026-08-24T12:00:00Z" },
+    ]);
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByText(/Audit Log/)).toBeInTheDocument();
+    });
+    expect(screen.getByText("ban_user")).toBeInTheDocument();
   });
 });

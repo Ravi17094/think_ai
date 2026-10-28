@@ -172,7 +172,7 @@ export default function StudentAssessmentTaker() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-slate-400 font-mono text-xs bg-slate-950">
+      <div className="min-h-full flex items-center justify-center text-slate-400 font-mono text-xs bg-slate-950">
         <Loader2 className="animate-spin mr-2 text-emerald-500" size={16} /> Loading assessment questions...
       </div>
     );
@@ -183,7 +183,7 @@ export default function StudentAssessmentTaker() {
 
   return (
     <div 
-      className="min-h-screen w-full bg-gradient-to-br from-[#F6F5F1] via-[#EFECE6] to-[#E5E2D9] dark:from-[#0b0f17] dark:via-[#111827] dark:to-[#0f172a] text-slate-900 dark:text-[#f1f3f9] p-4 sm:p-6 lg:p-8 font-sans transition-colors duration-500"
+      className="min-h-full w-full bg-gradient-to-br from-[#F6F5F1] via-[#EFECE6] to-[#E5E2D9] dark:from-[#0b0f17] dark:via-[#111827] dark:to-[#0f172a] text-slate-900 dark:text-[#f1f3f9] p-4 sm:p-6 lg:p-8 font-sans transition-colors duration-500"
       style={{ fontFamily: "Inter, sans-serif" }}
     >
       <style>{FONT_IMPORT}</style>

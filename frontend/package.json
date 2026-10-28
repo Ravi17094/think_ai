@@ -10,7 +10,8 @@
     "test": "vitest run",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "lint:ci": "eslint src/api/rolesApi.js src/api/searchApi.js src/features/auth/authSlice.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -20,7 +21,7 @@
     "@reduxjs/toolkit": "^2.12.0",
     "axios": "^1.19.0",
     "expo": "^51.0.39",
-    "lucide-react": "^1.38.0",
+    "lucide-react": "^1.40.0",
     "metro": "~0.80.8",
     "prop-types": "^15.8.1",
     "react": "18.2.0",

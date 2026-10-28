@@ -1,2 +1,23 @@
+node_modules/
 .expo/
+dist/
+web-build/
+.web-build/
+coverage/
+.walkthrough-tmp/
 
+demo-artifacts/
+
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+.DS_Store

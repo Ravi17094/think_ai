@@ -24,6 +24,7 @@ function upsertPreferences(userId, updates) {
         forumReplies: true,
         paymentAlerts: true,
         systemAnnouncements: true,
+        liveSessions: true,
       },
       updatedAt: now,
     });

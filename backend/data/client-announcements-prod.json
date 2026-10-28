@@ -1,0 +1,51 @@
+{
+  "source": "client-announcements-prod.json",
+  "provider": "clientdomain.com",
+  "contentType": "real",
+  "generated": false,
+  "pinned": true,
+  "threads": [
+    {
+      "id": "d-ann-guidelines",
+      "title": "Community Guidelines",
+      "body": "Our community works best when everyone feels safe to ask, share and learn.\n\nCore guidelines:\n1. Be respectful \u2014 assume good intent and disagree constructively.\n2. No spam, self-promotion or off-topic promotions.\n3. Protect each other's privacy \u2014 do not post personal data.\n4. Flag content you believe breaks these rules with the reason provided.\n\nModerators review every report. Thank you for keeping this space healthy.",
+      "authorEmail": "olivia.bennett@clientdomain.com",
+      "category": "Announcements",
+      "tags": ["community", "guidelines", "moderation"],
+      "createdAt": "2026-03-01T09:05:00.000Z",
+      "solved": true,
+      "pinned": true,
+      "views": 5120,
+      "upvotes": 240,
+      "downvotes": 3
+    },
+    {
+      "id": "d-ann-onboarding",
+      "title": "Onboarding Resources",
+      "body": "Everything a new member needs to get started in one place.\n\n1. Platform tour video\n2. Course catalogue and completion FAQ\n3. Community participation guide\n4. Help & Support escalation path\n5. Calendar of monthly AMA sessions\n\nBookmark this thread \u2014 it is updated after every release.",
+      "authorEmail": "marcus.chen@clientdomain.com",
+      "category": "Announcements",
+      "tags": ["onboarding", "resources", "getting-started"],
+      "createdAt": "2026-03-02T10:00:00.000Z",
+      "solved": true,
+      "pinned": true,
+      "views": 3987,
+      "upvotes": 191,
+      "downvotes": 1
+    },
+    {
+      "id": "d-ann-ama",
+      "title": "Monthly AMA Schedule",
+      "body": "Join leadership for an open Ask-Me-Anything on the last Thursday of every month at 16:00.\n\nUpcoming AMAs:\n\n- Course roadmap with the Learning team\n- Mentorship programme Q&A with community managers\n- Security & data practices with the trust team\n\nQuestions are collected in advance through the shared form and live during the session.",
+      "authorEmail": "sofia.almeida@clientdomain.com",
+      "category": "Announcements",
+      "tags": ["ama", "events", "schedule"],
+      "createdAt": "2026-08-01T08:30:00.000Z",
+      "solved": true,
+      "pinned": true,
+      "views": 2210,
+      "upvotes": 143,
+      "downvotes": 0
+    }
+  ]
+}

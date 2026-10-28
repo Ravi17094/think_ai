@@ -1,6 +1,8 @@
 const Comment = require("../models/Comment");
 const Discussion = require("../models/Discussion");
 const notificationService = require("../services/notificationService");
+const moderationPolicy = require("../services/forum/moderationPolicy");
+const contentFilter = require("../services/forum/contentFilter");
 
 const BODY_MIN = 2;
 const BODY_MAX = 5000;
@@ -33,25 +35,75 @@ function create(req, res) {
         return res.status(400).json({ success: false, message: "Validation failed", errors });
     }
 
+    if (contentFilter.hasBlockedContent(body)) {
+        return res.status(422).json({
+            success: false,
+            message: "Content review required: your comment was flagged by the community content policy.",
+            code: "CONTENT_REVIEW_REQUIRED",
+            blockedTerms: contentFilter.findBlockedTerms(body)
+        });
+    }
+
     const comment = Comment.create({
         discussionId: discussion.id,
         parentId: req.body.parentId,
-        body,
+        body: contentFilter.sanitizeContent(body),
         authorId: req.user.id
     });
 
-    const created = notificationService.notifyMentions({
+    const mentionNotifications = notificationService.notifyMentions({
         text: body,
         authorId: req.user.id,
-        message: `${req.user.username} mentioned you in a comment on “${discussion.title}”`,
+        message: `${req.user.username} mentioned you in a comment on "${discussion.title}"`,
         link: `/forum/${discussion.id}`
     });
+
+    if (discussion.authorId !== req.user.id) {
+        notificationService.notifyReply({
+            discussionAuthorId: discussion.authorId,
+            replierName: req.user.name || req.user.username,
+            discussionId: discussion.id,
+            discussionTitle: discussion.title
+        });
+    }
 
     res.status(201).json({
         success: true,
         data: Comment.serialize(comment),
-        notificationsCreated: created.length
+        notificationsCreated: mentionNotifications.length
     });
 }
 
-module.exports = { listByDiscussion, create };
+/**
+ * Report a comment. The community moderation policy evaluates the report
+ * count and auto-flags (3) or auto-hides (5 within an hour) accordingly.
+ */
+function flag(req, res) {
+    const comment = Comment.findById(req.params.id);
+    if (!comment) {
+        return res.status(404).json({ success: false, message: "Comment not found" });
+    }
+    const outcome = moderationPolicy.applyReport({
+        contentType: "comment",
+        contentId: comment.id,
+        reporterUserId: req.user ? req.user.id : null,
+        reason: req.body.reason
+    });
+    if (!outcome.ok) {
+        return res.status(404).json({ success: false, message: "Comment not found" });
+    }
+    res.status(201).json({
+        success: true,
+        data: {
+            id: comment.id,
+            flagged: outcome.flagged,
+            hidden: outcome.hidden,
+            action: outcome.action,
+            reportCount: outcome.reportCount,
+            autoFlagReports: outcome.autoFlagReports,
+            hideReports: outcome.hideReports
+        }
+    });
+}
+
+module.exports = { listByDiscussion, create, flag };

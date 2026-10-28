@@ -1,11 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import * as notificationsApi from '../../api/preferencesApi'; 
+import * as preferencesApi from '../../api/preferencesApi';
+import { fetchNotifications, markNotificationRead as markNotificationReadRequest, markAllNotificationsRead } from '../../services/moderationApi';
 
 export const fetchPreferences = createAsyncThunk(
   'notifications/fetchPreferences',
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await notificationApi.getPreferences(userId);
+      const response = await preferencesApi.getPreferences(userId);
       return response.data?.data || response.data || response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch preferences');
@@ -17,7 +18,7 @@ export const updatePreferences = createAsyncThunk(
   'notifications/updatePreferences',
   async ({ userId, updates }, { rejectWithValue }) => {
     try {
-      const response = await notificationApi.updatePreferences(userId, updates);
+      const response = await preferencesApi.updatePreferences(userId, updates);
       return response.data?.data || response.data || response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update preferences');
@@ -29,10 +30,48 @@ export const fetchQueueStatus = createAsyncThunk(
   'notifications/fetchQueueStatus',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await notificationApi.getQueueStatus();
+      const response = await preferencesApi.getQueueStatus();
       return response.data?.data || response.data || response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch queue status');
+    }
+  }
+);
+
+export const loadForumNotifications = createAsyncThunk(
+  'notifications/loadForumNotifications',
+  async (userId, { rejectWithValue }) => {
+    try {
+      const data = await fetchNotifications(userId);
+      return data || [];
+    } catch (error) {
+      return rejectWithValue(error.message || 'Failed to load notifications');
+    }
+  }
+);
+
+export const markForumNotificationRead = createAsyncThunk(
+  'notifications/markForumNotificationRead',
+  async (notificationId, { rejectWithValue }) => {
+    try {
+      const updated = await markNotificationReadRequest(notificationId);
+      return updated;
+    } catch (error) {
+      return rejectWithValue(error.message || 'Failed to mark notification as read');
+    }
+  }
+);
+
+export const markAllForumNotificationsRead = createAsyncThunk(
+  'notifications/markAllForumNotificationsRead',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const state = getState();
+      const unreadNotifications = (state.notifications?.notificationsList || []).filter(n => !n.read);
+      await Promise.all(unreadNotifications.map(n => markNotificationReadRequest(n.id)));
+      return true;
+    } catch (error) {
+      return rejectWithValue(error.message || 'Failed to mark all as read');
     }
   }
 );
@@ -55,6 +94,8 @@ const notificationSlice = createSlice({
         title: action.payload.title || 'Notification',
         message: action.payload.message,
         type: action.payload.type || 'success',
+        link: action.payload.link || null,
+        linkLabel: action.payload.linkLabel || null,
       };
       state.activeToasts.push(newToast);
     },
@@ -102,6 +143,34 @@ const notificationSlice = createSlice({
       // Queue Status
       .addCase(fetchQueueStatus.fulfilled, (state, action) => {
         state.queueStatus = action.payload;
+      })
+      // Forum notifications load
+      .addCase(loadForumNotifications.fulfilled, (state, action) => {
+        const forumNotifs = action.payload || [];
+        const existingIds = new Set(state.notificationsList.map(n => n.id));
+        const newNotifs = forumNotifs.filter(n => !existingIds.has(n.id));
+        if (newNotifs.length > 0) {
+          state.notificationsList = [...newNotifs, ...state.notificationsList];
+        } else if (state.notificationsList.length === 0) {
+          state.notificationsList = forumNotifs;
+        }
+        state.unreadCount = state.notificationsList.filter(n => !n.read).length;
+      })
+      // Mark single forum notification read
+      .addCase(markForumNotificationRead.fulfilled, (state, action) => {
+        const updated = action.payload;
+        if (updated && updated.id) {
+          const notif = state.notificationsList.find(n => n.id === updated.id);
+          if (notif && !notif.read) {
+            notif.read = true;
+            state.unreadCount = Math.max(0, state.unreadCount - 1);
+          }
+        }
+      })
+      // Mark all forum notifications read
+      .addCase(markAllForumNotificationsRead.fulfilled, (state) => {
+        state.notificationsList = state.notificationsList.map(n => ({ ...n, read: true }));
+        state.unreadCount = 0;
       });
   },
 });
@@ -120,5 +189,9 @@ export const {
 export const selectNotifications = (state) => state.notifications?.notificationsList || [];
 export const selectUnreadCount = (state) => state.notifications?.unreadCount || 0;
 export const selectNotificationsLoading = (state) => state.notifications?.loading || false;
+export const selectForumNotifications = (state) => {
+  const list = state.notifications?.notificationsList || [];
+  return list.filter(n => n.type === 'reply' || n.type === 'mention' || n.type === 'solved' || n.type === 'moderation' || n.type === 'system');
+};
 
 export default notificationSlice.reducer;

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import './LandingPage.css';
+import './Landingpage.css';
 
 const TERMINAL_LINES = [
   '<span class="kw">from</span> thinkz <span class="kw">import</span> trainer\n',

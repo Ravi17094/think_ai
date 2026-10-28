@@ -16,7 +16,7 @@ export async function searchModules(query) {
 }
 
 export async function searchLessons(query) {
-  const res = await getLessons();
+  const res = await getAllLessons();
   const all = res.data.data || [];
   const q = query.toLowerCase();
   return all.filter((l) => l.title?.toLowerCase().includes(q));

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Camera, CameraOff } from "lucide-react";
 
 const STARTING = "starting";
 const ACTIVE = "active";
@@ -79,7 +80,20 @@ export default function CameraModal({ title, onClose }) {
             onClick={onClose}
             aria-label="Close camera"
           >
-            ✕
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
 
@@ -95,12 +109,16 @@ export default function CameraModal({ title, onClose }) {
             />
           ) : status === ERROR ? (
             <div className="studio-camera-modal__state" data-testid="camera-error">
-              <span className="studio-camera-modal__icon" aria-hidden="true">🚫</span>
+              <span className="studio-camera-modal__icon" aria-hidden="true">
+                <CameraOff size={40} />
+              </span>
               <span>{errorMsg}</span>
             </div>
           ) : (
             <div className="studio-camera-modal__state" data-testid="camera-starting">
-              <span className="studio-camera-modal__icon" aria-hidden="true">📷</span>
+              <span className="studio-camera-modal__icon" aria-hidden="true">
+                <Camera size={40} />
+              </span>
               <span>Requesting camera…</span>
             </div>
           )}

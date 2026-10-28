@@ -1,5 +1,10 @@
 const db = require("../data/mockData");
 
+// Forum Performance: a new post invalidates the 5-minute cached search
+// pages + hot-thread ranking so fresh content is immediately searchable.
+const { forumPerformanceService } = require("../services/forum/perf/forumPerformanceService");
+const { invalidateSearchesSync, invalidateForDiscussionSync } = forumPerformanceService;
+
 function serialize(discussion, currentUserId) {
     const author = db.users.find((u) => u.id === discussion.authorId);
     const userVote = currentUserId
@@ -47,6 +52,7 @@ function create({ title, body, tags, categoryId, authorId }) {
         downvotes: 0
     };
     db.discussions.unshift(discussion);
+    invalidateSearchesSync(); // new post invalidates search + hot-thread cache
     return discussion;
 }
 
@@ -71,6 +77,8 @@ function vote(discussionId, userId, direction) {
     discussion.upvotes = upvotes;
     discussion.downvotes = downvotes;
 
+    invalidateForDiscussionSync(discussion.id); // votes affect hot-thread ranking
+
     return { discussion, userVote: userVotes.get(userId) || "none" };
 }
 
@@ -79,6 +87,7 @@ function setSolved(id, solved) {
     if (!discussion) return null;
     discussion.solved = Boolean(solved);
     discussion.updatedAt = new Date().toISOString();
+    invalidateForDiscussionSync(discussion.id); // edit invalidates the solved-filter cache
     return discussion;
 }
 
@@ -86,6 +95,7 @@ function setHidden(id, hidden) {
     const discussion = findById(id);
     if (!discussion) return null;
     discussion.hidden = Boolean(hidden);
+    invalidateForDiscussionSync(discussion.id);
     return discussion;
 }
 
@@ -94,6 +104,7 @@ function setFlagged(id, flagged, reason) {
     if (!discussion) return null;
     discussion.flagged = Boolean(flagged);
     discussion.flagReason = flagged ? reason || "Reported by user" : null;
+    invalidateForDiscussionSync(discussion.id);
     return discussion;
 }
 

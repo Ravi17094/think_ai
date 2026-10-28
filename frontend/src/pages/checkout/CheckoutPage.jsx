@@ -1,22 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getCourseById } from '../../api/courseApi';
-import { createOrder, verifyPayment } from '../../api/checkoutApi';
+import { createOrder, verifyPaymentWithRetry, resolvePaymentInstrument, PAYMENT_TEST_INSTRUMENTS, FALLBACK_CARD, validateDiscount } from '../../api/checkoutApi';
 import { showToast, notificationReceived } from '../../features/preferenceNotification/preferenceNotificationSlice';
+import {
+  COST_CENTER_PATTERN,
+  CLIENT_SUPPORT_EMAIL,
+  CLIENT_REFUND_POLICY,
+  CLIENT_DEPARTMENTS,
+} from '../../schemas/checkout.schema';
+import '../../styles/checkout.css';
 
 const STEPS = {
   REVIEW: 'review',
   PAYING: 'paying',
   SUCCESS: 'success',
+  FAILED: 'failed',
 };
 
-// Available mock coupons dictionary
-const AVAILABLE_COUPONS = {
-  'THINKZ10': { discountPercent: 10, description: '10% off your order' },
-  'SAVE20': { discountPercent: 20, description: '20% off your order' },
-};
+function normalizeCostCenter(value) {
+  return String(value || '').trim().toUpperCase();
+}
+
+function isFixedType(type) {
+  return type === 'fixed';
+}
 
 function CreditCardIcon() {
   return (
@@ -53,12 +63,20 @@ export default function CheckoutPage() {
   const [step, setStep] = useState(STEPS.REVIEW);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState(null);
+  const [receipt, setReceipt] = useState(null);
 
   // Coupon State
   const [couponCodeInput, setCouponCodeInput] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponError, setCouponError] = useState('');
   const [generatedRewardCoupon, setGeneratedRewardCoupon] = useState('');
+  const [validatingDiscount, setValidatingDiscount] = useState(false);
+
+  // Client checkout fields: cost center (mandatory, "XX-0000") + department
+  // (used to check the commission table's eligibleDepartments).
+  const [costCenter, setCostCenter] = useState('');
+  const [costCenterError, setCostCenterError] = useState('');
+  const [department, setDepartment] = useState(CLIENT_DEPARTMENTS[0]);
 
   // UI State
   const [selectedMethod, setSelectedMethod] = useState('upi');
@@ -72,6 +90,21 @@ export default function CheckoutPage() {
   });
   const [upiId, setUpiId] = useState('');
   const [cardDetails, setCardDetails] = useState({ number: '', expiry: '', cvv: '', name: '' });
+
+  // Detect the active demo scenario from the entered test card / UPI id so the
+  // UI can preview the expected outcome before the payment is submitted.
+  const activeInstrument = resolvePaymentInstrument({
+    method: selectedMethod,
+    cardNumber: cardDetails.number,
+    upiId,
+  });
+
+  const handleUseTestInstrument = (instrument) => {
+    setSelectedMethod('card');
+    setCardDetails((previous) => ({ ...previous, number: instrument.instrument }));
+    setError(null);
+    toast.info(`Test card loaded: ${instrument.instrument}`, { theme: 'dark' });
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -91,31 +124,68 @@ export default function CheckoutPage() {
   // Derived Pricing Calculations with Coupon Support
   const coursePrice = typeof course?.price === 'number' ? course.price : 0;
 
-  let discountAmount = 0;
-  if (appliedCoupon) {
-    discountAmount = (coursePrice * appliedCoupon.discountPercent) / 100;
-  }
+  // The discount amount is supplied by the server-side validation so fixed and
+  // percent codes stay consistent with the commission table.
+  const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
 
   const discountedPrice = Math.max(0, coursePrice - discountAmount);
   const shippingFee = 0;
   const tax = discountedPrice * 0.18; // 18% tax on discounted total
   const grandTotal = (discountedPrice + shippingFee + tax).toFixed(2);
 
-  // Handle Coupon Application
-  const handleApplyCoupon = (e) => {
+  const handleCostCenterChange = (value) => {
+    setCostCenter(value);
+    if (!value) {
+      setCostCenterError('');
+      return;
+    }
+    setCostCenterError(COST_CENTER_PATTERN.test(normalizeCostCenter(value)) ? '' : 'Format: XX-0000');
+  };
+
+  // Handle Coupon Application (server-validated against the client commission)
+  const handleApplyCoupon = async (e) => {
     e.preventDefault();
     setCouponError('');
     const code = couponCodeInput.trim().toUpperCase();
 
     if (!code) return;
 
-    if (AVAILABLE_COUPONS[code]) {
-      setAppliedCoupon({ code, ...AVAILABLE_COUPONS[code] });
-      toast.success(`Coupon ${code} applied successfully!`, { theme: 'dark' });
-      setCouponCodeInput('');
-    } else {
-      setCouponError('Invalid coupon code. Try THINKZ10 or SAVE20');
+    const center = normalizeCostCenter(costCenter);
+    if (!center || !COST_CENTER_PATTERN.test(center)) {
+      setCostCenterError('Format: XX-0000');
+      setCouponError('Enter a valid cost center (Format: XX-0000) before applying a discount.');
+      return;
     }
+
+    setValidatingDiscount(true);
+    try {
+      const payload = await validateDiscount({ code, costCenter: center, department, amount: coursePrice });
+      const data = payload.data;
+      if (!data.valid) {
+        setCouponError(data.message || 'Invalid coupon code.');
+        return;
+      }
+      setAppliedCoupon({
+        code,
+        discountType: data.discount.type,
+        discountValue: data.discount.value,
+        discountAmount: data.discountAmount,
+        message: data.message,
+        costCenter: center,
+      });
+      setCostCenterError('');
+      setCouponCodeInput('');
+      toast.success(`${code} applied (${data.discount.type === 'fixed' ? '₹' : ''}${formatDiscountLabel(data)} off)`, { theme: 'dark' });
+    } catch (err) {
+      setCouponError(err.message || 'Invalid coupon code.');
+    } finally {
+      setValidatingDiscount(false);
+    }
+  };
+
+  const formatDiscountLabel = (data) => {
+    if (data.discount.type === 'fixed') return String(data.discount.value).toFixed(2);
+    return `${data.discount.value}%`;
   };
 
   const handleRemoveCoupon = () => {
@@ -125,22 +195,46 @@ export default function CheckoutPage() {
 
   const handlePay = async () => {
     setError(null);
+
+    // Cost center is mandatory at checkout (client requirement, "XX-0000").
+    const center = normalizeCostCenter(costCenter);
+    if (!center || !COST_CENTER_PATTERN.test(center)) {
+      setCostCenterError('Format: XX-0000');
+      setError('Cost center is required to complete this order (Format: XX-0000).');
+      return;
+    }
+
     setProcessing(true);
     setStep(STEPS.PAYING);
 
     try {
-      const order = await createOrder({ courseId, amount: parseFloat(grandTotal) });
+      const order = await createOrder({ courseId, amount: parseFloat(grandTotal), costCenter: center, department, discountCode: appliedCoupon ? appliedCoupon.code : null });
 
       const mockPaymentId = `pay_mock_${Date.now()}`;
       const mockSignature = 'mock_signature';
 
-      const result = await verifyPayment({
+      const result = await verifyPaymentWithRetry({
         orderId: order.orderId,
         paymentId: mockPaymentId,
         signature: mockSignature,
+        instrument: activeInstrument,
       });
 
       if (result.success) {
+        setReceipt({
+          orderId: order.orderId,
+          paymentId: mockPaymentId,
+          courseTitle: course.title,
+          courseId,
+          amount: grandTotal,
+          currency: '₹',
+          paidAt: new Date().toISOString(),
+          enrollmentId: result.enrollmentId,
+          costCenter: center,
+          discountCode: appliedCoupon ? appliedCoupon.code : '',
+          discountLabel: appliedCoupon ? appliedCoupon.discountAmount : 0,
+          attemptsUsed: result.attemptsUsed,
+        });
         setStep(STEPS.SUCCESS);
 
         // Generate a reward coupon for future purchases
@@ -164,14 +258,31 @@ export default function CheckoutPage() {
 
         toast.success('Payment successful — you are enrolled!', { theme: 'dark' });
       } else {
-        throw new Error('Payment could not be verified.');
+        const reason = result.reason || 'Payment could not be verified.';
+        setError(reason);
+        setStep(STEPS.FAILED);
+        dispatch(showToast({
+          title: 'Payment Failed',
+          message: reason,
+          type: 'error'
+        }));
       }
     } catch (err) {
       setError(err.message || 'Payment failed. Please try again.');
-      setStep(STEPS.REVIEW);
+      setStep(STEPS.FAILED);
+      dispatch(showToast({
+        title: 'Payment Failed',
+        message: err.message || 'Payment failed. Please try again.',
+        type: 'error'
+      }));
     } finally {
       setProcessing(false);
     }
+  };
+
+  const handleRetry = () => {
+    setError(null);
+    setStep(STEPS.REVIEW);
   };
 
   if (loading) {
@@ -224,12 +335,115 @@ export default function CheckoutPage() {
             </div>
           )}
 
+          {/* Receipt */}
+          {receipt && (
+            <div className="checkout-receipt p-4 rounded-xl border border-slate-200 dark:border-[#323846] bg-slate-50 dark:bg-[#222736]/50 text-left space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-[#94a3b8]">Receipt</p>
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-500 dark:text-slate-400">Course</span>
+                <span className="font-medium text-slate-900 dark:text-white">{receipt.courseTitle}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-500 dark:text-slate-400">Order ID</span>
+                <span className="font-mono text-slate-900 dark:text-white">{receipt.orderId}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-500 dark:text-slate-400">Payment ID</span>
+                <span className="font-mono text-slate-900 dark:text-white">{receipt.paymentId}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-500 dark:text-slate-400">Cost Center</span>
+                <span className="font-mono text-slate-900 dark:text-white">{receipt.costCenter}</span>
+              </div>
+              {receipt.discountCode && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-500 dark:text-slate-400">Discount code</span>
+                  <span className="font-mono text-emerald-600 dark:text-emerald-400">{receipt.discountCode} (-₹{Number(receipt.discountLabel).toFixed(2)})</span>
+                </div>
+              )}
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-500 dark:text-slate-400">Enrollment</span>
+                <span className="font-mono text-slate-900 dark:text-white">{receipt.enrollmentId}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-500 dark:text-slate-400">Paid</span>
+                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                  {receipt.currency}{receipt.amount}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-500 dark:text-slate-400">When</span>
+                <span className="text-slate-900 dark:text-white">
+                  {new Date(receipt.paidAt).toLocaleString()}
+                </span>
+              </div>
+              {receipt.attemptsUsed > 1 && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-500 dark:text-slate-400">Payment attempts</span>
+                  <span className="text-amber-600 dark:text-amber-400 font-medium">
+                    Succeeded on attempt {receipt.attemptsUsed} after automatic retries
+                  </span>
+                </div>
+              )}
+              <div className="pt-2 border-t border-slate-200 dark:border-[#323846]">
+                <p className="text-[10.5px] leading-relaxed text-slate-500 dark:text-[#94a3b8]">
+                  <strong className="text-slate-700 dark:text-slate-300">Refund policy:</strong> {CLIENT_REFUND_POLICY}
+                </p>
+                <p className="text-[10.5px] text-slate-400 dark:text-slate-500 mt-1.5">
+                  Questions about this receipt or your refund eligibility? Contact{' '}
+                  <a href={`mailto:${CLIENT_SUPPORT_EMAIL}`} className="text-purple-600 dark:text-purple-400 underline">{CLIENT_SUPPORT_EMAIL}</a>.
+                </p>
+              </div>
+            </div>
+          )}
+
+          <Link
+            to={`/learner/courses/${courseId}/courseDetails`}
+            className="block w-full rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 hover:from-indigo-400 hover:to-purple-500 transition-all cursor-pointer"
+          >
+            Access your course →
+          </Link>
+
           <button
             onClick={() => navigate('/learner')}
             className="w-full rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-400 hover:to-emerald-500 transition-all cursor-pointer"
           >
             Go to my dashboard
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === STEPS.FAILED) {
+    return (
+      <div className="min-h-[calc(100vh-8rem)] p-4 md:p-8 flex items-center justify-center bg-slate-50 dark:bg-[#151821] text-slate-900 dark:text-[#f1f3f9]">
+        <div className="w-full max-w-md rounded-3xl bg-white dark:bg-[#1a1e2b] border border-red-500/30 dark:border-red-500/30 backdrop-blur-xl p-8 text-center shadow-2xl space-y-4">
+          <div className="mx-auto h-16 w-16 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M6 18L18 6M6 6l12 12"
+                stroke="#f87171"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Payment failed</h2>
+          <p className="text-sm text-slate-500 dark:text-[#94a3b8]">{error}</p>
+          <button
+            onClick={handleRetry}
+            className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-indigo-500 transition-all cursor-pointer"
+          >
+            Try again
+          </button>
+          <Link
+            to="/forum"
+            className="block text-xs text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-colors"
+          >
+            ← Back to forum
+          </Link>
         </div>
       </div>
     );
@@ -312,11 +526,56 @@ export default function CheckoutPage() {
                 <span className="h-2 w-2 rounded-full bg-emerald-500 mt-1.5 shrink-0 shadow-[0_0_8px_#10b981]" />
               </div>
             )}
+
+            {/* Client-mandated cost center (Format: XX-0000) */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-slate-600 dark:text-[#94a3b8]">
+                Cost Center <span className="text-red-500">*</span>
+                <span className="font-normal text-slate-400 dark:text-slate-500"> — Format: XX-0000 (e.g. HR-2501)</span>
+              </label>
+              <input
+                type="text"
+                value={costCenter}
+                onChange={(e) => handleCostCenterChange(e.target.value)}
+                placeholder="XX-0000"
+                aria-label="Cost center"
+                aria-invalid={Boolean(costCenterError)}
+                className={`w-full bg-white dark:bg-[#1a1e2b] border rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-purple-500 font-mono tracking-widest uppercase ${costCenterError ? 'border-red-500' : 'border-slate-300 dark:border-[#3e4658]'}`}
+              />
+              {costCenterError && (
+                <p className="text-[11px] text-red-400" role="alert">{costCenterError}</p>
+              )}
+            </div>
           </div>
 
           {/* Step 2: Payment Methods */}
           <div className="space-y-3">
             <h2 className="text-sm font-semibold tracking-wide text-slate-500 dark:text-[#94a3b8] uppercase">2. Choose Payment Method</h2>
+
+            {/* Test-card quick fill (Day 13 demo scenarios) */}
+            <div className="checkout-test-cards p-3 rounded-xl border border-indigo-500/30 bg-indigo-500/10 space-y-2">
+              <p className="text-xs font-semibold text-indigo-500 dark:text-indigo-300 uppercase tracking-wider">
+                Demo test cards — tap to fill
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {PAYMENT_TEST_INSTRUMENTS.map((instrument) => (
+                  <button
+                    key={instrument.id}
+                    type="button"
+                    title={instrument.hint}
+                    onClick={() => handleUseTestInstrument(instrument)}
+                    className="checkout-test-card text-[11px] px-2.5 py-1.5 rounded-lg border border-indigo-500/40 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-500/20 cursor-pointer transition-colors"
+                  >
+                    {instrument.label}
+                  </button>
+                ))}
+              </div>
+              {activeInstrument ? (
+                <p className="text-[11px] text-emerald-600 dark:text-emerald-400" role="status">
+                  Scenario detected: {activeInstrument.label} — {activeInstrument.hint}
+                </p>
+              ) : null}
+            </div>
 
             <div className="space-y-3">
               <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${selectedMethod === 'upi' ? 'border-purple-500 bg-purple-500/10' : 'border-slate-200 dark:border-[#323846] bg-slate-50 dark:bg-[#222736]/40 hover:bg-slate-100 dark:hover:bg-[#222736]'}`}>
@@ -369,7 +628,7 @@ export default function CheckoutPage() {
                 <div className="grid grid-cols-2 gap-3 p-4 rounded-xl border border-slate-200 dark:border-[#323846] bg-slate-50 dark:bg-[#222736]/55">
                   <input
                     type="text"
-                    placeholder="Card Number"
+                    placeholder={FALLBACK_CARD}
                     value={cardDetails.number}
                     onChange={(e) => setCardDetails({ ...cardDetails, number: e.target.value })}
                     className="col-span-2 bg-white dark:bg-[#1a1e2b] border border-slate-300 dark:border-[#3e4658] rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-purple-500 font-mono tracking-widest"
@@ -402,19 +661,34 @@ export default function CheckoutPage() {
 
             {/* Coupon Section */}
             <div className="space-y-2">
+              <label className="block text-xs font-semibold text-slate-600 dark:text-[#94a3b8]">
+                Department <span className="font-normal text-slate-400 dark:text-slate-500">— some codes are department-specific</span>
+              </label>
+              <select
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+                aria-label="Department"
+                className="w-full bg-white dark:bg-[#1a1e2b] border border-slate-300 dark:border-[#3e4658] rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-purple-500"
+              >
+                {CLIENT_DEPARTMENTS.map((dept) => (
+                  <option key={dept} value={dept}>{dept}</option>
+                ))}
+              </select>
+
               <form onSubmit={handleApplyCoupon} className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="Coupon Code (e.g. THINKZ10)"
+                  placeholder="Discount code"
                   value={couponCodeInput}
                   onChange={(e) => setCouponCodeInput(e.target.value)}
                   className="flex-1 bg-white dark:bg-[#1a1e2b] border border-slate-300 dark:border-[#3e4658] rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white uppercase outline-none focus:border-purple-500"
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-semibold cursor-pointer transition-colors shadow-md"
+                  disabled={validatingDiscount}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-semibold cursor-pointer transition-colors shadow-md disabled:opacity-60"
                 >
-                  Apply
+                  {validatingDiscount ? 'Checking…' : 'Apply'}
                 </button>
               </form>
 
@@ -422,8 +696,11 @@ export default function CheckoutPage() {
 
               {appliedCoupon && (
                 <div className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-600 dark:text-emerald-300">
-                  <span>Coupon <strong>{appliedCoupon.code}</strong> applied ({appliedCoupon.discountPercent}% off)</span>
-                  <button onClick={handleRemoveCoupon} className="hover:text-slate-900 dark:hover:text-white font-bold cursor-pointer">×</button>
+                  <span>
+                    Coupon <strong>{appliedCoupon.code}</strong> applied (
+                    {appliedCoupon.discountType === 'fixed' ? `₹${Number(appliedCoupon.discountValue).toFixed(2)} off` : `${appliedCoupon.discountValue}% off`})
+                  </span>
+                  <button onClick={handleRemoveCoupon} aria-label="Remove coupon" className="hover:text-slate-900 dark:hover:text-white font-bold cursor-pointer">×</button>
                 </div>
               )}
             </div>
@@ -436,7 +713,7 @@ export default function CheckoutPage() {
 
               {appliedCoupon && (
                 <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
-                  <span>Discount ({appliedCoupon.discountPercent}%)</span>
+                  <span>Discount ({appliedCoupon.discountType === 'fixed' ? `₹${Number(appliedCoupon.discountValue).toFixed(2)}` : `${appliedCoupon.discountValue}%`})</span>
                   <span className="font-mono">-₹{discountAmount.toFixed(2)}</span>
                 </div>
               )}

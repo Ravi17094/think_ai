@@ -1,5 +1,3 @@
-const BASE = '/api/roles';
-const USE_MOCK = false;
 import api from "./axios";
 
 // Fetch the role permission matrix

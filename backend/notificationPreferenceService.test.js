@@ -21,6 +21,7 @@ test("upsertPreferences creates a new preference with defaults when none provide
     forumReplies: true,
     paymentAlerts: true,
     systemAnnouncements: true,
+    liveSessions: true,
   });
 });
 

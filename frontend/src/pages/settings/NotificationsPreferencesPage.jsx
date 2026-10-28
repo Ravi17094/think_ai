@@ -50,6 +50,7 @@ export default function NotificationPreferencesPage() {
           paymentAlerts: true,
           forumReplies: true,
           systemAnnouncements: true,
+          liveSessions: true,
         };
     }
   };

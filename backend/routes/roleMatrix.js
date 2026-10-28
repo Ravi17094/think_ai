@@ -27,7 +27,7 @@ const permissions = [
 ];
 
 // Grants: which permissions each role has
-// KNOWN ISSUE: task doc expects 5 roles, only 4 exist in data/roles.js and data/users.js — flagged for follow-up
+// Moderator role added (client moderation deliverable) — 5 roles now present.
 const grants = {
   Admin: [
     "view_courses", "edit_courses", "delete_courses",
@@ -40,6 +40,15 @@ const grants = {
     "view_courses", "edit_courses",
     "view_users",
     "view_assessments", "grade_assessments",
+    "manage_notifications",
+  ],
+  // Client community moderator (added for the moderation deliverable; forum
+  // permission set "forum:read | forum:hide-post | forum:warn-user | forum:view-reports"
+  // is defined on the role id "moderator" in config/forum.config.js).
+  Moderator: [
+    "view_courses",
+    "view_users",
+    "view_audit_log",
     "manage_notifications",
   ],
   TA: [

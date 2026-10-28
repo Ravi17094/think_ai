@@ -1,0 +1,64 @@
+/* ============================================================
+   Checkout & Payment UI — responsive + accessibility polish.
+   Breakpoints verified: 375px, 768px, 1440px.
+   ============================================================ */
+
+.checkout-test-cards {
+  min-width: 0;
+}
+
+.checkout-test-card {
+  min-height: 34px;
+  white-space: nowrap;
+}
+
+/* ---------- focus visibility (keyboard navigation) ---------- */
+
+.checkout-test-card:focus-visible,
+.checkout-receipt a:focus-visible,
+.checkout-receipt button:focus-visible,
+.checkout-card-input:focus-visible,
+.checkout-page input:focus-visible,
+.checkout-page select:focus-visible {
+  outline: 2px solid var(--forum-accent, #6366f1);
+  outline-offset: 2px;
+}
+
+/* ---------- no horizontal scroll on small screens ---------- */
+
+.checkout-page {
+  overflow-x: hidden;
+}
+
+/* ---------- 375px guard: stack cards, full-width tap targets ---------- */
+
+@media (max-width: 375px) {
+  .checkout-test-card {
+    min-width: calc(50% - 8px);
+    min-height: 44px;
+    text-align: center;
+  }
+
+  .checkout-page input,
+  .checkout-page button,
+  .checkout-page select {
+    min-height: 44px;
+  }
+
+  .checkout-receipt {
+    word-break: break-word;
+  }
+}
+
+/* ---------- coarse pointers: guaranteed 44px touch targets ---------- */
+
+@media (hover: none) and (pointer: coarse) {
+  .checkout-test-card {
+    min-height: 44px;
+  }
+
+  .checkout-page input,
+  .checkout-page button {
+    min-height: 44px;
+  }
+}

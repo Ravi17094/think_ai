@@ -1,6 +1,6 @@
 import React from "react";
 import { Eye, BarChart2, Pencil, Trash2, Clock } from "lucide-react";
-import IconBtn from "./IconBtn";
+import IconBtn from "./Iconbtn.jsx";
 
 export default function AssessmentListItem({ asm, index, onView, onAnalytics, onEdit, onDeleteRequest }) {
   return (

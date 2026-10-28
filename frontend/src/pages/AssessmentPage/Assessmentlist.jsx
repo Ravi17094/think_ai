@@ -1,7 +1,7 @@
 import React from "react";
-import AssessmentForm from "./AssessmentForm";
-import ConfirmDelete from "./ConfirmDelete";
-import AssessmentListItem from "./AssessmentListItem";
+import AssessmentForm from "./Assessmentform.jsx";
+import ConfirmDelete from "./Confirmdelete.jsx";
+import AssessmentListItem from "./Assessmentlistitem.jsx";
 
 export default function AssessmentList({
   assessments,

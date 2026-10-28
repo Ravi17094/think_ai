@@ -12,6 +12,7 @@ export default function DiscussionList({
   pendingVoteIds,
   emptyActionLabel,
   onEmptyAction,
+  searchTerm,
 }) {
   if (!discussions || discussions.length === 0) {
     return (
@@ -37,6 +38,7 @@ export default function DiscussionList({
           isBookmarked={isBookmarked ? isBookmarked(discussion.id) : undefined}
           onToggleBookmark={onToggleBookmark}
           votePending={pendingVoteIds ? pendingVoteIds.has(discussion.id) : false}
+          searchTerm={searchTerm}
         />
       ))}
     </div>

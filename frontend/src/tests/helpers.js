@@ -96,3 +96,14 @@ export const moderationUserFixture = (overrides = {}) => ({
   avatarColor: "#ef4444",
   ...overrides,
 });
+
+export const notificationFixture = (overrides = {}) => ({
+  id: "n1",
+  userId: "u1",
+  type: "mention",
+  message: "@priya mentioned you",
+  link: "/forum/d1",
+  read: false,
+  createdAt: "2026-08-24T10:00:00.000Z",
+  ...overrides,
+});

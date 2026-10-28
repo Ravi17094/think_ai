@@ -1,7 +1,7 @@
 /**
- * User moderation table (Phase 8): ban / unban members.
+ * User moderation table (Phase 8): ban / unban / warn / mute members.
  */
-export default function UserModeration({ users = [], onToggleBan, busyIds }) {
+export default function UserModeration({ users = [], onToggleBan, onWarn, onToggleMute, busyIds }) {
   if (users.length === 0) {
     return <p className="loading-note">No users found.</p>;
   }
@@ -31,11 +31,15 @@ export default function UserModeration({ users = [], onToggleBan, busyIds }) {
                 <td style={{ padding: "8px" }}>
                   {user.banned ? (
                     <span style={{ color: "#fda4af" }}>Banned</span>
+                  ) : user.warned ? (
+                    <span style={{ color: "#fbbf24" }}>Warned</span>
+                  ) : user.muted ? (
+                    <span style={{ color: "#93a0bf" }}>Muted</span>
                   ) : (
                     <span style={{ color: "#6ee7b7" }}>Active</span>
                   )}
                 </td>
-                <td style={{ padding: "8px", textAlign: "right" }}>
+                <td style={{ padding: "8px", textAlign: "right", display: "flex", gap: 4, justifyContent: "flex-end", flexWrap: "wrap" }}>
                   <button
                     type="button"
                     className={`btn btn--small ${user.banned ? "" : "btn--danger"}`}
@@ -44,6 +48,26 @@ export default function UserModeration({ users = [], onToggleBan, busyIds }) {
                   >
                     {user.banned ? "Unban" : "Ban"}
                   </button>
+                  {!user.banned && onWarn && (
+                    <button
+                      type="button"
+                      className="btn btn--small btn--ghost"
+                      disabled={busy || user.warned}
+                      onClick={() => onWarn(user)}
+                    >
+                      Warn
+                    </button>
+                  )}
+                  {!user.banned && onToggleMute && (
+                    <button
+                      type="button"
+                      className="btn btn--small btn--ghost"
+                      disabled={busy}
+                      onClick={() => onToggleMute(user)}
+                    >
+                      {user.muted ? "Unmute" : "Mute"}
+                    </button>
+                  )}
                 </td>
               </tr>
             );

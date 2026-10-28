@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { validateCommentBody } from "../../utils/validation";
+import RichTextEditor from "../moderation/RichTextEditor";
 
 /** New comment form with client-side validation (Phase 1). */
 export default function CommentForm({ onSubmit, disabled = false }) {
@@ -30,12 +31,11 @@ export default function CommentForm({ onSubmit, disabled = false }) {
     <form className="comment-form" onSubmit={handleSubmit} noValidate>
       <div className="field">
         <label htmlFor="comment-body">Add a comment — use @username to mention someone</label>
-        <textarea
+        <RichTextEditor
           id="comment-body"
           value={body}
-          placeholder="Share your thoughts…"
-          onChange={(event) => setBody(event.target.value)}
-          disabled={disabled || submitting}
+          placeholder="Share your thoughts — use @username to mention someone"
+          onChange={setBody}
         />
         {error && (
           <p className="field-error" role="alert">

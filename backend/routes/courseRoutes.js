@@ -1,6 +1,8 @@
 const express = require("express");
 
 const router = express.Router();
+const authenticateToken = require('../middleware/authenticateToken');
+const authorizeRoles = require("../middleware/requireRole");
 
 
 const {
@@ -216,6 +218,8 @@ router.get(
  */
 router.post(
     "/",
+    authenticateToken,
+    authorizeRoles(['Admin']),
     validateCourseCreate,
     createCourse
 );

@@ -9,12 +9,37 @@
 export const FORUM_API_BASE_URL =
   import.meta.env.VITE_FORUM_API_URL ||
   import.meta.env.VITE_API_BASE_URL ||
-  "http://localhost:5000/api";
+  "/api";
 
 const CURRENT_USER_KEY = "thinkz_forum_user_id";
 
 /** Demo identity used by the mock auth middleware on the backend. */
 export const DEFAULT_USER_ID = "u1";
+
+/** Demo role used when no real JWT is stored (mirrors the backend mock auth). */
+const DEFAULT_DEMO_ROLE = "Instructor";
+
+/**
+ * Builds the auth headers expected by the shared backend middleware
+ * (`authenticateToken` / `requireRole`): a Bearer JWT when one is stored,
+ * otherwise the mock/demo headers (`x-demo-role` / `x-demo-user-id`).
+ */
+function buildAuthHeaders() {
+  let token = null;
+  try {
+    token = localStorage.getItem("token");
+  } catch {
+    /* storage unavailable (private mode / tests) */
+  }
+
+  if (token) {
+    return { Authorization: `Bearer ${token}` };
+  }
+  return {
+    "x-demo-role": DEFAULT_DEMO_ROLE,
+    "x-demo-user-id": getCurrentUserId(),
+  };
+}
 
 /** Current forum identity, resolved lazily from localStorage. */
 export function getCurrentUser() {
@@ -29,26 +54,6 @@ export function getCurrentUserId() {
     return localStorage.getItem(CURRENT_USER_KEY) || DEFAULT_USER_ID;
   } catch {
     return DEFAULT_USER_ID;
-  }
-}
-
-/**
- * The Studio uses the signed-in application role for UI permissions. The
- * localStorage value is written at login; decoding the token is a fallback
- * for existing sessions created before that change.
- */
-export function getCurrentUserRole() {
-  try {
-    const savedRole = localStorage.getItem("role");
-    if (savedRole) return savedRole;
-    const token = localStorage.getItem("token");
-    if (!token) return "";
-    const payload = token.split(".")[1];
-    if (!payload) return "";
-    const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
-    return JSON.parse(json).role || "";
-  } catch {
-    return "";
   }
 }
 
@@ -82,18 +87,15 @@ async function request(path, { method = "GET", body, query } = {}) {
     if (qs) url += `?${qs}`;
   }
 
-  const token = localStorage.getItem("token");
-  const headers = {
-    "Content-Type": "application/json",
-    "x-user-id": getCurrentUserId(),
-  };
-  if (token) headers.Authorization = `Bearer ${token}`;
-
   let response;
   try {
     response = await fetch(url, {
       method,
-      headers,
+      headers: {
+        "Content-Type": "application/json",
+        "x-user-id": getCurrentUserId(),
+        ...buildAuthHeaders(),
+      },
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   } catch {

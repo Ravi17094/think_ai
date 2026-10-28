@@ -33,6 +33,26 @@ export default function SearchBar({ filters = {}, onChange }) {
     patch({ author: normalized });
   };
 
+  const handleDateFromChange = (event) => {
+    const from = event.target.value;
+    const to = filters.dateTo || "";
+    if (from && to && from > to) {
+      patch({ dateFrom: from, dateTo: "" });
+    } else {
+      patch({ dateFrom: from });
+    }
+  };
+
+  const handleDateToChange = (event) => {
+    const to = event.target.value;
+    const from = filters.dateFrom || "";
+    if (from && to && to < from) {
+      patch({ dateTo: to, dateFrom: "" });
+    } else {
+      patch({ dateTo: to });
+    }
+  };
+
   return (
     <form className="search-bar" role="search" onSubmit={submitSearch}>
       <div className="search-bar__row">
@@ -68,8 +88,9 @@ export default function SearchBar({ filters = {}, onChange }) {
           value={filters.sort ?? "recent"}
           onChange={(event) => patch({ sort: event.target.value })}
         >
-          <option value="recent">Most recent</option>
-          <option value="votes">Top voted</option>
+          <option value="recent">Newest</option>
+          <option value="relevance">Relevance</option>
+          <option value="votes">Most voted</option>
           <option value="views">Most viewed</option>
           <option value="title">Title A–Z</option>
         </select>
@@ -91,7 +112,7 @@ export default function SearchBar({ filters = {}, onChange }) {
           className="input"
           value={filters.dateFrom ?? ""}
           aria-label="Date from"
-          onChange={(event) => patch({ dateFrom: event.target.value })}
+          onChange={handleDateFromChange}
         />
         <input
           id="forum-date-to"
@@ -99,7 +120,7 @@ export default function SearchBar({ filters = {}, onChange }) {
           className="input"
           value={filters.dateTo ?? ""}
           aria-label="Date to"
-          onChange={(event) => patch({ dateTo: event.target.value })}
+          onChange={handleDateToChange}
         />
 
         <button

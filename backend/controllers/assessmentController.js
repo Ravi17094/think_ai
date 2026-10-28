@@ -1,4 +1,4 @@
-const service = require("../services/assessmentService");
+﻿const service = require("../services/assessmentService");
 
 // ============================================================
 // VALIDATION HELPERS
@@ -591,19 +591,18 @@ const getAssessmentSubmissions = async (req, res) => {
                 success: false,
                 message: error.message
             });
-        }
+           }
 
-        return sendControllerError(
-            res,
-            error,
-            [
-                "Assessment not found"
-            ]
-        );
-    }
-};
+        };
 
 // ============================================================
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+
+
 // ADMIN - CREATE CODING QUESTION
 // ============================================================
 
@@ -915,45 +914,6 @@ const deleteCodingTestCase = async (req, res) => {
 };
 
 
-const getTaGradingQueue = async (req, res) => {
-    try {
-        const submissions = await service.getTaGradingQueue();
-        return res.status(200).json({ success: true, data: submissions });
-    } catch (error) {
-        return sendControllerError(res, error);
-    }
-};
-
-const gradeSubmission = async (req, res) => {
-    try {
-        const submission = await service.gradeSubmission(req.params.submissionId, {
-            ...req.body,
-            gradedBy: req.user?.email || req.user?.id || "TA"
-        });
-        return res.status(200).json({ success: true, message: "Submission graded successfully", data: submission });
-    } catch (error) {
-        return sendControllerError(res, error, ["Assessment submission not found"]);
-    }
-};
-
-const gradeSubmissionsBulk = async (req, res) => {
-    try {
-        const results = await service.gradeSubmissionsBulk(
-            req.body?.grades,
-            req.user?.email || req.user?.id || "TA"
-        );
-        const failed = results.filter((result) => !result.success);
-        return res.status(failed.length ? 207 : 200).json({
-            success: true,
-            partial: failed.length > 0,
-            message: failed.length ? `${failed.length} grade(s) could not be saved` : "Grades saved successfully",
-            data: results
-        });
-    } catch (error) {
-        return sendControllerError(res, error);
-    }
-};
-
 // ============================================================
 // EXPORTS
 // ============================================================
@@ -985,7 +945,4 @@ module.exports = {
     getCodingTestCases,
     updateCodingTestCase,
     deleteCodingTestCase,
-    getTaGradingQueue,
-    gradeSubmission,
-    gradeSubmissionsBulk
 };

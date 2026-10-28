@@ -26,7 +26,7 @@ export function useStudioSocket({ sessionId, user }) {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    const socket = io("http://localhost:5000", {
+    const socket = io(window.location.origin, {
       auth: { token },
       extraHeaders: {
         "x-demo-role": user?.role || "student",

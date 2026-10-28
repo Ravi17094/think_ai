@@ -9,6 +9,7 @@ let notificationPreferences = [
       forumReplies: true,
       paymentAlerts: true,
       systemAnnouncements: true,
+      liveSessions: true,
     },
     updatedAt: new Date().toISOString(),
   },

@@ -20,7 +20,7 @@ function requireRole(allowedRoles) {
     else if (authHeader && authHeader.startsWith("Bearer ")) {
       const token = authHeader.split(" ")[1];
       try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
         req.user = decoded; // Attach decoded user info (id, email, role)
         req.thinkzAuthenticatedUser = decoded;
         userRole = req.user.role;

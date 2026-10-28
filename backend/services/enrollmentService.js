@@ -3,6 +3,14 @@ const prisma = require("../config/database");
 const repository =
     require("../repositories/enrollmentRepository");
 
+const {
+    enqueue
+} = require("./notificationQueueService");
+
+const {
+    enrollmentConfirmationEmail
+} = require("./notificationService");
+
 
 /*
  * ----------------------------------------------------
@@ -679,9 +687,30 @@ const unlockCourseAccess = async (
     }
 
 
-    return repository.unlockCourseAccess(
-        enrollmentId
-    );
+    const unlockedEnrollment =
+        await repository.unlockCourseAccess(
+            enrollmentId
+        );
+
+    const courseName =
+        unlockedEnrollment.batch?.course?.title ||
+        "your course";
+
+    const email = enrollmentConfirmationEmail({
+        name: unlockedEnrollment.studentName,
+        courseName
+    });
+
+    enqueue({
+        type: "enrollment-confirmation",
+        to: unlockedEnrollment.studentEmail,
+        recipientName: unlockedEnrollment.studentName,
+        subject: email.subject,
+        text: email.text,
+        html: email.html
+    });
+
+    return unlockedEnrollment;
 };
 
 

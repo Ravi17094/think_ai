@@ -9,6 +9,7 @@ import NotificationToast from "../../components/forum/NotificationToast";
 import { fetchDiscussionById, flagDiscussion, setDiscussionSolved, fetchComments, postComment } from "../../services/forumApi";
 import { useVoting } from "../../hooks/useVoting";
 import { useBookmarks } from "../../hooks/useBookmarks";
+import { useForumSocket } from "../../hooks/useForumSocket";
 
 /** Thread detail page: discussion body + comments (Phase 1/2). */
 export default function DiscussionDetailsPage() {
@@ -22,6 +23,21 @@ export default function DiscussionDetailsPage() {
   const pushToast = (notification) => {
     setToasts((previous) => [...previous.slice(-2), notification]);
   };
+
+  // Real-time: surface incoming notifications (mentions / replies / moderation
+  // alerts for the current user) as toasts without any page refresh.
+  const { subscribe } = useForumSocket();
+  useEffect(() => {
+    const unsubscribe = subscribe("notification:new", (notification) => {
+      pushToast({
+        id: `socket-${notification.id || Date.now()}`,
+        type: notification.type,
+        message: notification.message,
+        link: notification.link,
+      });
+    });
+    return unsubscribe;
+  }, [subscribe]);
 
   const { vote, pendingIds } = useVoting((message) =>
     pushToast({ id: `vote-err-${Date.now()}`, type: "system", message })

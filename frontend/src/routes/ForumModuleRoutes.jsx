@@ -6,6 +6,7 @@ import CreateDiscussionPage from "../pages/forum/CreateDiscussionPage";
 import CategoriesPage from "../pages/forum/CategoriesPage";
 import BookmarksPage from "../pages/forum/BookmarksPage";
 import PreferencesPage from "../pages/forum/PreferencesPage";
+import NotificationCenterPage from "../pages/forum/NotificationCenterPage";
 import LiveStudioPage from "../pages/liveStudio/LiveStudioPage";
 import ModerationDashboardPage from "../pages/moderation/ModerationDashboardPage";
 
@@ -20,16 +21,19 @@ import ModerationDashboardPage from "../pages/moderation/ModerationDashboardPage
  */
 export default function ForumModuleRoutes() {
   return (
-    <Routes>
-      <Route path="/" element={<DiscussionListPage />} />
-      <Route path="new" element={<CreateDiscussionPage />} />
-      <Route path="categories" element={<CategoriesPage />} />
-      <Route path="bookmarks" element={<BookmarksPage />} />
-      <Route path="preferences" element={<PreferencesPage />} />
-      <Route path="studio" element={<LiveStudioPage />} />
-      <Route path="moderation" element={<ModerationDashboardPage />} />
-      <Route path=":id" element={<DiscussionDetailsPage />} />
-      <Route path="*" element={<Navigate to="/forum" replace />} />
-    </Routes>
+    <main className="forum-module-layout">
+      <Routes>
+        <Route path="/" element={<DiscussionListPage />} />
+        <Route path="new" element={<CreateDiscussionPage />} />
+        <Route path="categories" element={<CategoriesPage />} />
+        <Route path="bookmarks" element={<BookmarksPage />} />
+        <Route path="notifications" element={<NotificationCenterPage />} />
+        <Route path="preferences" element={<PreferencesPage />} />
+        <Route path="studio" element={<LiveStudioPage />} />
+        <Route path="moderation" element={<ModerationDashboardPage />} />
+        <Route path=":id" element={<DiscussionDetailsPage />} />
+        <Route path="*" element={<Navigate to="/forum" replace />} />
+      </Routes>
+    </main>
   );
 }

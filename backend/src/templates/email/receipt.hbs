@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Payment Receipt — {{courseTitle}}</title>
+</head>
+<body style="margin:0;padding:24px;font-family:Segoe UI,Arial,sans-serif;background:#f4f5f7;color:#1a1e2b;">
+  <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;padding:28px 32px;border:1px solid #e2e5ea;">
+    <p style="margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#64748b;">Payment Receipt</p>
+    <h1 style="margin:0 0 16px;font-size:22px;">{{courseTitle}}</h1>
+
+    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      <tr>
+        <td style="padding:6px 0;color:#64748b;">Order ID</td>
+        <td style="padding:6px 0;text-align:right;font-family:Consolas,monospace;">{{orderId}}</td>
+      </tr>
+      {{#if enrollmentId}}
+      <tr>
+        <td style="padding:6px 0;color:#64748b;">Enrollment ID</td>
+        <td style="padding:6px 0;text-align:right;font-family:Consolas,monospace;">{{enrollmentId}}</td>
+      </tr>
+      {{/if}}
+      <tr>
+        <td style="padding:6px 0;color:#64748b;">Cost Center</td>
+        <td style="padding:6px 0;text-align:right;font-family:Consolas,monospace;">{{costCenter}}</td>
+      </tr>
+      {{#if discountCode}}
+      <tr>
+        <td style="padding:6px 0;color:#64748b;">Discount code</td>
+        <td style="padding:6px 0;text-align:right;font-family:Consolas,monospace;">{{discountCode}}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;color:#64748b;">Discount applied</td>
+        <td style="padding:6px 0;text-align:right;font-family:Consolas,monospace;">-{{currency}}{{discountValue}}</td>
+      </tr>
+      {{/if}}
+      <tr>
+        <td style="padding:6px 0;color:#64748b;">Amount paid</td>
+        <td style="padding:6px 0;text-align:right;font-family:Consolas,monospace;font-weight:700;">{{currency}}{{amount}}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;color:#64748b;">Payment date</td>
+        <td style="padding:6px 0;text-align:right;">{{paidAt}}</td>
+      </tr>
+    </table>
+
+    <div style="margin-top:24px;padding:16px;background:#f8fafc;border-radius:8px;font-size:13px;color:#475569;">
+      <p style="margin:0 0 8px;"><strong>Refund policy</strong></p>
+      <p style="margin:0;">All course purchases are eligible for a full refund within 14 days of purchase if the course has not been completed. Refund requests are processed back to the original payment method within 5–7 business days. Completed courses and requests made after 14 days are not eligible for a refund.</p>
+    </div>
+
+    <p style="margin-top:20px;font-size:12px;color:#94a3b8;">
+      Questions about this receipt or your refund eligibility?
+      Contact <a href="mailto:{{supportEmail}}">{{supportEmail}}</a>.
+    </p>
+  </div>
+</body>
+</html>
