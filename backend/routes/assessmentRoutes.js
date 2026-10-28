@@ -13,9 +13,6 @@ const {
     getAssessmentAnalytics,
     getAssessmentSubmissions,
     getEnrollmentAssessmentStatus,
-    getTaGradingQueue,
-    gradeSubmission,
-    gradeSubmissionsBulk,
 
     // Admin coding questions
     createCodingQuestion,
@@ -393,24 +390,6 @@ router.get(
  *       500:
  *         description: Internal server error
  */
-
-router.get(
-    "/ta/grading-queue",
-    requireRole(["TA", "Instructor", "Admin"]),
-    getTaGradingQueue
-);
-
-router.patch(
-    "/ta/grading-queue/bulk",
-    requireRole(["TA", "Instructor", "Admin"]),
-    gradeSubmissionsBulk
-);
-
-router.patch(
-    "/submissions/:submissionId/grade",
-    requireRole(["TA", "Instructor", "Admin"]),
-    gradeSubmission
-);
 
 router.get(
     "/:id",
