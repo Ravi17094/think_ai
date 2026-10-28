@@ -10,6 +10,7 @@ import { selectUnreadCount } from '../features/preferenceNotification/preference
 const NAV_ITEMS = [
   { to: '/admin/dashboard', label: 'Dashboard' },
   { to: '/admin/rbac', label: 'RBAC' },
+  { to: '/admin/audit-logs', label: 'Audit logs' },
   { to: '/admin/users', label: 'Users' },
   { to: '/admin/courses', label: 'Courses' },
   { to: '/admin/batches', label: 'Batches' },
@@ -57,8 +58,8 @@ export default function AdminLayout() {
               className={({ isActive }) =>
                 `px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive
                   ? isDarkMode
-                    ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30'
-                    : 'bg-cyan-50 text-cyan-700 border border-cyan-200'
+                    ? 'bg-blue-500/15 text-blue-300 border border-blue-500/30'
+                    : 'bg-blue-50 text-blue-700 border border-blue-200'
                   : isDarkMode
                     ? 'text-[#94a3b8] hover:text-white hover:bg-[#222736]'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -94,8 +95,8 @@ export default function AdminLayout() {
 
             {/* Mobile-only brand mark */}
             <Link to="/admin/dashboard" className="md:hidden flex items-center gap-2 font-bold tracking-tight">
-              <span className="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center font-mono text-[10px] font-bold shadow-[0_0_10px_rgba(147,51,235,0.4)]">tz</span>
-              <span className={`text-base font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Thinkz<span className="text-purple-500">.ai</span></span>
+              <span className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-mono text-[10px] font-bold shadow-[0_0_10px_rgba(37,99,235,0.4)]">tz</span>
+              <span className={`text-base font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Thinkz<span className="text-blue-600">.ai</span></span>
             </Link>
 
             <p className={`text-sm hidden sm:block ${isDarkMode ? 'text-[#94a3b8]' : 'text-slate-600'}`}>Admin Console</p>
@@ -114,7 +115,7 @@ export default function AdminLayout() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-purple-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                     {unreadCount}
                   </span>
                 )}
@@ -139,7 +140,7 @@ export default function AdminLayout() {
                 className={`flex items-center gap-3 px-2 sm:px-4 py-2 rounded-xl text-left border transition-colors cursor-pointer ${isDarkMode ? 'bg-[#222736] border-[#313849] hover:border-[#3d475d] text-white' : 'bg-white border-slate-200 hover:border-slate-300 text-slate-900 shadow-sm'}`}
               >
                 <div className="relative">
-                  <div className="w-9 h-9 rounded-full bg-cyan-500/20 border border-cyan-600 flex items-center justify-center text-xs text-cyan-400 font-bold">
+                  <div className="w-9 h-9 rounded-full bg-blue-500/20 border border-blue-600 flex items-center justify-center text-xs text-blue-400 font-bold">
                     {(user?.name || 'A').charAt(0).toUpperCase()}
                   </div>
                   <div className={`absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border ${isDarkMode ? 'border-[#222736]' : 'border-white'}`}></div>
@@ -209,8 +210,8 @@ export default function AdminLayout() {
                   className={({ isActive }) =>
                     `block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive
                       ? isDarkMode
-                        ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30'
-                        : 'bg-cyan-50 text-cyan-700'
+                        ? 'bg-blue-500/15 text-blue-300 border border-blue-500/30'
+                        : 'bg-blue-50 text-blue-700'
                       : isDarkMode
                         ? 'text-[#94a3b8] hover:text-white hover:bg-[#222736]'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'

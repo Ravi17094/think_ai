@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Thinkz AI design tokens: shared website palette. */
+:root {
+  --thinkz-primary: #2563eb;
+  --thinkz-primary-dark: #1d4ed8;
+  --thinkz-primary-soft: #dbeafe;
+  --thinkz-primary-surface: #eff6ff;
+  --thinkz-background: #f8fafc;
+  --thinkz-surface: #ffffff;
+  --thinkz-text: #0f172a;
+  --thinkz-muted: #64748b;
+  --thinkz-border: #e2e8f0;
+  --thinkz-success: #047857;
+  --thinkz-warning: #b45309;
+  --thinkz-danger: #b91c1c;
+}
+
 /* Global Styles */
 
 html,
@@ -11,8 +27,8 @@ body,
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  background: #f3f4f6;
-  color: #111827;
+  background: var(--thinkz-background);
+  color: var(--thinkz-text);
 }
 
 @keyframes fadeIn {
@@ -54,7 +70,7 @@ code {
 
 .text-brand {
   @apply font-semibold tracking-wide;
-  background: linear-gradient(90deg, #A435F0, #6D28D9);
+  background: linear-gradient(90deg, var(--thinkz-primary), var(--thinkz-primary-dark));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -97,12 +113,12 @@ code {
   }
 
   .custom-checkbox:checked {
-    background: linear-gradient(to right, #6366f1, #22d3ee);
+    background: var(--thinkz-primary);
     border-color: transparent;
   }
 
   .reset-link {
-    color: #22d3ee;
+    color: var(--thinkz-primary);
     text-decoration: none;
     transition: opacity .2s;
   }

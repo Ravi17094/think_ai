@@ -30,6 +30,7 @@ import AddLesson from '../pages/lessons/AddLesson';
 import EditLesson from '../pages/lessons/EditLesson';
 import LessonDetails from '../pages/lessons/LessonDetails';
 import RBACMatrix from "../pages/admin/RBACMatrix";
+import AuditLogPage from "../pages/admin/AuditLogPage";
 
 // Assessment Management (create/update/view/delete assessments, per-module)
 import AssessmentManager from "../pages/AssessmentPage/Assessmentmanager";
@@ -48,6 +49,7 @@ function AdminRoutes() {
         <Route path="profile" element={<AdminProfilePage />} />
         <Route path="profile/edit" element={<AdminEditProfilePage />} />
         <Route path="rbac" element={<RBACMatrix />} />
+        <Route path="audit-logs" element={<AuditLogPage />} />
 
         {/* Instructor Student Certificates & Progress Tracker */}
         <Route path="certificates" element={<InstructorCertificates />} />

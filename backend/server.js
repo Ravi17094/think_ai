@@ -36,6 +36,7 @@ const codeExecutionRoutes = require("./routes/codeExecutionRoutes");
 const sessionRoutes = require("./routes/sessionRoutes");
 const studioRoutes = require("./routes/studioRoutes"); // Live Class Studio Routes
 const attendanceRoutes = require("./routes/attendanceRoutes");
+const reportRoutes = require("./routes/reportRoutes");
 
 const analyticsRoutes = require("./routes/analytics");
 const adminCodingQuestionRoutes = require("./routes/adminCodingQuestionRoutes");
@@ -123,6 +124,7 @@ app.use("/api/sessions", sessionRoutes);
 // endpoints mounted below through `./src/routes` at `/api/studio`.
 app.use("/api/legacy-studio", studioRoutes);
 app.use("/api/attendance", attendanceRoutes);
+app.use("/api/reports", reportRoutes);
 app.use("/api/audit-logs", auditLogRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/notifications", notificationPreferenceRoutes);

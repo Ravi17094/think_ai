@@ -936,6 +936,24 @@ const gradeSubmission = async (req, res) => {
     }
 };
 
+const gradeSubmissionsBulk = async (req, res) => {
+    try {
+        const results = await service.gradeSubmissionsBulk(
+            req.body?.grades,
+            req.user?.email || req.user?.id || "TA"
+        );
+        const failed = results.filter((result) => !result.success);
+        return res.status(failed.length ? 207 : 200).json({
+            success: true,
+            partial: failed.length > 0,
+            message: failed.length ? `${failed.length} grade(s) could not be saved` : "Grades saved successfully",
+            data: results
+        });
+    } catch (error) {
+        return sendControllerError(res, error);
+    }
+};
+
 // ============================================================
 // EXPORTS
 // ============================================================
@@ -968,5 +986,6 @@ module.exports = {
     updateCodingTestCase,
     deleteCodingTestCase,
     getTaGradingQueue,
-    gradeSubmission
+    gradeSubmission,
+    gradeSubmissionsBulk
 };

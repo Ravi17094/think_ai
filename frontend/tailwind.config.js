@@ -1,22 +1,34 @@
 /** @type {import('tailwindcss').Config} */
+const thinkzBlue = {
+  50: '#eff6ff',
+  100: '#dbeafe',
+  200: '#bfdbfe',
+  300: '#93c5fd',
+  400: '#60a5fa',
+  500: '#3b82f6',
+  600: '#2563eb',
+  700: '#1d4ed8',
+  800: '#1e40af',
+  900: '#1e3a8a',
+  950: '#172554',
+};
+
 export default {
    darkMode: 'class',
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
       colors: {
+        // Historical pages used several primary colour families. Keep their
+        // existing class names, but render each one with the Thinkz blue scale.
+        blue: thinkzBlue,
+        cyan: thinkzBlue,
+        indigo: thinkzBlue,
+        purple: thinkzBlue,
+        violet: thinkzBlue,
+        fuchsia: thinkzBlue,
         brand: {
-          50:  '#eff7ff',
-          100: '#dbeefe',
-          200: '#bee0fd',
-          300: '#90ccfb',
-          400: '#5cb0f6',
-          500: '#3891f0',
-          600: '#2274e7',
-          700: '#1a5fd5',
-          800: '#1c4faf',
-          900: '#1c4489',
-          950: '#152b54'
+          ...thinkzBlue,
         },
         accent: {
           500: '#14b8a6',

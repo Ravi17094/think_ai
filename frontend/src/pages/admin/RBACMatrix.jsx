@@ -20,7 +20,7 @@ export default function RBACMatrix() {
           Toggle direct grants or revocations. Route guards follow the role hierarchy shown below.
         </p>
         {inheritance.length > 0 && (
-          <p className="mt-3 inline-flex rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-200">
+          <p className="mt-3 inline-flex rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-200">
             Guard inheritance: {inheritance.join(' → ')}
           </p>
         )}
@@ -37,7 +37,7 @@ export default function RBACMatrix() {
           {isDirty ? `${changes.length} unsaved change${changes.length === 1 ? '' : 's'}` : 'All changes saved'}
         </span>
         <button type="button" onClick={discard} disabled={!isDirty || saving} className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600">Discard</button>
-        <button type="button" onClick={save} disabled={!isDirty || saving} className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">{saving ? 'Saving…' : 'Save changes'}</button>
+        <button type="button" onClick={save} disabled={!isDirty || saving} className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">{saving ? 'Saving…' : 'Save changes'}</button>
       </div>
       <p className="mb-4 text-xs text-gray-500 dark:text-gray-400">Changes are staged locally until saved. Checked boxes represent direct grants; route guard inheritance is shown above.</p>
 
@@ -68,7 +68,7 @@ export default function RBACMatrix() {
                           disabled={saving}
                           onChange={() => toggle(role, perm)}
                           aria-label={`${direct ? 'Revoke' : 'Grant'} ${perm} for ${role}`}
-                          className={`h-5 w-5 rounded border-gray-300 text-purple-600 transition duration-200 ease-out focus:ring-purple-500 checked:scale-110 dark:border-[#3f3f3f] dark:bg-[#212121] ${saving ? 'cursor-wait opacity-50' : 'cursor-pointer'
+                          className={`h-5 w-5 rounded border-gray-300 text-blue-600 transition duration-200 ease-out focus:ring-blue-500 checked:scale-110 dark:border-[#3f3f3f] dark:bg-[#212121] ${saving ? 'cursor-wait opacity-50' : 'cursor-pointer'
                             }`}
                         />
                       </td>

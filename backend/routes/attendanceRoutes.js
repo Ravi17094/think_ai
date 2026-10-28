@@ -56,6 +56,12 @@ router.put("/ta/record", requireRole(["TA", "Instructor", "Admin"]), async (req,
     if (!sessionTitle) throw new Error("sessionTitle is required");
     if (!allowedStatuses.includes(status)) throw new Error("Status must be PRESENT, TARDY, ABSENT, or EXCUSED");
 
+    const enrollment = await prisma.enrollment.findFirst({
+      where: { id: enrollmentId, courseAccess: true, enrollmentStatus: "ENROLLED" },
+      select: { id: true }
+    });
+    if (!enrollment) throw new Error("The selected learner does not have an active enrollment");
+
     const record = await prisma.attendanceRecord.upsert({
       where: { enrollmentId_sessionDate_sessionTitle: { enrollmentId, sessionDate, sessionTitle } },
       create: {

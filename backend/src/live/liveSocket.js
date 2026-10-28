@@ -48,6 +48,7 @@ module.exports = function initLiveSocket(io) {
     namespace.use(authenticateStudioSocket);
 
     namespace.on("connection", (socket) => {
+        let joinedSessionId = null;
         socket.on("session:join", async ({ sessionId, user } = {}) => {
             try {
                 const authenticatedUser = {
@@ -59,6 +60,7 @@ module.exports = function initLiveSocket(io) {
                     socket.emit("session:error", { message: "Session not found" });
                     return;
                 }
+                joinedSessionId = session.id;
                 socket.join(session.id);
                 for (const room of socket.rooms) {
                     if (room !== session.id && room !== socket.id) socket.leave(room);
@@ -112,8 +114,11 @@ module.exports = function initLiveSocket(io) {
         });
 
         socket.on("disconnect", () => {
-            // Presence flip-off is handled by the client heartbeat; leaving the
-            // room here is a no-op because the socket was already disconnected.
+            // Persist the actual check-out time even though the socket room has
+            // already been released by Socket.IO.
+            if (joinedSessionId) {
+                void service.updateSessionPresence(joinedSessionId, String(socket.user.id), { online: false });
+            }
         });
     });
 

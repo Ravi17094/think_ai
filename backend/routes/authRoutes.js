@@ -32,10 +32,6 @@ const requireRole = require('../middleware/requireRole');
  *                 type: string
  *                 format: password
  *                 example: Abc@12345
- *               role:
- *                 type: string
- *                 enum: [Learner, Instructor, TA, Admin]
- *                 example: Learner
  *     responses:
  *       201:
  *         description: User registered successfully

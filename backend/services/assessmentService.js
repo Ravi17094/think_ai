@@ -375,6 +375,20 @@ const gradeSubmission = async (submissionId, data) => {
     });
 };
 
+const gradeSubmissionsBulk = async (grades, gradedBy) => {
+    if (!Array.isArray(grades) || grades.length === 0) throw new Error("At least one grade is required");
+    if (grades.length > 100) throw new Error("A maximum of 100 submissions can be graded at once");
+
+    const results = await Promise.allSettled(grades.map((grade) =>
+        gradeSubmission(grade.submissionId, { ...grade, gradedBy })
+    ));
+
+    return results.map((result, index) => result.status === "fulfilled"
+        ? { submissionId: Number(grades[index].submissionId), success: true, data: result.value }
+        : { submissionId: Number(grades[index].submissionId), success: false, message: result.reason?.message || "Could not save grade" }
+    );
+};
+
 // ============================================================
 // EXPORTS
 // ============================================================
@@ -419,5 +433,6 @@ module.exports = {
     getEnrollmentAssessmentStatus,
     getAssessmentSubmissionResult,
     getTaGradingQueue,
-    gradeSubmission
+    gradeSubmission,
+    gradeSubmissionsBulk
 };

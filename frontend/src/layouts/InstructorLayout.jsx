@@ -45,7 +45,6 @@ export default function InstructorLayout() {
               })}
             </nav>
           </div>
-          <div className="absolute bottom-0 w-60 border-t border-slate-100 p-4 text-xs text-slate-400 dark:border-slate-800">Instructor Workspace</div>
         </aside>
 
         <div className="min-w-0 flex-1">

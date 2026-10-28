@@ -24,6 +24,11 @@ const RATE_LIMIT_MAX = 20;
 const RATE_LIMIT_WINDOW_MS = 10000;
 const ROOM_EVENT_HISTORY_LIMIT = 100;
 const roomEventHistory = new Map();
+// High-frequency socket logging becomes measurable under load. Keep it opt-in
+// for diagnosis instead of writing once per connection/event in normal runs.
+const debugSocket = (...args) => {
+    if (process.env.SOCKET_DEBUG === "true") console.log(...args);
+};
 
 function emitRoomEvent(io, roomName, event, payload) {
     const entry = { event, payload, timestamp: new Date().toISOString() };
@@ -193,7 +198,7 @@ module.exports = function (io) {
             });
 
 
-            console.log(
+            debugSocket(
                 `[socket] RECONNECTED: ${socket.id} ` +
                 `(user=${userId}) — restored ` +
                 `${prevState.rooms.size} room(s)`
@@ -213,7 +218,7 @@ module.exports = function (io) {
             );
 
 
-            console.log(
+            debugSocket(
                 `[socket] connected: ${socket.id} ` +
                 `(user=${userId}, role=${role})`
             );
@@ -299,7 +304,7 @@ module.exports = function (io) {
                 });
 
 
-                console.log(
+                debugSocket(
                     `[socket] ${socket.id} ` +
                     `joined room "${roomName}"`
                 );
@@ -374,7 +379,7 @@ module.exports = function (io) {
                 });
 
 
-                console.log(
+                debugSocket(
                     `[socket] ${socket.id} ` +
                     `left room "${roomName}"`
                 );
@@ -516,7 +521,6 @@ module.exports = function (io) {
             const message = chatManager.addMessage(roomName, userId, text);
 
             emitRoomEvent(io, roomName, EVENTS.CHAT_MESSAGE, message);
-
             ack?.({ ok: true, message });
         });
 
@@ -541,7 +545,6 @@ module.exports = function (io) {
                 roomName,
                 startedAt: poll.startedAt,
             });
-
             ack?.({ ok: true, pollId: poll.pollId });
         });
 
@@ -566,7 +569,6 @@ module.exports = function (io) {
                 votes: poll.votes,
                 roomName,
             });
-
             ack?.({ ok: true });
         });
 
@@ -728,7 +730,7 @@ module.exports = function (io) {
                                 );
 
 
-                                console.log(
+                                debugSocket(
                                     `[socket] grace period ` +
                                     `expired for user=${userId} ` +
                                     `— fully removed`
@@ -762,7 +764,7 @@ module.exports = function (io) {
                 );
 
 
-                console.log(
+                debugSocket(
                     `[socket] disconnected: ` +
                     `${socket.id} ` +
                     `(reason: ${reason}) ` +

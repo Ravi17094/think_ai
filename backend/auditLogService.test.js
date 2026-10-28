@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { logRoleChange, getEntries, toCSV, toJSON } = require("./services/auditLogService");
+const { logAccessDenied, logRoleChange, getEntries, toCSV, toJSON } = require("./services/auditLogService");
 
 test("logRoleChange creates an entry with expected fields", () => {
   const entry = logRoleChange({
@@ -29,6 +29,18 @@ test("getEntries filters by action", () => {
   const results = getEntries({ action: "ROLE_CHANGE" });
   assert.ok(results.every(e => e.action === "ROLE_CHANGE"));
   assert.ok(results.length >= 1);
+});
+
+test("logAccessDenied records the rejected route and required roles", () => {
+  const entry = logAccessDenied({
+    actorRole: "TA",
+    targetUserId: "ta-1",
+    route: "/api/admin/users",
+    requiredRoles: ["Admin"],
+  });
+  assert.equal(entry.action, "ACCESS_DENIED");
+  assert.equal(entry.targetUserName, "/api/admin/users");
+  assert.equal(entry.newRole, "Required: Admin");
 });
 
 test("getEntries with no filters returns all entries", () => {

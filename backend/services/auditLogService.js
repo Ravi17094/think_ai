@@ -44,6 +44,22 @@ function logPermissionChange({ actorRole, role, permission, granted }) {
   return entry;
 }
 
+function logAccessDenied({ actorRole, targetUserId, route, requiredRoles }) {
+  removeExpiredEntries();
+  const entry = {
+    id: nextId++,
+    timestamp: new Date().toISOString(),
+    actorRole: actorRole || "Unknown",
+    action: "ACCESS_DENIED",
+    targetUserId: targetUserId || "unknown-user",
+    targetUserName: route,
+    oldRole: actorRole || "Unknown",
+    newRole: `Required: ${requiredRoles.join(", ")}`,
+  };
+  auditLog.push(entry);
+  return entry;
+}
+
 function toJSON(entries) {
   return JSON.stringify(entries, null, 2);
 }
@@ -67,4 +83,4 @@ function toCSV(entries) {
   return [header, ...rows].join("\n");
 }
 
-module.exports = { logRoleChange, logPermissionChange, getEntries, toCSV, toJSON };
+module.exports = { logRoleChange, logPermissionChange, logAccessDenied, getEntries, toCSV, toJSON };

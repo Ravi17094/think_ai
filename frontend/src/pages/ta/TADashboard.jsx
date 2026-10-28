@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import apiClient from "../../services/apiClient";
 import { logout } from "../../features/auth/authSlice";
 import { ATTENDANCE_STATUSES } from "../../constants/attendance";
 import useTADashboard from "../../hooks/useTADashboard";
+import { useTheme } from "../../components/ThemeContext";
 
 const dashboardPreview = {
   courses: ["Java Fundamentals", "React Essentials", "Python for Data"],
@@ -13,6 +14,12 @@ const dashboardPreview = {
     { title: "Java live lab", time: "Tomorrow, 10:30 AM" },
   ],
 };
+
+function localDateInputValue() {
+  const now = new Date();
+  const local = new Date(now.getTime() - (now.getTimezoneOffset() * 60 * 1000));
+  return local.toISOString().slice(0, 10);
+}
 
 function StatCard({ label, value, helper }) {
   return (
@@ -28,44 +35,92 @@ export default function TADashboard() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const dashboard = useMemo(() => dashboardPreview, []);
-  const today = new Date().toISOString().slice(0, 10);
-  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem("ta-theme") === "dark");
+  const today = localDateInputValue();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [attendanceDate, setAttendanceDate] = useState(today);
   const [attendanceSession, setAttendanceSession] = useState("TA session");
-  const [savingEnrollmentId, setSavingEnrollmentId] = useState(null);
+  const [isSavingAttendance, setIsSavingAttendance] = useState(false);
+  const [changedEnrollmentIds, setChangedEnrollmentIds] = useState([]);
+  const [attendanceSuccess, setAttendanceSuccess] = useState("");
   const {
-    attendance, setAttendance, attendanceError, isLoadingAttendance,
+    attendance, setAttendance, attendanceError, setAttendanceError, isLoadingAttendance, loadedAttendanceFilters,
     report, reportError, isRefreshingReport, reportUpdatedAt,
     loadAttendance, loadReport,
   } = useTADashboard({ initialDate: today, initialSessionTitle: "TA session" });
   const learnerAlerts = attendance.filter((row) => row.status === "ABSENT" || row.status === "TARDY");
   const pendingSupportTasks = (report ? 0 : 1) + learnerAlerts.length;
 
-  useEffect(() => {
-    localStorage.setItem("ta-theme", isDarkMode ? "dark" : "light");
-    document.documentElement.classList.toggle("dark", isDarkMode);
-  }, [isDarkMode]);
+  const filtersChanged = Boolean(
+    loadedAttendanceFilters && (
+      loadedAttendanceFilters.sessionDate !== attendanceDate ||
+      loadedAttendanceFilters.sessionTitle !== attendanceSession
+    )
+  );
 
-  const saveAttendance = async (row, status) => {
-    setSavingEnrollmentId(row.enrollmentId);
+  const changeAttendanceStatus = (enrollmentId, status) => {
+    setAttendance((current) => current.map((item) => (
+      item.enrollmentId === enrollmentId ? { ...item, status } : item
+    )));
+    setChangedEnrollmentIds((current) => current.includes(enrollmentId) ? current : [...current, enrollmentId]);
     setAttendanceError("");
+    setAttendanceSuccess("");
+  };
+
+  const changeAttendanceNotes = (enrollmentId, notes) => {
+    setAttendance((current) => current.map((item) => (
+      item.enrollmentId === enrollmentId ? { ...item, notes } : item
+    )));
+    setChangedEnrollmentIds((current) => current.includes(enrollmentId) ? current : [...current, enrollmentId]);
+    setAttendanceError("");
+    setAttendanceSuccess("");
+  };
+
+  const discardAttendanceChanges = () => {
+    if (!loadedAttendanceFilters || isSavingAttendance) return;
+    setChangedEnrollmentIds([]);
+    setAttendanceError("");
+    setAttendanceSuccess("");
+    loadAttendance(loadedAttendanceFilters);
+  };
+
+  const handleLoadAttendance = () => {
+    if (changedEnrollmentIds.length && !window.confirm("You have unsaved attendance changes. Load another session and discard them?")) {
+      return;
+    }
+    setChangedEnrollmentIds([]);
+    setAttendanceSuccess("");
+    setAttendanceError("");
+    loadAttendance({ sessionDate: attendanceDate, sessionTitle: attendanceSession });
+  };
+
+  const saveAttendance = async () => {
+    if (!loadedAttendanceFilters || !changedEnrollmentIds.length || filtersChanged) return;
+    const changedRows = attendance.filter((row) => changedEnrollmentIds.includes(row.enrollmentId));
+    setIsSavingAttendance(true);
+    setAttendanceError("");
+    setAttendanceSuccess("");
     try {
-      await apiClient.put("/attendance/ta/record", {
+      const results = await Promise.allSettled(changedRows.map((row) => apiClient.put("/attendance/ta/record", {
         enrollmentId: row.enrollmentId,
-        sessionDate: attendanceDate,
-        sessionTitle: attendanceSession,
-        status,
+        sessionDate: loadedAttendanceFilters.sessionDate,
+        sessionTitle: loadedAttendanceFilters.sessionTitle,
+        status: row.status,
         notes: row.notes
-      });
-      setAttendance((current) => current.map((item) => (
-        item.enrollmentId === row.enrollmentId ? { ...item, status } : item
-      )));
+      })));
+      const failedEnrollmentIds = results.flatMap((result, index) => result.status === "rejected" ? [changedRows[index].enrollmentId] : []);
+      const savedCount = changedRows.length - failedEnrollmentIds.length;
+      setChangedEnrollmentIds(failedEnrollmentIds);
+      if (failedEnrollmentIds.length) {
+        setAttendanceError(`${savedCount} learner${savedCount === 1 ? "" : "s"} saved. ${failedEnrollmentIds.length} change${failedEnrollmentIds.length === 1 ? "" : "s"} could not be saved; please try again.`);
+      } else {
+        setAttendanceSuccess(`Attendance saved for ${savedCount} learner${savedCount === 1 ? "" : "s"}.`);
+      }
       await loadReport();
     } catch (error) {
       setAttendanceError(error.response?.data?.message || "Could not save attendance.");
     } finally {
-      setSavingEnrollmentId(null);
+      setIsSavingAttendance(false);
     }
   };
 
@@ -80,13 +135,12 @@ export default function TADashboard() {
           <div className="px-4 py-6">
             <p className="px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">TA Console</p>
             <nav className="mt-3 space-y-1 text-sm font-medium">
-              <Link to="/ta" className="flex items-center gap-3 rounded-lg bg-blue-50 px-3 py-2.5 text-blue-700"><span>▦</span> Dashboard</Link>
+              <Link to="/ta" className="flex items-center gap-3 rounded-lg bg-blue-50 px-3 py-2.5 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"><span>▦</span> Dashboard</Link>
               <a href="#attendance" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"><span>✓</span> Attendance</a>
               <a href="#reports" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"><span>▤</span> Progress reports</a>
               <Link to="/forum/studio" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"><span>◉</span> Live Studio</Link>
             </nav>
           </div>
-          <div className="absolute bottom-0 w-60 border-t border-slate-100 p-4 text-xs text-slate-400 dark:border-slate-800">Teaching Assistant Workspace</div>
         </aside>
 
         <div className="min-w-0 flex-1">
@@ -96,7 +150,7 @@ export default function TADashboard() {
               <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Teaching Assistant Console</span>
             </div>
             <div className="flex items-center gap-3">
-              <button type="button" onClick={() => setIsDarkMode((current) => !current)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">{isDarkMode ? "☀ Light" : "◐ Dark"}</button>
+              <button type="button" onClick={toggleTheme} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">{isDarkMode ? "☀ Light" : "◐ Dark"}</button>
               <div className="relative">
                 <button
                   type="button"
@@ -150,10 +204,12 @@ export default function TADashboard() {
                 <div className="flex flex-wrap gap-2">
                   <input aria-label="Attendance session title" value={attendanceSession} onChange={(event) => setAttendanceSession(event.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
                   <input aria-label="Attendance date" type="date" value={attendanceDate} onChange={(event) => setAttendanceDate(event.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
-                  <button type="button" onClick={() => loadAttendance({ sessionDate: attendanceDate, sessionTitle: attendanceSession })} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Load</button>
+                  <button type="button" onClick={handleLoadAttendance} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Load</button>
                 </div>
               </div>
-              {attendanceError && <p className="px-5 pt-4 text-sm text-rose-600">{attendanceError}</p>}
+              {filtersChanged && <p role="status" className="px-5 pt-4 text-sm text-amber-700 dark:text-amber-300">Session or date changed. Click Load before editing attendance.</p>}
+              {attendanceError && <p role="alert" className="px-5 pt-4 text-sm text-rose-600">{attendanceError}</p>}
+              {attendanceSuccess && <p role="status" className="px-5 pt-4 text-sm text-emerald-700 dark:text-emerald-300">{attendanceSuccess}</p>}
               {isLoadingAttendance ? (
                 <p className="p-5 text-sm text-slate-500 dark:text-slate-400">Loading attendance...</p>
               ) : attendance.length === 0 ? (
@@ -161,19 +217,21 @@ export default function TADashboard() {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-left text-sm">
-                    <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:bg-slate-800 dark:text-slate-400"><tr><th className="px-5 py-3">Learner</th><th className="px-5 py-3">Course</th><th className="px-5 py-3 text-right">Attendance</th></tr></thead>
+                    <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:bg-slate-800 dark:text-slate-400"><tr><th className="px-5 py-3">Learner</th><th className="px-5 py-3">Course</th><th className="px-5 py-3">Notes</th><th className="px-5 py-3 text-right">Attendance</th></tr></thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                       {attendance.map((row) => (
                         <tr key={row.enrollmentId}>
                           <td className="px-5 py-4 font-medium text-slate-800 dark:text-slate-100">{row.studentName}</td>
                           <td className="px-5 py-4 text-slate-500 dark:text-slate-400">{row.courseTitle}</td>
-                          <td className="px-5 py-4 text-right"><select aria-label={`Attendance status for ${row.studentName}`} value={row.status} onChange={(event) => saveAttendance(row, event.target.value)} disabled={savingEnrollmentId === row.enrollmentId} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-white">{ATTENDANCE_STATUSES.map((status) => <option key={status.value} value={status.value}>{status.label}</option>)}</select>{savingEnrollmentId === row.enrollmentId && <span className="ml-2 text-xs text-slate-500 dark:text-slate-400">Saving...</span>}</td>
+                          <td className="px-5 py-4"><input aria-label={`Attendance notes for ${row.studentName}`} value={row.notes || ""} onChange={(event) => changeAttendanceNotes(row.enrollmentId, event.target.value)} disabled={isSavingAttendance || filtersChanged} placeholder="Optional note" className="w-44 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-white" /></td>
+                          <td className="px-5 py-4 text-right"><select aria-label={`Attendance status for ${row.studentName}`} value={row.status} onChange={(event) => changeAttendanceStatus(row.enrollmentId, event.target.value)} disabled={isSavingAttendance || filtersChanged} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-white">{ATTENDANCE_STATUSES.map((status) => <option key={status.value} value={status.value}>{status.label}</option>)}</select></td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               )}
+              {!isLoadingAttendance && attendance.length > 0 && <div className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-100 p-5 dark:border-slate-800"><p className="text-sm text-slate-500 dark:text-slate-400">{changedEnrollmentIds.length ? `${changedEnrollmentIds.length} unsaved change${changedEnrollmentIds.length === 1 ? "" : "s"}` : "No unsaved changes"}</p><div className="flex gap-2"><button type="button" onClick={discardAttendanceChanges} disabled={!changedEnrollmentIds.length || isSavingAttendance} className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">Discard</button><button type="button" onClick={saveAttendance} disabled={!changedEnrollmentIds.length || isSavingAttendance || filtersChanged} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">{isSavingAttendance ? "Saving..." : "Save attendance"}</button></div></div>}
             </section>
 
             <section id="reports" className="mt-7 rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">

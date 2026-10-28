@@ -46,14 +46,24 @@ function serializeSession(session) {
         status: session.status,
         scheduledAt: session.scheduledAt ? session.scheduledAt.toISOString() : null,
         startedAt: session.startedAt ? session.startedAt.toISOString() : null,
-        attendees: (session.attendees || []).map((attendee) => ({
-            userId: attendee.userId,
-            name: attendee.userName,
-            online: Boolean(attendee.online),
-            muted: Boolean(attendee.muted),
-            cameraOn: Boolean(attendee.cameraOn),
-            raisedHand: Boolean(attendee.raisedHand)
-        })),
+        attendees: (session.attendees || []).map((attendee) => {
+            const joinedAt = attendee.createdAt ? attendee.createdAt.toISOString() : null;
+            const lastSeenAt = attendee.updatedAt ? attendee.updatedAt.toISOString() : joinedAt;
+            const durationSeconds = joinedAt && lastSeenAt
+                ? Math.max(0, Math.round((new Date(lastSeenAt).getTime() - new Date(joinedAt).getTime()) / 1000))
+                : null;
+            return {
+                userId: attendee.userId,
+                name: attendee.userName,
+                online: Boolean(attendee.online),
+                muted: Boolean(attendee.muted),
+                cameraOn: Boolean(attendee.cameraOn),
+                raisedHand: Boolean(attendee.raisedHand),
+                joinedAt,
+                lastSeenAt,
+                durationSeconds
+            };
+        }),
         polls: (session.polls || []).map(serializePoll),
         messages: (session.messages || []).map(serializeMessage)
     };
@@ -289,6 +299,7 @@ module.exports = {
     ensureSession,
     joinSession,
     updateSessionStatus,
+    updateSessionPresence,
     getMessages,
     sendMessage,
     deleteMessage,

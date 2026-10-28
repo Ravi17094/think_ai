@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 // Item 3: User Registration
 exports.register = async (req, res) => {
     try {
-        const { email, password, name, role } = req.body;
+        const { email, password, name } = req.body;
 
         // Basic validation
         if (!email || !password) {
@@ -22,12 +22,13 @@ exports.register = async (req, res) => {
         // Hash the password before saving to the database
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Save user to MongoDB (Defaults role to 'Learner' if not specified)
+        // Public registration must never trust a role sent by the browser.
+        // Privileged roles are assigned later through an administrator-only flow.
         const newUser = new User({
             email,
             password: hashedPassword,
             name: name || null,
-            role: role || 'Learner'
+            role: 'Learner'
         });
 
         await newUser.save();

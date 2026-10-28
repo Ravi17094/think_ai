@@ -1,4 +1,4 @@
-{
+ {
   "name": "backend",
   "version": "1.0.0",
   "description": "Thinkz AI LMS Backend",
@@ -9,8 +9,10 @@
     "dev": "nodemon server.js",
     "lint": "node --check server.js && node --check app.js",
     "build": "node --check server.js && node --check app.js",
-    "test": "node --test tests/*.test.js",
-    "seed:ta-demo": "node scripts/seedTaDemo.js"
+    "test": "node --test tests/*.test.js auditLogService.test.js requireRole.test.js",
+    "seed:ta-demo": "node scripts/seedTaDemo.js",
+    "test:live-session": "node scripts/live-session-e2e.js",
+    "test:ws-load": "node scripts/websocket-load-50.js"
   },
   "keywords": [],
   "author": "",

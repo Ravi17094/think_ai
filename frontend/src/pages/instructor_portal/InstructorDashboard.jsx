@@ -10,17 +10,30 @@ function StatCard({ title, count, description }) {
 export default function InstructorDashboard() {
   const navigate = useNavigate();
   const [report, setReport] = useState(null);
+  const [reportError, setReportError] = useState("");
+  const [isLoadingReport, setIsLoadingReport] = useState(true);
 
-  useEffect(() => {
-    apiClient.get('/attendance/ta/report').then((response) => setReport(response.data?.data || null)).catch(() => setReport(null));
-  }, []);
+  const loadReport = () => {
+    setIsLoadingReport(true);
+    setReportError("");
+    apiClient.get('/attendance/ta/report')
+      .then((response) => setReport(response.data?.data || null))
+      .catch((error) => {
+        setReport(null);
+        setReportError(error.response?.data?.message || "Could not load the dashboard report.");
+      })
+      .finally(() => setIsLoadingReport(false));
+  };
+
+  useEffect(() => { loadReport(); }, []);
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
       <div className="mb-7"><p className="text-sm font-medium text-blue-600">Dashboard</p><h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Instructor Workspace</h1><p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Manage modules, lessons, assessments, live classes, and learner progress.</p></div>
-      <section className="grid gap-4 sm:grid-cols-3"><StatCard title="Active modules" count={report?.coursework?.activeModules ?? '—'} description="Modules in the database" /><StatCard title="Module assignments" count={report?.coursework?.activeAssessments ?? '—'} description="Active assessments in the database" /><StatCard title="Pending submissions" count={report?.grading?.pending ?? '—'} description="Submitted learner assessments" /></section>
+      {reportError && <div role="alert" className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"><span>{reportError}</span><button type="button" onClick={loadReport} className="font-semibold underline">Retry</button></div>}
+      <section className="grid gap-4 sm:grid-cols-3"><StatCard title="Active modules" count={isLoadingReport ? '…' : report?.coursework?.activeModules ?? '—'} description="Platform modules currently available" /><StatCard title="Active assessments" count={isLoadingReport ? '…' : report?.coursework?.activeAssessments ?? '—'} description="Platform assessments currently available" /><StatCard title="Pending submissions" count={isLoadingReport ? '…' : report?.grading?.pending ?? '—'} description="Platform submitted assessments awaiting processing" /></section>
 
-      <section className="mt-7"><SessionPrepChecklist /></section>
+      <section className="mt-7"><SessionPrepChecklist onOpenLiveStudio={() => navigate('/forum/studio')} /></section>
 
       <section className="mt-7 grid gap-5 lg:grid-cols-2">
         <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"><div className="flex items-start justify-between gap-4"><div><h2 className="text-lg font-semibold text-slate-900 dark:text-white">Modules & lessons</h2><p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">Create course modules and manage nested lessons, topics, and videos.</p></div><span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300">Content</span></div><button type="button" onClick={() => navigate('/instructor/modules')} className="mt-5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Manage Modules</button></article>

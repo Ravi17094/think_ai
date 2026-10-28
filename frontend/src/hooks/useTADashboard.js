@@ -10,6 +10,7 @@ export default function useTADashboard({ initialDate, initialSessionTitle }) {
   const [attendance, setAttendance] = useState([]);
   const [attendanceError, setAttendanceError] = useState("");
   const [isLoadingAttendance, setIsLoadingAttendance] = useState(true);
+  const [loadedAttendanceFilters, setLoadedAttendanceFilters] = useState(null);
   const [report, setReport] = useState(null);
   const [reportError, setReportError] = useState("");
   const [isRefreshingReport, setIsRefreshingReport] = useState(false);
@@ -21,6 +22,7 @@ export default function useTADashboard({ initialDate, initialSessionTitle }) {
     try {
       const response = await apiClient.get("/attendance/ta/register", { params: { sessionDate, sessionTitle } });
       setAttendance(response.data?.data || []);
+      setLoadedAttendanceFilters({ sessionDate, sessionTitle });
     } catch (error) {
       setAttendanceError(error.response?.data?.message || "Could not load attendance.");
     } finally {
@@ -52,7 +54,7 @@ export default function useTADashboard({ initialDate, initialSessionTitle }) {
   }, [initialDate, initialSessionTitle, refreshDashboard]);
 
   return {
-    attendance, setAttendance, attendanceError, isLoadingAttendance,
+    attendance, setAttendance, attendanceError, setAttendanceError, isLoadingAttendance, loadedAttendanceFilters,
     report, reportError, isRefreshingReport, reportUpdatedAt,
     loadAttendance, loadReport, refreshDashboard,
   };

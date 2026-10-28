@@ -15,6 +15,7 @@ const {
     getEnrollmentAssessmentStatus,
     getTaGradingQueue,
     gradeSubmission,
+    gradeSubmissionsBulk,
 
     // Admin coding questions
     createCodingQuestion,
@@ -397,6 +398,12 @@ router.get(
     "/ta/grading-queue",
     requireRole(["TA", "Instructor", "Admin"]),
     getTaGradingQueue
+);
+
+router.patch(
+    "/ta/grading-queue/bulk",
+    requireRole(["TA", "Instructor", "Admin"]),
+    gradeSubmissionsBulk
 );
 
 router.patch(
