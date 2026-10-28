@@ -25,6 +25,7 @@ const lessonProgressRoutes = require("./routes/lessonProgressRoutes");
 const certificateRoutes = require("./routes/certificateRoutes");
 const assessmentRoutes = require("./routes/assessmentRoutes");
 const codeExecutionRoutes = require("./routes/codeExecutionRoutes");
+const attendanceRoutes = require("./routes/attendanceRoutes");
 
 const auditLogRoutes = require("./routes/auditLog");
 const analyticsRoutes = require("./routes/analytics");
@@ -204,6 +205,8 @@ app.use("/api/lesson-progress", lessonProgressRoutes);
 app.use("/api/certificates", certificateRoutes);
 
 app.use("/api/assessments", assessmentRoutes);
+
+app.use("/api/attendance", attendanceRoutes);
 
 app.use("/api/code", codeExecutionRoutes);
 

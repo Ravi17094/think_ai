@@ -196,19 +196,6 @@ export default function TADashboard() {
                   <div className="absolute right-0 z-20 mt-2 w-44 rounded-lg border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
                     <button
                       type="button"
-                      className="w-full rounded-md px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700"
-                    >
-                      View profile
-                    </button>
-                    <button
-                      type="button"
-                      className="w-full rounded-md px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700"
-                    >
-                      Edit profile
-                    </button>
-                    <div className="my-1 border-t border-slate-100 dark:border-slate-700" />
-                    <button
-                      type="button"
                       onClick={() => { dispatch(logout()); navigate("/login"); }}
                       className="w-full rounded-md px-3 py-2 text-left text-sm font-medium text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10"
                     >

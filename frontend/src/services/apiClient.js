@@ -1,7 +1,14 @@
 import axios from "axios"
 
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+const apiBaseUrl = configuredApiBaseUrl?.startsWith('http')
+  ? configuredApiBaseUrl
+  : 'http://localhost:5000/api';
+
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, 
+  // A relative /api setting works only when a proxy is configured. The local
+  // demo must call the backend directly so portal data loads on any Vite port.
+  baseURL: apiBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },

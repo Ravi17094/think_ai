@@ -72,6 +72,23 @@ async function main() {
     });
   }
 
+  const lessonTitle = "Variables and block scope";
+  const lesson = await prisma.lesson.findFirst({
+    where: { moduleId: moduleItem.id, title: lessonTitle }
+  });
+  if (!lesson) {
+    await prisma.lesson.create({
+      data: {
+        title: lessonTitle,
+        description: "Learn when to use let and const in JavaScript.",
+        content: "This demo lesson explains block-scoped variables and prepares the learner for the Variables Check assessment.",
+        duration: "10 minutes",
+        order: 1,
+        moduleId: moduleItem.id
+      }
+    });
+  }
+
   let assessment = await prisma.assessment.findFirst({
     where: { moduleId: moduleItem.id, title: ASSESSMENT_TITLE },
     include: { questions: { include: { options: true } } }
