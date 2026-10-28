@@ -34,4 +34,4 @@ jobs:
         with:
           context: ./backend
           push: true
-                   tags: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          tags: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
