@@ -15,6 +15,7 @@ import LearnerRoutes from "./routes/LearnerRoutes";
 import AdminRoutes from "./routes/AdminRoutes";
 import InstructorRoutes from "./routes/InstructorRoutes";
 import ForumModuleRoutes from "./routes/ForumModuleRoutes";
+import TADashboard from "./pages/ta/TADashboard";
 
 import { fetchCurrentUser } from "./features/auth/authSlice";
 import useSessionTimeout from "./hooks/useSessionTimeout";
@@ -155,7 +156,7 @@ function App() {
             <ProtectedRoute
               allowedRoles={["TA", "Admin"]}
             >
-              <RolePlaceholder label="TA" />
+              <TADashboard />
             </ProtectedRoute>
           }
         />

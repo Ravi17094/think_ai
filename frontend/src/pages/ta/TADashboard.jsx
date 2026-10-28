@@ -77,7 +77,7 @@ export default function TADashboard() {
   }, []);
 
   const navItemClass = (sectionId) => `flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition ${activeSection === sectionId
-    ? "bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
+    ? "bg-purple-50 text-purple-700 dark:bg-purple-500/15 dark:text-purple-300"
     : "text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"}`;
 
   const filtersChanged = Boolean(
@@ -158,7 +158,7 @@ export default function TADashboard() {
       <div className="flex min-h-screen">
         <aside className="sticky top-0 hidden h-screen w-60 shrink-0 self-start overflow-y-auto border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 lg:block">
           <div className="flex h-16 items-center gap-3 border-b border-slate-100 px-6 dark:border-slate-800">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-blue-600 text-sm font-black text-white">tz</span>
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-purple-600 text-sm font-black text-white">tz</span>
             <span className="text-lg font-bold tracking-tight text-slate-800 dark:text-white">Thinkz.ai</span>
           </div>
           <div className="px-4 py-6">
@@ -175,7 +175,7 @@ export default function TADashboard() {
         <div className="min-w-0 flex-1">
           <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-5 dark:border-slate-800 dark:bg-slate-900 sm:px-8">
             <div className="flex items-center gap-3">
-              <span className="grid h-8 w-8 place-items-center rounded-lg bg-blue-600 text-xs font-black text-white lg:hidden">tz</span>
+              <span className="grid h-8 w-8 place-items-center rounded-lg bg-purple-600 text-xs font-black text-white lg:hidden">tz</span>
               <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Teaching Assistant Console</span>
             </div>
             <div className="flex items-center gap-3">
@@ -210,7 +210,7 @@ export default function TADashboard() {
           <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
             <div id="dashboard" className="mb-7 scroll-mt-24 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-sm font-medium text-blue-600">Dashboard</p>
+                <p className="text-sm font-medium text-purple-600">Dashboard</p>
                 <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Teaching Assistant Workspace</h1>
                 <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Monitor learner progress, record attendance, and support live classes.</p>
               </div>
