@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-16",
+  "mobile": {
+    "tests": 343,
+    "suites": 31,
+    "passed": true,
+    "typecheck": "passed"
+  },
+  "sharedWeb": {
+    "tests": 33,
+    "passed": true
+  },
+  "sqliteApiAndExecutor": {
+    "tests": 62,
+    "passed": true
+  },
+  "finalPostgresql": {
+    "tests": 51,
+    "passed": true,
+    "migrationBackfill": "passed",
+    "schemaEquivalence": "no difference"
+  },
+  "builds": {
+    "web": "passed",
+    "expoWeb": "passed"
+  },
+  "liveVerification": {
+    "awsS3": "pending configuration",
+    "email": "pending configuration",
+    "judge0": "unavailable",
+    "androidIosDevices": "not available"
+  },
+  "stressReport": "stress-fixture.json",
+  "walkthroughs": "../all-tasks-demos/index.html"
+}

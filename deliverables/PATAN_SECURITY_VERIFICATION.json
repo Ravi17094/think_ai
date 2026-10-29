@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-26",
+  "before": {
+    "backendLms": 35,
+    "backendCi": 25,
+    "mobile": 390,
+    "mobileSuites": 37,
+    "typecheck": "PASS"
+  },
+  "after": {
+    "backendLms": 135,
+    "backendCi": 25,
+    "mobile": 401,
+    "mobileSuites": 38,
+    "typecheck": "PASS",
+    "postgresqlIntegration": 14,
+    "webExport": "PASS"
+  },
+  "cloudAcceptance": "PENDING",
+  "stagingCertificateFlow": "NOT_RUN",
+  "judge0SuccessfulExecutionLatencies": null,
+  "reportScheduleEnabled": false,
+  "nativeDevices": "PENDING",
+  "evidenceKind": "Observed command results; cloud adapters are injected only in local integration/unit tests."
+}

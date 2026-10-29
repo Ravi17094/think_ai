@@ -1,0 +1,2305 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Learning API — Days 1–4",
+    "version": "1.0.0",
+    "description": "Bearer JWT required. Learner resources are enrollment-owner scoped. Grading and certificate delivery use durable background jobs. Native/cloud acceptance status is documented separately."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5001/api"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "CourseInput": {
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "category",
+          "price",
+          "duration"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "duration": {
+            "type": "string"
+          },
+          "thumbnail": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "videoUrl": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "instructorName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          }
+        }
+      },
+      "Draft": {
+        "type": "object",
+        "required": [
+          "answers",
+          "flags",
+          "currentIndex"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "answers": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "currentIndex": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "languages": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "enum": [
+                "python",
+                "javascript",
+                "java",
+                "cpp"
+              ]
+            }
+          }
+        }
+      },
+      "Submission": {
+        "type": "object",
+        "required": [
+          "answers",
+          "flags",
+          "currentIndex"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "answers": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "currentIndex": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "languages": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "enum": [
+                "python",
+                "javascript",
+                "java",
+                "cpp"
+              ]
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Client timestamp for audit. Server deadline controls acceptance."
+          }
+        }
+      },
+      "GenerateCertificate": {
+        "type": "object",
+        "required": [
+          "enrollmentId"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "enrollmentId": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "ProfilePatch": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "avatarUrl": {
+            "type": "string",
+            "description": "HTTP(S) avatar URL or empty string to clear."
+          }
+        }
+      },
+      "CodeExecution": {
+        "type": "object",
+        "required": [
+          "language",
+          "source_code"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "language": {
+            "type": "string",
+            "enum": [
+              "python",
+              "javascript",
+              "java",
+              "cpp",
+              "c++"
+            ]
+          },
+          "source_code": {
+            "type": "string",
+            "maxLength": 100000
+          },
+          "timeout": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 30
+          },
+          "test_cases": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "maxLength": 50000
+                },
+                "expected_output": {
+                  "type": "string",
+                  "maxLength": 100000
+                }
+              }
+            }
+          }
+        }
+      },
+      "ProgressSync": {
+        "type": "object",
+        "required": [
+          "updates"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "updates": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 50,
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "lessonId",
+                "positionSeconds",
+                "durationSeconds",
+                "completed",
+                "baseUpdatedAt"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "lessonId": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "positionSeconds": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 864000
+                },
+                "durationSeconds": {
+                  "type": "number",
+                  "exclusiveMinimum": true,
+                  "minimum": 0,
+                  "maximum": 864000
+                },
+                "completed": {
+                  "type": "boolean"
+                },
+                "baseUpdatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "nullable": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/lms/courses": {
+      "get": {
+        "summary": "List courses",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create course (staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CourseInput"
+              },
+              "example": {
+                "title": "React Native",
+                "description": "Course",
+                "category": "Development",
+                "price": 0,
+                "duration": "1h"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lms/courses/{courseId}": {
+      "get": {
+        "summary": "Course curriculum",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update course (staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "title": "Updated title"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete course (staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      }
+    },
+    "/lms/courses/{courseId}/modules": {
+      "post": {
+        "summary": "Create ordered module (staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "title": "Getting started"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lms/courses/{courseId}/modules/order": {
+      "put": {
+        "summary": "Reorder modules (staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "ids": [
+                  "{{moduleId}}"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lms/modules/{moduleId}": {
+      "patch": {
+        "summary": "Update module (staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "title": "Module title"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete module (staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      }
+    },
+    "/lms/modules/{moduleId}/lessons": {
+      "post": {
+        "summary": "Create ordered lesson (staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "title": "Components",
+                "content": "Lesson content"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lms/modules/{moduleId}/lessons/order": {
+      "put": {
+        "summary": "Reorder lessons (staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "ids": [
+                  "{{lessonId}}"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lms/lessons/{lessonId}": {
+      "patch": {
+        "summary": "Update lesson (staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lessonId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "title": "Lesson title"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete lesson (staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lessonId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      }
+    },
+    "/lms/enrollments": {
+      "get": {
+        "summary": "List own enrollments (staff may list all)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      },
+      "post": {
+        "summary": "Enroll learner (staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "batchId": "{{batchId}}",
+                "studentName": "Learner",
+                "studentEmail": "learner@example.test"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lms/enrollments/{enrollmentId}": {
+      "patch": {
+        "summary": "Update enrollment (staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "enrollmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "enrollmentStatus": "IN_PROGRESS",
+                "courseAccess": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lms/enrollments/{enrollmentId}/progress": {
+      "get": {
+        "summary": "Enrollment completion",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "enrollmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      }
+    },
+    "/lms/courses/{courseId}/player": {
+      "get": {
+        "summary": "Owned course player",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      }
+    },
+    "/lms/lessons/{lessonId}/content": {
+      "get": {
+        "summary": "Owned lesson content",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lessonId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      }
+    },
+    "/lms/lessons/{lessonId}/notes": {
+      "put": {
+        "summary": "Save lesson notes",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lessonId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "notes": "My notes"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lms/lessons/{lessonId}/progress": {
+      "put": {
+        "summary": "Save playback",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lessonId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "positionSeconds": 95,
+                "durationSeconds": 100,
+                "completed": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lms/modules/{moduleId}/assessments": {
+      "post": {
+        "summary": "Create assessment with grading policy (staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "moduleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {
+                "title": "State check",
+                "duration": 30,
+                "passPercentage": 40,
+                "maxAttempts": 2,
+                "questions": [
+                  {
+                    "questionText": "Which hook stores state?",
+                    "questionType": "MCQ",
+                    "marks": 1,
+                    "options": [
+                      {
+                        "optionText": "useState",
+                        "isCorrect": true
+                      },
+                      {
+                        "optionText": "useMemo",
+                        "isCorrect": false
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lms/assessments/{assessmentId}/attempt": {
+      "post": {
+        "summary": "Start or restore assessment",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "assessmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {}
+            }
+          }
+        }
+      }
+    },
+    "/lms/assessments/{assessmentId}/draft": {
+      "put": {
+        "summary": "Save draft",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "assessmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Draft"
+              },
+              "example": {
+                "answers": {
+                  "{{questionId}}": "{{optionId}}"
+                },
+                "flags": [],
+                "currentIndex": 0,
+                "languages": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lms/assessments/{assessmentId}/submit": {
+      "post": {
+        "summary": "Submit idempotently; coding is queued",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "assessmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Submission"
+              },
+              "example": {
+                "answers": {
+                  "{{questionId}}": "{{optionId}}"
+                },
+                "flags": [],
+                "currentIndex": 0,
+                "languages": {},
+                "timestamp": "2026-10-16T10:00:00Z"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lms/assessments/{assessmentId}/results": {
+      "get": {
+        "summary": "Own result, breakdown, retake and certificate eligibility",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "assessmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      }
+    },
+    "/lms/assessments/{assessmentId}/retake": {
+      "post": {
+        "summary": "Start allowed failed-assessment retake",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "assessmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {}
+            }
+          }
+        }
+      }
+    },
+    "/lms/assessments/{assessmentId}/retry-grading": {
+      "post": {
+        "summary": "Retry failed grading without a new submission",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "assessmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              },
+              "example": {}
+            }
+          }
+        }
+      }
+    },
+    "/lms/certificates/generate": {
+      "post": {
+        "summary": "Queue eligible certificate upload and email",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "202": {
+            "description": "Certificate delivery queued"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateCertificate"
+              },
+              "example": {
+                "enrollmentId": "{{enrollmentId}}"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lms/certificates": {
+      "get": {
+        "summary": "List own issued certificates",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      }
+    },
+    "/lms/certificates/{certificateId}": {
+      "get": {
+        "summary": "Certificate metadata and delivery status",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "certificateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      }
+    },
+    "/lms/certificates/{certificateId}/preview": {
+      "get": {
+        "summary": "Actual first PDF page as PNG",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "certificateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PNG image"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      }
+    },
+    "/lms/certificates/{certificateId}/document": {
+      "get": {
+        "summary": "Protected certificate PDF",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "certificateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF file"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      }
+    },
+    "/lms/certificates/{certificateId}/download-url": {
+      "get": {
+        "summary": "One-hour signed S3 download URL",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "certificateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      }
+    },
+    "/lms/profile": {
+      "get": {
+        "summary": "Account profile, learning stats and ten recent actions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update own display name/avatar only",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfilePatch"
+              },
+              "example": {
+                "name": "Patan",
+                "avatarUrl": ""
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lms/analytics": {
+      "get": {
+        "summary": "Administrator analytics (UTC date range)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "daily",
+                "weekly",
+                "monthly"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        }
+      }
+    },
+    "/progress/sync": {
+      "post": {
+        "summary": "Offline progress synchronization; server version wins",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgressSync"
+              },
+              "example": {
+                "updates": [
+                  {
+                    "id": "device-update-1",
+                    "lessonId": "{{lessonId}}",
+                    "positionSeconds": 42,
+                    "durationSeconds": 100,
+                    "completed": false,
+                    "baseUpdatedAt": null
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/code/execute": {
+      "post": {
+        "summary": "Bounded Judge0 code execution",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success; JSON uses { success: true, data: ... }"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission or enrollment denied"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Attempt closed, retake unavailable or certificate requirements not met"
+          },
+          "503": {
+            "description": "External runner, storage or email unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CodeExecution"
+              },
+              "example": {
+                "language": "python",
+                "source_code": "print(42)",
+                "timeout": 30,
+                "test_cases": [
+                  {
+                    "input": "",
+                    "expected_output": "42"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

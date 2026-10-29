@@ -39,6 +39,7 @@ const io = new Server(httpServer, {
 
 // Make Socket.IO available to Express
 app.set("io", io);
+require("./lms").startLmsWorker(app, io);
 
 // Initialize Socket handlers
 initSockets(io);

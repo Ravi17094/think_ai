@@ -1,0 +1,14 @@
+{
+  "fixture": true,
+  "pageErrors": [],
+  "checks": [
+    "Login gate and authenticated workspace",
+    "Course player, ordered lessons and notes",
+    "Assessment answers, flags, submit modal and results",
+    "Playground execution and persisted history",
+    "Profile stats and recent activity",
+    "Admin analytics, trend buckets and date range",
+    "Certificate metadata, preview and copy link action",
+    "Sign out guards deep-linked learner data"
+  ]
+}

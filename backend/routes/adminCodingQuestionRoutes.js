@@ -1,6 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
+const { authenticateToken, authorizeRoles } = require("../middleware/lmsLegacyAccess");
 
 const {
     createCodingQuestion,
@@ -93,6 +94,8 @@ const {
 
 router.post(
     "/coding-questions",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     createCodingQuestion
 );
 
@@ -125,6 +128,8 @@ router.post(
 
 router.get(
     "/assessments/:assessmentId/coding-questions",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     getCodingQuestions
 );
 
@@ -159,6 +164,8 @@ router.get(
 
 router.get(
     "/coding-questions/:questionId",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     getCodingQuestionById
 );
 
@@ -209,6 +216,8 @@ router.get(
 
 router.put(
     "/coding-questions/:questionId",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     updateCodingQuestion
 );
 
@@ -241,6 +250,8 @@ router.put(
 
 router.delete(
     "/coding-questions/:questionId",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     deleteCodingQuestion
 );
 
@@ -296,6 +307,8 @@ router.delete(
 
 router.post(
     "/coding-questions/:questionId/test-cases",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     createCodingTestCase
 );
 
@@ -328,6 +341,8 @@ router.post(
 
 router.get(
     "/coding-questions/:questionId/test-cases",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     getCodingTestCases
 );
 
@@ -379,6 +394,8 @@ router.get(
 
 router.put(
     "/coding-test-cases/:testCaseId",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     updateCodingTestCase
 );
 
@@ -411,6 +428,8 @@ router.put(
 
 router.delete(
     "/coding-test-cases/:testCaseId",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     deleteCodingTestCase
 );
 

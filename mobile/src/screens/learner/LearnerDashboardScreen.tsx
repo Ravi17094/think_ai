@@ -1,3 +1,4 @@
+import {LmsSyncIndicator} from '@/lms/SyncIndicator';
 import { useCallback } from 'react';
 import {
   Pressable,
@@ -93,6 +94,7 @@ export function LearnerDashboardScreen({
             <Text style={styles.statValue}>{enrollments.length}</Text>
           </View>
         </View>
+        <LmsSyncIndicator/>
 
         {showSkeleton ? (
           <View style={styles.section}>

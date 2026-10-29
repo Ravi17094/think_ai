@@ -1,0 +1,16 @@
+{
+  "environment": "Local practice data, not staging",
+  "studentName": "Patan",
+  "courseName": "Local practice: LMS walkthrough",
+  "issuedAt": "2026-10-23T05:27:35.446Z",
+  "certificateNo": "CERT-8d4fd76b-fe33-4c76-b7cb-467b294e7314",
+  "clientLogoVerified": false,
+  "clientAccreditationVerified": false,
+  "clientSignatureVerified": false,
+  "logoTargetCoordinates": {
+    "x": 50,
+    "y": 40
+  },
+  "brandingApproved": false,
+  "nativeShareVerified": false
+}

@@ -1,0 +1,282 @@
+{
+  "date": "2026-10-26",
+  "projectFiles": [
+    {
+      "path": "PATAN_START_HERE.md",
+      "sha256": "9a65ed9a9550afbb964e26d3e734b56ae54800a7efdb751a95a22b19538e660a"
+    },
+    {
+      "path": "Start-Patan.ps1",
+      "sha256": "768c8635544c166319c21cd256b17ab2a411e8abfe92588a1bc05b48295a6dac"
+    },
+    {
+      "path": "backend/.env.patan.example",
+      "sha256": "ba6dacc1f89a74711c6611e5b5110621994416def32d583e376eef3ad88d57f2"
+    },
+    {
+      "path": "backend/lms/acceptance.js",
+      "sha256": "485b8839d9add3c9828992a32241b20f4f7574a79337c1e273ad9afaa0ae5b2c"
+    },
+    {
+      "path": "backend/lms/certificates.js",
+      "sha256": "23bf91bd333b7fdfe743f326d36d539446b2c01c7d4ca4958e18cfa8f6500de7"
+    },
+    {
+      "path": "backend/lms/email-delivery.js",
+      "sha256": "be03c9a9c9ef7fec2047e167427d7f5a6da877efa6fc02fecb212e5fb992814b"
+    },
+    {
+      "path": "backend/lms/executor.js",
+      "sha256": "b3d3580afab136d9249f50cf0e5db2792d6cd6885b370dba8df298518b7c025b"
+    },
+    {
+      "path": "backend/lms/index.js",
+      "sha256": "b0e6be6eb81fe1a295fbc469cf62149c5474a2e073643df8948af509478fbe23"
+    },
+    {
+      "path": "backend/lms/openapi.json",
+      "sha256": "b83c575f2e8cbb8c5aea60e85a11667dfa9f0c7200b5072ff8602da63326f21a"
+    },
+    {
+      "path": "backend/lms/report-delivery.js",
+      "sha256": "dac1d929f88e542207a0200c8cb837dcc1ce5b6ceb99633cf915d1e8d0b7a636"
+    },
+    {
+      "path": "backend/lms/router.js",
+      "sha256": "ca40429d47505cefaf192d937e6328f7290243ad66e7ba6873aac26d157c7abf"
+    },
+    {
+      "path": "backend/lms/schemas.js",
+      "sha256": "a85acca39477cb22b0f45cdb338d9dd75f3d5e7c0d2fc4f7f7a39c6745abe9ff"
+    },
+    {
+      "path": "backend/lms/scripts/day7-e2e.js",
+      "sha256": "632bc8df565ac82ca40efa769379162d8dbd1074c9fcd5f0152b3a6c9d15e1ed"
+    },
+    {
+      "path": "backend/lms/scripts/stress-day7.js",
+      "sha256": "60ec8f4473819e6de537c66625b42208ffe6c93878316ff1b02f2eafaca3f9b7"
+    },
+    {
+      "path": "backend/lms/security-acceptance-migration.sql",
+      "sha256": "43f75fadebb72391c59eb17a1bb20504de9fd180d3befeb34c3eb25597316bc2"
+    },
+    {
+      "path": "backend/lms/service.js",
+      "sha256": "bdb6b9aea28b236d840540f85cec03b238170f42a41becb6fd591f300b8ac906"
+    },
+    {
+      "path": "backend/lms/stress-runner.js",
+      "sha256": "4acaa45cfebbb91510f90005d998aae533d873dc3d1f554c5280e0eb6ea72ec1"
+    },
+    {
+      "path": "backend/lms/tests/configuration-regressions.test.js",
+      "sha256": "a1a36da1de7396e5e603d9f482401b6bed335eceef6e45ae05d771b8a2088c71"
+    },
+    {
+      "path": "backend/lms/tests/database.integration.js",
+      "sha256": "b4475021d4142f059883044e88df1678652edecd50897e60fb0b326b3cc37267"
+    },
+    {
+      "path": "backend/lms/tests/delivery-safety.test.js",
+      "sha256": "f42b6645167ba91ad0f0155e59ec110f09a19603aeb82ec77ba9b606043ac6df"
+    },
+    {
+      "path": "backend/lms/tests/generation-lease.test.js",
+      "sha256": "31d0a14c22e610f8a91ff09eaf89e55c118a329574356c1a5e6a86ee4d28b437"
+    },
+    {
+      "path": "backend/lms/tests/internal-callback-security.test.js",
+      "sha256": "c0b8159d3ed6c9bf0a036be86a3cc15caa86df67ec8d78b80dc2494727bf0ff1"
+    },
+    {
+      "path": "backend/lms/tests/legacy-admin-security.test.js",
+      "sha256": "66b837ada99832ba8b2d439c20822122951d1dd7f06b214dde9a12c827784875"
+    },
+    {
+      "path": "backend/lms/tests/legacy-learner-security.test.js",
+      "sha256": "eb6b87dde4b57dbfbb580be16f6494ca9a580270f4376e68e491c0c8f0ea56af"
+    },
+    {
+      "path": "backend/lms/tests/receipt-evidence.test.js",
+      "sha256": "6b19c0072f9894687cb6dc78f633531e6e653ea681c8f6b1af6cf0aba87d9923"
+    },
+    {
+      "path": "backend/lms/tests/stress-edge-load.test.js",
+      "sha256": "99f6ffea427b718c0737716c3e1857cd9379beaa9234131fa13d94548f520b33"
+    },
+    {
+      "path": "backend/middleware/internalCallbackAuth.js",
+      "sha256": "abdb99a6ac5d45878a2410099a2606d61327c259e806c7125f86accb198679f2"
+    },
+    {
+      "path": "backend/middleware/lmsLegacyAccess.js",
+      "sha256": "b4526c28b42f51c7beee2bb44aeaa172341fae938e147e01b5bc3322e2688cb3"
+    },
+    {
+      "path": "backend/middleware/lmsLegacyOwnership.js",
+      "sha256": "d7b30e2ca111260e10494802a56c5460d7a54a6a65f2919f4b8651fc68ab289f"
+    },
+    {
+      "path": "backend/prisma/schema.prisma",
+      "sha256": "a44afa32b4766c95e96b6db902e536153657ab4d2fbfc198200eb92f758fd11e"
+    },
+    {
+      "path": "backend/routes/adminCodingQuestionRoutes.js",
+      "sha256": "dfceaf4283713cb4e24cad6f271ba2235fd9492cab747767d7bf5f8e47f6f482"
+    },
+    {
+      "path": "backend/routes/assessmentRoutes.js",
+      "sha256": "56f96bcf46f1d4533008e2d6bc6ddb76caa3192c438d4f7b17f9cb00b4b5736e"
+    },
+    {
+      "path": "backend/routes/batchRoutes.js",
+      "sha256": "9dd43fb88ad7f5af78b00efd37ccfe0a0636d61fd6f6e50997769deb3aa4b102"
+    },
+    {
+      "path": "backend/routes/certificateTemplateRoutes.js",
+      "sha256": "b9bd397604d1ad6af29ea06d77f88cf5b33d4161c2b1dbc78b16bf7642e104da"
+    },
+    {
+      "path": "backend/routes/codeExecutionRoutes.js",
+      "sha256": "8a37e967134f9294903c6f6208d53f779626020a78b90c5358434d723754fe65"
+    },
+    {
+      "path": "backend/routes/courseRoutes.js",
+      "sha256": "e50257860ae4d7c084ac2708b0fb39a1b6d0662233293875a0a42f27fe3d3b02"
+    },
+    {
+      "path": "backend/routes/enrollmentRoutes.js",
+      "sha256": "2b9cf680ecec7e259006a7a50fde91cf549ee79a36566044f5a8d95105f360a7"
+    },
+    {
+      "path": "backend/routes/lessonRoutes.js",
+      "sha256": "f6e2bb9d23e644ba51947c424945bfafd7b1f1461f1c729acb2fb7ced6924a3b"
+    },
+    {
+      "path": "backend/routes/moduleRoutes.js",
+      "sha256": "de2fe0a01620d8947a3e80b1640b13c0bfd973f268a1fb8dd26d3fb70afe98a4"
+    },
+    {
+      "path": "backend/routes/sessionRoutes.js",
+      "sha256": "df1611f67d73a839dc9cfb55401cf668ecb0998e495b5a524596f31c66dffc8d"
+    },
+    {
+      "path": "backend/services/enrollmentService.js",
+      "sha256": "6d3a6153f9d660a58925bf215855ad9d6e0d8c5aa31dad1b6efd2745509cdca2"
+    },
+    {
+      "path": "backend/validations/certificateTemplateValidation.js",
+      "sha256": "3d69fb5cee4f2b2ad897a1a36a837838f512dd1514cce1c102c7a6c6a03b8233"
+    },
+    {
+      "path": "deliverables/PATAN_DAY7_STATUS.md",
+      "sha256": "14355b582c40203246aff8125e97f8fba64de4930d4505715dc8958bc86cb304"
+    },
+    {
+      "path": "deliverables/PATAN_SECURITY_ACCEPTANCE.md",
+      "sha256": "93a792e5be43d1aac3ff45bbe96816702334387592e75c10d36aca8ee6c21e2d"
+    },
+    {
+      "path": "deliverables/PATAN_SECURITY_VERIFICATION.json",
+      "sha256": "9bb57f89df18b0c21351c3a48c470a7845037c4025608e0a4d4ea264fa2eee97"
+    },
+    {
+      "path": "deliverables/PATAN_TASK_STATUS.md",
+      "sha256": "b3a2a02f803b8661e3638de9a0d9e96497a4396e8c387b0cd549c17255e8ebb8"
+    },
+    {
+      "path": "deliverables/Patan-LMS.postman_collection.json",
+      "sha256": "d86372fdaa5e37157ce111edef180cac4a384cb757eac51e9de10e0eb1655512"
+    },
+    {
+      "path": "deliverables/RUN_PROJECT.md",
+      "sha256": "c166f16b131cf5236366d4a6ebc1d2ac32042646abc9465700b8e4d0d5c487ac"
+    },
+    {
+      "path": "deliverables/assessment-cert-e2e.json",
+      "sha256": "323c9df535617047a102aea310bf94ad3ca95315126d4e000574c6457ce8d033"
+    },
+    {
+      "path": "deliverables/assessment-cert-e2e.md",
+      "sha256": "4f4c749c149b264675373db6bed99911ee82632cd1cf3289384f272d5c815445"
+    },
+    {
+      "path": "deliverables/code-exec-stress-test.md",
+      "sha256": "c91763f924215a7865959982589ac59034a00848fb91877e0605f44e42976525"
+    },
+    {
+      "path": "deliverables/code-execution-stress.json",
+      "sha256": "6a25f56d0e5b5e121af891b8f97670c0929150280f2977a7d42b9b5e23778edb"
+    },
+    {
+      "path": "mobile/src/lms/completion.ts",
+      "sha256": "f35bc265411e0d7559f1669a87cfa65c81b19635ba8f61a48a4c6469ea0fd1b8"
+    },
+    {
+      "path": "mobile/src/lms/downloadFileSystem.native.ts",
+      "sha256": "8817d5f44f1297bf80d1da03d4f9b49898f4982eccd868d3ea29775de63271e6"
+    },
+    {
+      "path": "mobile/src/lms/downloads.ts",
+      "sha256": "92a5972b8e598bc569eaf98f276ed79fb43d21eb6ab68c5daceaf41ecbfbc0aa"
+    },
+    {
+      "path": "mobile/src/lms/screens/AnalyticsScreen.tsx",
+      "sha256": "95834a8c2e75fd8ebea903509b3c012db1477ae2dcdf896c9d7174c392070cfe"
+    },
+    {
+      "path": "mobile/src/lms/screens/CoursePlayerScreen.tsx",
+      "sha256": "d14a16602485462657c6ba37d12b5c2a9147d37b065ba787becef5ded3c7e589"
+    },
+    {
+      "path": "mobile/src/lms/types.ts",
+      "sha256": "c948ed5a1f7d62bb291bb52ac3560c81f3eb3082f93d79a3e31fcb1d36df3869"
+    },
+    {
+      "path": "mobile/src/tests/lms/completion.test.ts",
+      "sha256": "bf928430dc267e30622a2ee514d28f40af9773130aab4538ea7baeae06dd386b"
+    },
+    {
+      "path": "mobile/src/tests/lms/downloads.test.ts",
+      "sha256": "5152bdd540e8ffe1bfbb83065c205d299f4436e1a6bbf291bf401172fe37778e"
+    },
+    {
+      "path": "mobile/src/tests/lms/nativeDownloads.test.ts",
+      "sha256": "955e0b7f7ab776671883584b57ef3017a060eb7d8a54009d6ee0d7f048785dd7"
+    }
+  ],
+  "manifestFiles": [
+    "deliverables/PATAN_SECURITY_CHANGED_FILES.md",
+    "deliverables/PATAN_SECURITY_CHANGED_FILES.json"
+  ],
+  "generatedClientFiles": [
+    "backend/node_modules/.prisma/client/client.d.ts",
+    "backend/node_modules/.prisma/client/client.js",
+    "backend/node_modules/.prisma/client/default.d.ts",
+    "backend/node_modules/.prisma/client/default.js",
+    "backend/node_modules/.prisma/client/edge.d.ts",
+    "backend/node_modules/.prisma/client/edge.js",
+    "backend/node_modules/.prisma/client/index-browser.js",
+    "backend/node_modules/.prisma/client/index.d.ts",
+    "backend/node_modules/.prisma/client/index.js",
+    "backend/node_modules/.prisma/client/package.json",
+    "backend/node_modules/.prisma/client/query_engine_bg.wasm",
+    "backend/node_modules/.prisma/client/schema.prisma",
+    "backend/node_modules/.prisma/client/wasm-edge-light-loader.mjs",
+    "backend/node_modules/.prisma/client/wasm-worker-loader.mjs",
+    "backend/node_modules/.prisma/client/wasm.d.ts",
+    "backend/node_modules/.prisma/client/wasm.js"
+  ],
+  "ignoredRuntimeFiles": [
+    ".local/launcher.json"
+  ],
+  "databaseChanges": [
+    "Added Lesson.completionThreshold default90 to isolated local patan_local and patan_day7_integration; no shared/staging/production migration run."
+  ],
+  "notes": [
+    "Manifests exclude their own hashes to avoid self-reference.",
+    "Actual .env and credential files were read but not edited or packaged.",
+    "Local database storage, service logs, Expo caches and workspace test/export artifacts are runtime outputs, not hand-editable source changes."
+  ]
+}

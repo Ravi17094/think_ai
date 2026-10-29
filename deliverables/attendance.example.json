@@ -1,0 +1,12 @@
+{
+  "source": "Example schema only; replace with an authoritative roster export",
+  "environment": "local-fixture",
+  "rows": [
+    {
+      "sessionId": "example-session",
+      "userId": "example-learner",
+      "date": "2026-10-23",
+      "status": "PRESENT"
+    }
+  ]
+}

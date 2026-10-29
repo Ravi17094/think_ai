@@ -1,0 +1,115 @@
+{
+  "verifiedAt": "2026-10-26T15:18:06.385431+00:00",
+  "files": [
+    {
+      "file": "PATAN_START_HERE.md",
+      "sha256": "30372468c2fa947507fb14575c62534c2c177e49020803fa91c592185d619561"
+    },
+    {
+      "file": "backend/lms/acceptance.js",
+      "sha256": "2f499c8fde83576bc253a746492fe58a22bffd242914116b1a4e18e88bb40d04"
+    },
+    {
+      "file": "backend/lms/scripts/day7-e2e.js",
+      "sha256": "8cbe8f5e86f4e024b8c1ccd6158f03dfabd9517b679a801085ee511656b44c99"
+    },
+    {
+      "file": "backend/lms/scripts/judge0-local.cjs",
+      "sha256": "63c2dcb9519b68857acd521de378b6725940f3e3cba095f578ead8eda18f414e"
+    },
+    {
+      "file": "backend/lms/scripts/judge0-runtime.example.json",
+      "sha256": "2f0c624b64840233ed72ff14fa62fd14001175fbd5635dc06887a722ff389874"
+    },
+    {
+      "file": "backend/lms/scripts/stress-day7.js",
+      "sha256": "824f1e064fd2d92786055b7a8ffdc5951ec84efa85a913bd08ab78ebdf264df8"
+    },
+    {
+      "file": "backend/lms/scripts/verify-certificate-receipt.js",
+      "sha256": "657ee0c256e55b6fbbcfd1b2e5d0f9d78888886d9aa156df8ba7fd4c2a86390b"
+    },
+    {
+      "file": "backend/lms/scripts/verify-local-execution.cjs",
+      "sha256": "c0ca662a53cb69e9e6f8dc356c1f03489a9e08df28d235d093908070f424c1af"
+    },
+    {
+      "file": "backend/lms/stress-runner.js",
+      "sha256": "0c373bae51cd13893d8d11c7d61bdc8e4bd05f62ad6866b546728c526338651e"
+    },
+    {
+      "file": "backend/lms/tests/local-sandbox-control.test.js",
+      "sha256": "84560528eea3f27d9eaeef7db3b3ee7e8ed7c416aa9262aebf60a2036a973b7f"
+    },
+    {
+      "file": "backend/lms/tests/receipt-recheck.test.js",
+      "sha256": "e2b816ed8d7b01f1669089097ad65e913fdb8523d6c65de899c69f044110aebb"
+    },
+    {
+      "file": "backend/lms/tests/stress-vm-metrics.test.js",
+      "sha256": "cc33ea8714985a6699d144711b5f42057d52c03158163e572da41c3ec62ecd83"
+    },
+    {
+      "file": "deliverables/PATAN_DAY7_STATUS.md",
+      "sha256": "c5977c2f90561831ef6eb6a5036eaa6f550e408e1d9635af748a189d31300849"
+    },
+    {
+      "file": "deliverables/PATAN_ITEMS_1_2_STATUS.md",
+      "sha256": "ee9847fb5a3cbe38789c02941b59c21855501bb231ec6c25df819ca039423d9f"
+    },
+    {
+      "file": "deliverables/PATAN_SECURITY_ACCEPTANCE.md",
+      "sha256": "32dca6158883f539fbf777abc91b281bfcb60c5d91aba581d2dc4067aef7744c"
+    },
+    {
+      "file": "deliverables/PATAN_TASK_STATUS.md",
+      "sha256": "3ac9a991a47ef891e43b43a2130f6e5c2b7cf1fb336f3be61e1cb078a2df4940"
+    },
+    {
+      "file": "deliverables/REQUIRED_SOFTWARE.md",
+      "sha256": "95142d1d96e7c2b51ce352dd3f44448324a9b36cea276bb96321869189ae1439"
+    },
+    {
+      "file": "deliverables/RUN_PROJECT.md",
+      "sha256": "d820bde6f12ab1675440c80414453399b18399f3534733b5dc7f9e1e2b3e55c7"
+    },
+    {
+      "file": "deliverables/assessment-cert-e2e.json",
+      "sha256": "1bf4cd7795e02e33074397d8c6ff2ce7580ff2cde078837d2013ee71c3009ac4"
+    },
+    {
+      "file": "deliverables/assessment-cert-e2e.md",
+      "sha256": "826231662e0888161e7ed527be9f8a7f7bc316ad3c992214dd06e3b8f666f10d"
+    },
+    {
+      "file": "deliverables/code-exec-stress-test.md",
+      "sha256": "de200b0965f03e3063bfaedaa1fa50bd650e59b946f58a42bc8dcbbb71225429"
+    },
+    {
+      "file": "deliverables/code-execution-acceptance.json",
+      "sha256": "6ef169e5603d3e56f0599426e1003ac0abcef967ec437f5f1edda3b3316e0fde"
+    },
+    {
+      "file": "deliverables/code-execution-stress.json",
+      "sha256": "ebc62e3b498aa1d6613ef698d5f4d649d918f94214263d5c3be86d92a80bb68f"
+    },
+    {
+      "file": "deliverables/code-execution-unavailable.json",
+      "sha256": "1c0a45d861a5ac1d641885792c45ee1cebff6a9958aeab7130f8ba86196d99d9"
+    },
+    {
+      "file": "deliverables/judge0-local-readiness.json",
+      "sha256": "e69fc4f93b3dffc57c2abcfd211cf82f20542370636d1718fda0bc31429acc79"
+    },
+    {
+      "file": "deliverables/playground-real-output.jpg",
+      "sha256": "e3311231b36308abc1ac087433b6a5beb575cf44a9bacfa1ba3b79c8f80df221"
+    }
+  ],
+  "localPrivateFiles": [
+    "backend/.env (only Judge0 URL/auth/language IDs changed; other parsed values preserved)",
+    "backend/.local/judge0-runtime.json (ignored private runtime pointer)"
+  ],
+  "runtime": "Private QEMU binaries, Ubuntu disk, Docker images, SSH keys and token outside the checkout; not source deliverables.",
+  "mobile": "No mobile source files changed in this work."
+}

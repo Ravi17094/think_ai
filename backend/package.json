@@ -14,6 +14,15 @@
     "build": "node --check server.js && node --check app.js",
     "test": "node --test auditLogService.test.js authFlow.test.js communityModeration.test.js discountCheckout.test.js discussionPerformance.test.js emailIntegration.test.js notificationPreferenceService.test.js realForumSeeding.test.js roleHierarchy.test.js roleMatrix.test.js",
     "test:ci": "node --test auditLogService.test.js emailIntegration.test.js notificationPreferenceService.test.js roleHierarchy.test.js roleMatrix.test.js",
+    "test:patan": "node --test lms/tests/*.test.js",
+    "test:patan:db": "node --test lms/tests/database.integration.js lms/tests/desktop-database.integration.js",
+    "stress:patan": "node lms/scripts/stress.js",
+    "verify:content": "node lms/scripts/verify-content.js",
+    "verify:local": "node lms/scripts/verify-local.js",
+    "seed:local": "node lms/scripts/seed-local.js",
+    "baseline:day7": "node lms/scripts/baseline-local.js",
+    "e2e:day7": "node lms/scripts/day7-e2e.js",
+    "sample:certificate": "node lms/scripts/sample-certificate.js",
     "test:routes": "node --test --test-concurrency=1 liveStudioRoutes.test.js forumRoutes.test.js"
   },
   "keywords": [],
@@ -47,7 +56,10 @@
     "socket.io": "^4.8.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "uuid": "^14.0.2"
+    "uuid": "^14.0.2",
+    "zod": "^3.24.2",
+    "@aws-sdk/client-s3": "^3.922.0",
+    "@aws-sdk/s3-request-presigner": "^3.922.0"
   },
   "devDependencies": {
     "artillery": "^2.0.33",

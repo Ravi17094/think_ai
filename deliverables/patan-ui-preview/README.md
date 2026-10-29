@@ -1,0 +1,1 @@
+These screenshots and report use deterministic browser HTTP fixtures at a 390x844 viewport. They show the implemented UI and do not establish native device playback or real Judge0/S3/email behavior. Reproduce using mobile/scripts/verify-patan-ui.mjs after serving an Expo web export.

@@ -1,0 +1,9 @@
+{
+  "name": "YOUR APPROVED CLIENT NAME",
+  "primaryColor": "#443388",
+  "logoPath": "./branding/client-logo.png",
+  "accreditationText": "REPLACE WITH APPROVED ACCREDITATION TEXT",
+  "signatureName": "APPROVED SIGNATORY NAME",
+  "signatureTitle": "APPROVED SIGNATORY TITLE",
+  "approved": false
+}

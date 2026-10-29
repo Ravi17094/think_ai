@@ -1,0 +1,259 @@
+{
+  "startedAt": "2026-10-26T15:11:50.076Z",
+  "finishedAt": "2026-10-26T15:11:50.248Z",
+  "mode": "unavailable-service verification",
+  "concurrency": 20,
+  "stats": {
+    "python": {
+      "samples": 5,
+      "passed": 0,
+      "failed": 5,
+      "p50Ms": null,
+      "p95Ms": null,
+      "p99Ms": null
+    },
+    "javascript": {
+      "samples": 5,
+      "passed": 0,
+      "failed": 5,
+      "p50Ms": null,
+      "p95Ms": null,
+      "p99Ms": null
+    },
+    "java": {
+      "samples": 5,
+      "passed": 0,
+      "failed": 5,
+      "p50Ms": null,
+      "p95Ms": null,
+      "p99Ms": null
+    },
+    "cpp": {
+      "samples": 5,
+      "passed": 0,
+      "failed": 5,
+      "p50Ms": null,
+      "p95Ms": null,
+      "p99Ms": null
+    }
+  },
+  "executions": [
+    {
+      "language": "python",
+      "latencyMs": 29,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "javascript",
+      "latencyMs": 38,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "java",
+      "latencyMs": 62,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "cpp",
+      "latencyMs": 167,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "python",
+      "latencyMs": 62,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "javascript",
+      "latencyMs": 32,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "java",
+      "latencyMs": 45,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "cpp",
+      "latencyMs": 50,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "python",
+      "latencyMs": 50,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "javascript",
+      "latencyMs": 51,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "java",
+      "latencyMs": 51,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "cpp",
+      "latencyMs": 52,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "python",
+      "latencyMs": 53,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "javascript",
+      "latencyMs": 53,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "java",
+      "latencyMs": 54,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "cpp",
+      "latencyMs": 55,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "python",
+      "latencyMs": 56,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "javascript",
+      "latencyMs": 56,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "java",
+      "latencyMs": 57,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    },
+    {
+      "language": "cpp",
+      "latencyMs": 57,
+      "httpStatus": 503,
+      "passed": false,
+      "code": "EXECUTOR_UNAVAILABLE",
+      "statuses": [],
+      "sanitized": true,
+      "friendlyError": true
+    }
+  ],
+  "timeoutProbe": null,
+  "timeoutVerified": null,
+  "timeoutEvidence": "Remote termination was not established.",
+  "sanitizerProbe": null,
+  "sanitizerLoad": null,
+  "sanitizerVerified": null,
+  "fallbackVerified": true,
+  "apiStillHealthy": true,
+  "resources": {
+    "source": "not configured",
+    "samples": [],
+    "errors": [],
+    "peakCpuPercent": null,
+    "peakMemoryPercent": null
+  },
+  "executionStatus": "NOT_RUN",
+  "scaling": "No capacity recommendation: successful sandbox executions were not established."
+}

@@ -1,0 +1,15 @@
+{
+  "checks": [
+    "Web video plays and pauses",
+    "Notes save on blur",
+    "Video completion updates progress to 50%",
+    "Offline notes synchronize on reconnect",
+    "Lesson notes restore after navigation",
+    "Compiled Expo video plays and pauses",
+    "Compiled Expo course player renders at 390px and saves notes",
+    "Compiled Expo assessment answers, flags, navigation and confirmation work",
+    "Assessment answers and flags restore after reload",
+    "Unanswered warning and final submission work"
+  ],
+  "errors": []
+}

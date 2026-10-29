@@ -1,0 +1,256 @@
+{
+  "date": "2026-10-14T12:53:21.487Z",
+  "concurrency": 20,
+  "elapsedMs": 6393,
+  "passed": 20,
+  "total": 20,
+  "languages": {
+    "python": {
+      "requests": 5,
+      "passed": 5,
+      "p50Ms": 1665,
+      "p95Ms": 2437,
+      "p99Ms": 2437,
+      "meanCpuSeconds": 0.019,
+      "peakExecutionMemoryKb": 3216
+    },
+    "javascript": {
+      "requests": 5,
+      "passed": 5,
+      "p50Ms": 1612,
+      "p95Ms": 2338,
+      "p99Ms": 2338,
+      "meanCpuSeconds": 0.04139999999999999,
+      "peakExecutionMemoryKb": 6884
+    },
+    "java": {
+      "requests": 5,
+      "passed": 5,
+      "p50Ms": 2785,
+      "p95Ms": 3090,
+      "p99Ms": 3090,
+      "meanCpuSeconds": 0.07,
+      "peakExecutionMemoryKb": 15684
+    },
+    "cpp": {
+      "requests": 5,
+      "passed": 5,
+      "p50Ms": 2260,
+      "p95Ms": 2854,
+      "p99Ms": 2854,
+      "meanCpuSeconds": 0.004200000000000001,
+      "peakExecutionMemoryKb": 952
+    }
+  },
+  "probes": [
+    {
+      "name": "timeout",
+      "latencyMs": 2001,
+      "status": {
+        "id": 5,
+        "description": "Time Limit Exceeded"
+      },
+      "stdout": null,
+      "passed": true
+    },
+    {
+      "name": "sanitizer",
+      "latencyMs": 1221,
+      "status": {
+        "id": 3,
+        "description": "Accepted"
+      },
+      "stdout": "[script removed]safe\n",
+      "passed": true
+    }
+  ],
+  "clientCpuMicros": {
+    "user": 781000,
+    "system": 187000
+  },
+  "clientMemoryBytes": 88420352,
+  "judgeHostMetrics": "Unavailable from the remote Judge0 service; no host CPU or capacity claim is made.",
+  "results": [
+    {
+      "language": "python",
+      "latencyMs": 2437,
+      "passed": true,
+      "sanitizerUnderLoad": true,
+      "sanitizedOutput": "[script removed]42\n",
+      "status": "Accepted",
+      "memoryKb": 3120,
+      "cpuSeconds": 0.022
+    },
+    {
+      "language": "javascript",
+      "latencyMs": 1612,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 6880,
+      "cpuSeconds": 0.04
+    },
+    {
+      "language": "java",
+      "latencyMs": 2785,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 14464,
+      "cpuSeconds": 0.077
+    },
+    {
+      "language": "cpp",
+      "latencyMs": 2854,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 864,
+      "cpuSeconds": 0.004
+    },
+    {
+      "language": "python",
+      "latencyMs": 2400,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 3172,
+      "cpuSeconds": 0.019
+    },
+    {
+      "language": "javascript",
+      "latencyMs": 1592,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 6884,
+      "cpuSeconds": 0.04
+    },
+    {
+      "language": "java",
+      "latencyMs": 2865,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 15684,
+      "cpuSeconds": 0.058
+    },
+    {
+      "language": "cpp",
+      "latencyMs": 2235,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 864,
+      "cpuSeconds": 0.005
+    },
+    {
+      "language": "python",
+      "latencyMs": 1633,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 3216,
+      "cpuSeconds": 0.02
+    },
+    {
+      "language": "javascript",
+      "latencyMs": 1556,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 6816,
+      "cpuSeconds": 0.037
+    },
+    {
+      "language": "java",
+      "latencyMs": 2598,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 14548,
+      "cpuSeconds": 0.085
+    },
+    {
+      "language": "cpp",
+      "latencyMs": 2260,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 864,
+      "cpuSeconds": 0.004
+    },
+    {
+      "language": "python",
+      "latencyMs": 1554,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 3092,
+      "cpuSeconds": 0.015
+    },
+    {
+      "language": "javascript",
+      "latencyMs": 2259,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 6760,
+      "cpuSeconds": 0.045
+    },
+    {
+      "language": "java",
+      "latencyMs": 2751,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 14764,
+      "cpuSeconds": 0.071
+    },
+    {
+      "language": "cpp",
+      "latencyMs": 2806,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 952,
+      "cpuSeconds": 0.004
+    },
+    {
+      "language": "python",
+      "latencyMs": 1665,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 3140,
+      "cpuSeconds": 0.019
+    },
+    {
+      "language": "javascript",
+      "latencyMs": 2338,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 6796,
+      "cpuSeconds": 0.045
+    },
+    {
+      "language": "java",
+      "latencyMs": 3090,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 15480,
+      "cpuSeconds": 0.059
+    },
+    {
+      "language": "cpp",
+      "latencyMs": 2189,
+      "passed": true,
+      "sanitizerUnderLoad": false,
+      "status": "Accepted",
+      "memoryKb": 868,
+      "cpuSeconds": 0.004
+    }
+  ]
+}

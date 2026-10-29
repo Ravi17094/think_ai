@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-14T11:18:05.128Z",
+  "dataset": "Isolated PostgreSQL demo records, live APIs and real Judge0 execution",
+  "metrics": [
+    {
+      "name": "01-course-player",
+      "elapsedMs": 7116
+    },
+    {
+      "name": "02-assessment-taking",
+      "elapsedMs": 832
+    },
+    {
+      "name": "03-assessment-results",
+      "elapsedMs": 143
+    },
+    {
+      "name": "04-coding-assessment",
+      "elapsedMs": 3151
+    },
+    {
+      "name": "real-coding-submit-grade-certificate",
+      "elapsedMs": 3689
+    },
+    {
+      "name": "05-certificate-download",
+      "elapsedMs": 892
+    },
+    {
+      "name": "06-analytics-dashboard",
+      "elapsedMs": 408
+    },
+    {
+      "name": "07-code-playground",
+      "elapsedMs": 1474
+    },
+    {
+      "name": "08-learner-profile",
+      "elapsedMs": 334
+    }
+  ],
+  "errors": []
+}

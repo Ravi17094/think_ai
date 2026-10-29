@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-14T11:16:54.196Z",
+  "flow": "Create assessment → Submit → real Judge0 execution → grade 10/10 → new certificate → PDF download",
+  "elapsedMs": 1867,
+  "score": 10,
+  "certificateNo": "CERT-2026-a27367b0-e4e6-4074-99b5-17f5df8f9aa1",
+  "storage": "local",
+  "emailSent": false,
+  "cloudVerification": "S3 and email delivery unavailable: no cloud configuration"
+}

@@ -1,5 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const { authenticateToken, authorizeRoles } = require("../middleware/lmsLegacyAccess");
+const { internalCallbackAuth } = require("../middleware/internalCallbackAuth");
+const adminOnly = [authenticateToken, authorizeRoles("Admin")];
 
 // Import the session controller you worked on earlier
 const sessionController = require("../controllers/sessionController");
@@ -18,10 +21,10 @@ const { validateSessionInput } = require("../validations/sessionValidation");
  *         description: Session created successfully
  */
 // Added validateSessionInput here to protect session creation requests
-router.post("/sessions", validateSessionInput, sessionController.createSession);
+router.post("/sessions", ...adminOnly, validateSessionInput, sessionController.createSession);
 
 router.get("/sessions", sessionController.getSessions);
-router.post("/sessions/:id/start", sessionController.startSession); 
+router.post("/sessions/:id/start", ...adminOnly, sessionController.startSession); 
 router.get("/sessions/:id/join-token", sessionController.getJoinToken);
 /**
  * @swagger
@@ -31,7 +34,6 @@ router.get("/sessions/:id/join-token", sessionController.getJoinToken);
  *     tags: [Sessions]
  */
 // Connects to your controller endpoint handling recording completion events
-router.post("/sessions/:id/start", sessionController.startSession);
-router.post("/sessions/callback/recording", sessionController.saveRecordingCallback);
+router.post("/sessions/callback/recording", internalCallbackAuth("recording"), sessionController.saveRecordingCallback);
 
 module.exports = router;

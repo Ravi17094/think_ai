@@ -1,0 +1,274 @@
+{
+  "createdAt": "2026-10-23T09:38:51.265Z",
+  "environment": "Local PostgreSQL 18 validation fixture; not staging",
+  "source": [
+    {
+      "id": 1,
+      "date": "2026-01-15",
+      "course": "Baseline practice course 1",
+      "completed": 1,
+      "score": 100
+    },
+    {
+      "id": 2,
+      "date": "2026-03-31",
+      "course": "Baseline practice course 2",
+      "completed": 1,
+      "score": 80
+    },
+    {
+      "id": 3,
+      "date": "2026-04-01",
+      "course": "Baseline practice course 1",
+      "completed": 0,
+      "score": 0
+    },
+    {
+      "id": 4,
+      "date": "2026-07-01",
+      "course": "Baseline practice course 2",
+      "completed": 1,
+      "score": 60
+    },
+    {
+      "id": 5,
+      "date": "2026-09-30",
+      "course": "Baseline practice course 1",
+      "completed": 0,
+      "score": 40
+    },
+    {
+      "id": 6,
+      "date": "2026-10-01",
+      "course": "Baseline practice course 2",
+      "completed": 1,
+      "score": 90
+    }
+  ],
+  "attendance": [
+    {
+      "sessionId": "local-baseline",
+      "userId": "1",
+      "date": "2026-10-01",
+      "status": "PRESENT"
+    },
+    {
+      "sessionId": "local-baseline",
+      "userId": "2",
+      "date": "2026-10-01",
+      "status": "PRESENT"
+    },
+    {
+      "sessionId": "local-baseline",
+      "userId": "3",
+      "date": "2026-10-01",
+      "status": "LATE"
+    },
+    {
+      "sessionId": "local-baseline",
+      "userId": "4",
+      "date": "2026-10-01",
+      "status": "ABSENT"
+    },
+    {
+      "sessionId": "local-baseline",
+      "userId": "5",
+      "date": "2026-10-01",
+      "status": "EXCUSED"
+    }
+  ],
+  "api": {
+    "enrollmentCount": 6,
+    "completionRate": 66.66666666666666,
+    "averageScore": 61.666666666666664,
+    "activeUsers": 6,
+    "attendancePercentage": 75
+  },
+  "manual": {
+    "enrollmentCount": 6,
+    "completionRate": 66.66666666666666,
+    "averageScore": 61.666666666666664,
+    "activeUsers": 6,
+    "attendancePercentage": 75
+  },
+  "samples": [
+    {
+      "bucket": "weekly",
+      "run": 1,
+      "latencyMs": 155.553
+    },
+    {
+      "bucket": "weekly",
+      "run": 2,
+      "latencyMs": 13.923
+    },
+    {
+      "bucket": "weekly",
+      "run": 3,
+      "latencyMs": 6.199
+    },
+    {
+      "bucket": "weekly",
+      "run": 4,
+      "latencyMs": 30.035
+    },
+    {
+      "bucket": "weekly",
+      "run": 5,
+      "latencyMs": 8.08
+    },
+    {
+      "bucket": "monthly",
+      "run": 1,
+      "latencyMs": 8.195
+    },
+    {
+      "bucket": "monthly",
+      "run": 2,
+      "latencyMs": 12.133
+    },
+    {
+      "bucket": "monthly",
+      "run": 3,
+      "latencyMs": 5.353
+    },
+    {
+      "bucket": "monthly",
+      "run": 4,
+      "latencyMs": 5.239
+    },
+    {
+      "bucket": "monthly",
+      "run": 5,
+      "latencyMs": 6.189
+    },
+    {
+      "bucket": "quarterly",
+      "run": 1,
+      "latencyMs": 5.666
+    },
+    {
+      "bucket": "quarterly",
+      "run": 2,
+      "latencyMs": 5.026
+    },
+    {
+      "bucket": "quarterly",
+      "run": 3,
+      "latencyMs": 6.176
+    },
+    {
+      "bucket": "quarterly",
+      "run": 4,
+      "latencyMs": 5.249
+    },
+    {
+      "bucket": "quarterly",
+      "run": 5,
+      "latencyMs": 4.395
+    }
+  ],
+  "periods": [
+    {
+      "bucket": "weekly",
+      "trend": [
+        {
+          "date": "2026-01-12",
+          "count": 1
+        },
+        {
+          "date": "2026-03-30",
+          "count": 2
+        },
+        {
+          "date": "2026-06-29",
+          "count": 1
+        },
+        {
+          "date": "2026-09-28",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "bucket": "monthly",
+      "trend": [
+        {
+          "date": "2026-01",
+          "count": 1
+        },
+        {
+          "date": "2026-03",
+          "count": 1
+        },
+        {
+          "date": "2026-04",
+          "count": 1
+        },
+        {
+          "date": "2026-07",
+          "count": 1
+        },
+        {
+          "date": "2026-09",
+          "count": 1
+        },
+        {
+          "date": "2026-10",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "bucket": "quarterly",
+      "trend": [
+        {
+          "date": "2026-Q1",
+          "count": 2
+        },
+        {
+          "date": "2026-Q2",
+          "count": 1
+        },
+        {
+          "date": "2026-Q3",
+          "count": 2
+        },
+        {
+          "date": "2026-Q4",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "performance": {
+    "weekly": {
+      "samples": 5,
+      "p50Ms": 13.923,
+      "p95Ms": 155.553,
+      "p99Ms": 155.553
+    },
+    "monthly": {
+      "samples": 5,
+      "p50Ms": 6.189,
+      "p95Ms": 12.133,
+      "p99Ms": 12.133
+    },
+    "quarterly": {
+      "samples": 5,
+      "p50Ms": 5.249,
+      "p95Ms": 6.176,
+      "p99Ms": 6.176
+    }
+  },
+  "checks": [
+    "KPI values match independent fixture counts",
+    "Weekly/monthly/quarterly trend counts match PostgreSQL date_trunc grouping",
+    "Inclusive date range 2026-04-01 to 2026-09-30 contains exactly three enrollments"
+  ],
+  "pending": [
+    "Staging data and performance baseline",
+    "Approved client attendance definition and source",
+    "Client branding and report recipients"
+  ]
+}

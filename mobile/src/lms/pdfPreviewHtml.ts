@@ -1,0 +1,7 @@
+// Render the actual first PDF page rather than sending private certificates to a third-party viewer.
+export function pdfPreviewHtml(url: string) {
+  const safe = JSON.stringify(url).replace(/</g, "\\u003c");
+  return `<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{margin:0;background:#141a2e;color:#f1f3f9;font:14px sans-serif}canvas{width:100%;height:auto}p{padding:12px}</style></head><body><p id="status">Loading PDF preview...</p><canvas id="page" aria-label="Certificate PDF first page"></canvas><script type="module">
+  import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.mjs').then(function(pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.worker.mjs';return pdfjsLib.getDocument({url:${safe},isEvalSupported:false}).promise}).then(function(pdf){return pdf.getPage(1)}).then(function(page){var view=page.getViewport({scale:1.5}),canvas=document.getElementById('page');canvas.width=view.width;canvas.height=view.height;return page.render({canvasContext:canvas.getContext('2d'),viewport:view}).promise}).then(function(){document.getElementById('status').remove()}).catch(function(){document.getElementById('status').textContent='Preview unavailable. Use Save / share PDF. Your S3 bucket must allow app-origin GET requests.'});
+  </script></body></html>`;
+}

@@ -1,0 +1,169 @@
+{
+  "checkedAt": "2026-10-26T15:53:03.888Z",
+  "mode": "real existing localhost API and Judge0",
+  "status": "PASS",
+  "passed": 10,
+  "total": 10,
+  "checks": [
+    {
+      "name": "python functions/arrays/loop/if",
+      "language": "python",
+      "httpStatus": 200,
+      "passed": true,
+      "result": {
+        "status": "Accepted",
+        "statusId": 3,
+        "stdout": "1 4 9 16\nMatches: 2\n",
+        "stderr": "",
+        "compileOutput": "",
+        "time": "0.011",
+        "memory": 3260,
+        "passed": true
+      }
+    },
+    {
+      "name": "python functions/arrays/loop/else",
+      "language": "python",
+      "httpStatus": 200,
+      "passed": true,
+      "result": {
+        "status": "Accepted",
+        "statusId": 3,
+        "stdout": "1 4\nNo matches\n",
+        "stderr": "",
+        "compileOutput": "",
+        "time": "0.013",
+        "memory": 3288,
+        "passed": true
+      }
+    },
+    {
+      "name": "javascript functions/arrays/loop/if",
+      "language": "javascript",
+      "httpStatus": 200,
+      "passed": true,
+      "result": {
+        "status": "Accepted",
+        "statusId": 3,
+        "stdout": "1 4 9 16\nMatches: 2\n",
+        "stderr": "",
+        "compileOutput": "",
+        "time": "0.034",
+        "memory": 6900,
+        "passed": true
+      }
+    },
+    {
+      "name": "javascript functions/arrays/loop/else",
+      "language": "javascript",
+      "httpStatus": 200,
+      "passed": true,
+      "result": {
+        "status": "Accepted",
+        "statusId": 3,
+        "stdout": "1 4\nNo matches\n",
+        "stderr": "",
+        "compileOutput": "",
+        "time": "0.029",
+        "memory": 6824,
+        "passed": true
+      }
+    },
+    {
+      "name": "java functions/arrays/loop/if",
+      "language": "java",
+      "httpStatus": 200,
+      "passed": true,
+      "result": {
+        "status": "Accepted",
+        "statusId": 3,
+        "stdout": "1 4 9 16\nMatches: 2\n",
+        "stderr": "",
+        "compileOutput": "",
+        "time": "0.091",
+        "memory": 13940,
+        "passed": true
+      }
+    },
+    {
+      "name": "java functions/arrays/loop/else",
+      "language": "java",
+      "httpStatus": 200,
+      "passed": true,
+      "result": {
+        "status": "Accepted",
+        "statusId": 3,
+        "stdout": "1 4\nNo matches\n",
+        "stderr": "",
+        "compileOutput": "",
+        "time": "0.1",
+        "memory": 12236,
+        "passed": true
+      }
+    },
+    {
+      "name": "cpp functions/arrays/loop/if",
+      "language": "cpp",
+      "httpStatus": 200,
+      "passed": true,
+      "result": {
+        "status": "Accepted",
+        "statusId": 3,
+        "stdout": "1 4 9 16\nMatches: 2\n",
+        "stderr": "",
+        "compileOutput": "",
+        "time": "0.002",
+        "memory": 1944,
+        "passed": true
+      }
+    },
+    {
+      "name": "cpp functions/arrays/loop/else",
+      "language": "cpp",
+      "httpStatus": 200,
+      "passed": true,
+      "result": {
+        "status": "Accepted",
+        "statusId": 3,
+        "stdout": "1 4\nNo matches\n",
+        "stderr": "",
+        "compileOutput": "",
+        "time": "0.002",
+        "memory": 872,
+        "passed": true
+      }
+    },
+    {
+      "name": "Python handles EOF intentionally with empty stdin",
+      "language": "python",
+      "httpStatus": 200,
+      "passed": true,
+      "result": {
+        "status": "Accepted",
+        "statusId": 3,
+        "stdout": "No input handled\n",
+        "stderr": "",
+        "compileOutput": "",
+        "time": "0.017",
+        "memory": 3232,
+        "passed": true
+      }
+    },
+    {
+      "name": "Python missing stdin returns genuine runtime error",
+      "language": "python",
+      "httpStatus": 200,
+      "passed": true,
+      "result": {
+        "status": "Runtime Error (NZEC)",
+        "statusId": 11,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"script.py\", line 1, in \n    age = int(input())\nEOFError: EOF when reading a line\n",
+        "compileOutput": "",
+        "time": "0.01",
+        "memory": 3216,
+        "passed": false
+      }
+    }
+  ]
+}

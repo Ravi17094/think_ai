@@ -1,0 +1,28 @@
+[
+  {
+    "project": "Desktop",
+    "status": "PASS",
+    "certificateId": 1,
+    "pdfBytes": 2171,
+    "storage": "local",
+    "validPdfDownloaded": true,
+    "unauthorizedMetadataDenied": true,
+    "invalidDownloadLinkDenied": true,
+    "cloudUploaded": false,
+    "emailSent": false,
+    "apiBase": "http://localhost:5000"
+  },
+  {
+    "project": "Browser preview",
+    "status": "PASS",
+    "certificateId": 1,
+    "pdfBytes": 2176,
+    "storage": "local",
+    "certificatePage": "http://localhost:8086/learner/certificates/1",
+    "validPdfDownloaded": true,
+    "unauthorizedMetadataDenied": true,
+    "invalidDownloadLinkDenied": true,
+    "cloudUploaded": false,
+    "emailSent": false
+  }
+]

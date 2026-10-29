@@ -1,0 +1,53 @@
+{
+  "mode": "local protocol simulator; no real programs executed",
+  "at": "2026-10-16T10:31:24.354Z",
+  "concurrency": 20,
+  "successful": 20,
+  "total": 20,
+  "elapsedMs": 1718,
+  "languages": {
+    "python": {
+      "requests": 5,
+      "passed": 5,
+      "p50Ms": 630.68,
+      "p95Ms": 686.45,
+      "p99Ms": 686.45
+    },
+    "javascript": {
+      "requests": 5,
+      "passed": 5,
+      "p50Ms": 630.78,
+      "p95Ms": 632.1,
+      "p99Ms": 632.1
+    },
+    "java": {
+      "requests": 5,
+      "passed": 5,
+      "p50Ms": 630.89,
+      "p95Ms": 631.64,
+      "p99Ms": 631.64
+    },
+    "cpp": {
+      "requests": 5,
+      "passed": 5,
+      "p50Ms": 630.8,
+      "p95Ms": 631.38,
+      "p99Ms": 631.38
+    }
+  },
+  "timeouts": {
+    "httpStatus": 504,
+    "sandboxTerminationConfirmed": false,
+    "clientDeadlineHandled": true,
+    "note": "A client HTTP timeout alone does not prove termination of a queued remote job."
+  },
+  "sanitizerPassed": true,
+  "proxy": {
+    "cpuUserMs": 219,
+    "cpuSystemMs": 141,
+    "peakRssBytes": 82354176
+  },
+  "judge0Docker": null,
+  "metricsError": null,
+  "capacityNote": "This is a 20-request sample, not a production capacity guarantee. Judge0 CPU/memory require --docker-container on its host."
+}

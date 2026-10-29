@@ -1,6 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
+const { authenticateToken, authorizeRoles } = require("../middleware/lmsLegacyAccess");
 
 
 const {
@@ -98,6 +99,8 @@ router.get(
  */
 router.post(
     "/auto-allocate",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     autoAllocateStudent
 );
 
@@ -163,6 +166,8 @@ router.post(
  */
 router.post(
     "/",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     validateBatchCreate,
     createBatch
 );
@@ -265,6 +270,8 @@ router.get(
  */
 router.put(
     "/:id",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     validateBatchId,
     validateBatchUpdate,
     updateBatch
@@ -301,6 +308,8 @@ router.put(
  */
 router.delete(
     "/:id",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     validateBatchId,
     deleteBatch
 );

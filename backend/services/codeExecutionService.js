@@ -523,6 +523,11 @@ const judge0Request = async ({
                 controller.signal
         };
 
+        const authToken = process.env.JUDGE0_AUTH_TOKEN;
+        if (authToken && authToken.trim()) {
+            options.headers["X-Auth-Token"] = authToken.trim();
+        }
+
         if (body !== null) {
 
             options.body =
@@ -567,7 +572,25 @@ const judge0Request = async ({
             );
         }
 
-        return await response.json();
+        const data = await response.json();
+
+        // Decode only responses requested in Base64 format.
+        if (new URL(url).searchParams.get("base64_encoded") === "true") {
+            const textFields = [
+                "source_code", "stdin", "expected_output",
+                "stdout", "stderr", "compile_output", "message"
+            ];
+
+            for (const field of textFields) {
+                if (typeof data[field] === "string") {
+                    data[field] = Buffer.from(
+                        data[field], "base64"
+                    ).toString("utf8");
+                }
+            }
+        }
+
+        return data;
 
     } catch (error) {
 
@@ -637,7 +660,7 @@ const waitForJudge0Result = async (
                 url:
                     `${judge0Url}/submissions/` +
                     `${encodeURIComponent(token)}` +
-                    `?base64_encoded=false`,
+                    `?base64_encoded=true`,
 
                 method:
                     "GET"
@@ -737,10 +760,10 @@ const createJudge0Submission = async ({
             languageId,
 
         source_code:
-            code,
+            Buffer.from(code, "utf8").toString("base64"),
 
         stdin:
-            stdin || "",
+            Buffer.from(stdin || "", "utf8").toString("base64"),
 
         cpu_time_limit:
             getNumberEnv(
@@ -766,7 +789,7 @@ const createJudge0Submission = async ({
 
             url:
                 `${judge0Url}/submissions` +
-                `?base64_encoded=false` +
+                `?base64_encoded=true` +
                 `&wait=false`,
 
             method:

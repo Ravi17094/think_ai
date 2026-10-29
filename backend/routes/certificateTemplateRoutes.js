@@ -1,6 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
+const { authenticateToken, authorizeRoles } = require("../middleware/lmsLegacyAccess");
 
 const {
     getActiveCertificateTemplate,
@@ -15,7 +16,7 @@ const {
     validateCertificateTemplateCreate,
     validateCertificateTemplateUpdate,
     validateCertificateTemplateId
-} = require("../validations/certificateValidation");
+} = require("../validations/certificateTemplateValidation");
 
 
 // ----------------------------------------------------
@@ -160,6 +161,8 @@ router.get(
  */
 router.post(
     "/",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     validateCertificateTemplateCreate,
     createCertificateTemplate
 );
@@ -234,6 +237,8 @@ router.post(
  */
 router.put(
     "/:id",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     validateCertificateTemplateId,
     validateCertificateTemplateUpdate,
     updateCertificateTemplate
@@ -266,6 +271,8 @@ router.put(
  */
 router.delete(
     "/:id",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     validateCertificateTemplateId,
     deleteCertificateTemplate
 );

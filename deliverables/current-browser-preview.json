@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "scope": "Actual local backend and database; browser desktop and mobile viewport, not physical phone/native acceptance",
+  "checks": [
+    "Actual learner login and workspace rendered",
+    "Current course player and real API note save worked",
+    "Real database assessment submit, grading and result display worked",
+    "Profile and recent activity loaded from the local backend",
+    "Mobile-sized browser login worked through the laptop LAN address"
+  ],
+  "pageErrors": []
+}

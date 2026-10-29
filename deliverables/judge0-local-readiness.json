@@ -1,0 +1,98 @@
+{
+  "checkedAt": "2026-10-26T15:14:03.023Z",
+  "status": "PASS",
+  "postRestartApiExecution": {
+    "status": "Accepted",
+    "statusId": 3,
+    "stdout": "Hello, Patan!\n",
+    "stderr": "",
+    "compileOutput": "",
+    "time": "0.014",
+    "memory": 3104,
+    "passed": true
+  },
+  "apiHealth": 200,
+  "webHealth": 200,
+  "judge0WithoutAuth": 401,
+  "sandbox": {
+    "status": "READY",
+    "message": "Four actual language readiness programs passed; concurrency, timeout and load benchmarks remain separate checks.",
+    "updatedAt": "2026-10-26T15:12:27.888961+00:00",
+    "kernel": "5.15.0-198-generic",
+    "cpuCount": 2,
+    "cgroupVersion": "1",
+    "dockerVersion": "29.9.2",
+    "apiInsideGuest": "http://127.0.0.1:2358",
+    "executionReadiness": {
+      "status": "PASS",
+      "programs": {
+        "python": {
+          "languageId": 71,
+          "languageName": "Python (3.8.1)",
+          "statusId": 3,
+          "status": "Accepted",
+          "stdout": "42",
+          "cpuTimeSeconds": "0.031",
+          "memoryKiB": 7940
+        },
+        "javascript": {
+          "languageId": 63,
+          "languageName": "JavaScript (Node.js 12.14.0)",
+          "statusId": 3,
+          "status": "Accepted",
+          "stdout": "42",
+          "cpuTimeSeconds": "0.124",
+          "memoryKiB": 33444
+        },
+        "java": {
+          "languageId": 62,
+          "languageName": "Java (OpenJDK 13.0.1)",
+          "statusId": 3,
+          "status": "Accepted",
+          "stdout": "42",
+          "cpuTimeSeconds": "0.051",
+          "memoryKiB": 50296
+        },
+        "cpp": {
+          "languageId": 54,
+          "languageName": "C++ (GCC 9.2.0)",
+          "statusId": 3,
+          "status": "Accepted",
+          "stdout": "42",
+          "cpuTimeSeconds": "0.003",
+          "memoryKiB": 32860
+        }
+      },
+      "note": "Four real hello-program readiness runs only. This is not the concurrency/timeout/security benchmark."
+    }
+  },
+  "images": {
+    "judge0Version": "1.13.1",
+    "recordedAt": "2026-10-26T14:55:18.606695+00:00",
+    "scope": "Local development sandbox; not production acceptance.",
+    "images": [
+      {
+        "requestedTag": "judge0/judge0:1.13.1",
+        "resolvedRepoDigest": "judge0/judge0@sha256:6b5d6a66aa19a8e878a52ea3c6a560afc1086734d96e2885b561fd5c6018f082",
+        "localImageId": "sha256:6b5d6a66aa19a8e878a52ea3c6a560afc1086734d96e2885b561fd5c6018f082",
+        "architecture": "amd64",
+        "os": "linux"
+      },
+      {
+        "requestedTag": "postgres:16",
+        "resolvedRepoDigest": "postgres@sha256:9e2cf6287f25c3151f4c9421ccce2b17f3e60061c111a29165e0d2cdd9ff0a97",
+        "localImageId": "sha256:9e2cf6287f25c3151f4c9421ccce2b17f3e60061c111a29165e0d2cdd9ff0a97",
+        "architecture": "amd64",
+        "os": "linux"
+      },
+      {
+        "requestedTag": "redis:7.2",
+        "resolvedRepoDigest": "redis@sha256:1009f15ccd9ed271996d1c65745a1ab1dadedea188feb3f1ab938602a32e50a3",
+        "localImageId": "sha256:1009f15ccd9ed271996d1c65745a1ab1dadedea188feb3f1ab938602a32e50a3",
+        "architecture": "amd64",
+        "os": "linux"
+      }
+    ]
+  },
+  "scope": "Real local VM and existing local project only; no cloud certificate or staging acceptance."
+}

@@ -1,8 +1,22 @@
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 /** Route + param map for the five assigned pages. */
 export type RootStackParamList = {
+  SignIn: undefined;
   Login: undefined;
+  AdminHome: undefined;
+  Account: undefined;
+  LmsHome: undefined;
+  CoursePlayer: { courseId: number; lessonId?: number };
+  AssessmentTaking: { assessmentId: number; enrollmentId: number };
+  AssessmentResults: { assessmentId: number; attemptId: number };
+  LmsCertificate: { certificateId: number };
+  Analytics: undefined;
+  CodePlayground: { entry?: import("@/lms/types").HistoryEntry } | undefined;
+  PlaygroundHistory: undefined;
+  LearnerProfile: undefined;
+  LmsSettings: undefined;
+  Downloads: undefined;
   LearnerDashboard: undefined;
   MyCourses: undefined;
   CourseDetail: { courseId: string; moduleId?: string };

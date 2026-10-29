@@ -652,65 +652,11 @@ const updateEnrollment = async (
  * in the Enrollment Prisma model.
  */
 
-const unlockCourseAccess = async (
-    id
-) => {
-
-    const enrollmentId =
-        validateId(
-            id,
-            "Enrollment ID"
-        );
-
-
-    const enrollment =
-        await repository.getEnrollmentById(
-            enrollmentId
-        );
-
-
-    if (!enrollment) {
-
-        throw new Error(
-            "Enrollment not found"
-        );
-    }
-
-
-    /*
-     * This property will only be available
-     * after courseAccess is added to Prisma.
-     */
-
-    if (enrollment.courseAccess) {
-        return enrollment;
-    }
-
-
-    const unlockedEnrollment =
-        await repository.unlockCourseAccess(
-            enrollmentId
-        );
-
-    const courseName =
-        unlockedEnrollment.batch?.course?.title ||
-        "your course";
-
-    const email = enrollmentConfirmationEmail({
-        name: unlockedEnrollment.studentName,
-        courseName
-    });
-
-    enqueue({
-        type: "enrollment-confirmation",
-        to: unlockedEnrollment.studentEmail,
-        recipientName: unlockedEnrollment.studentName,
-        subject: email.subject,
-        text: email.text,
-        html: email.html
-    });
-
-    return unlockedEnrollment;
+const unlockCourseAccess = async () => {
+    throw new (require("../lms/errors").LmsError)(
+        503, "PAYMENT_WEBHOOK_REQUIRED",
+        "Course access requires the approved verified payment webhook, which is not integrated in this checkout."
+    );
 };
 
 

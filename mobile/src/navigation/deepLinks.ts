@@ -23,6 +23,10 @@ const ROUTE_QUERY_PARAMS: Readonly<Partial<Record<ScreenName, readonly string[]>
   Assessment: ['assessmentId'],
   Results: ['assessmentId', 'score', 'passed'],
   Certificate: ['courseId'],
+  CoursePlayer: ['courseId', 'lessonId'],
+  AssessmentTaking: ['assessmentId', 'enrollmentId'],
+  AssessmentResults: ['assessmentId', 'attemptId'],
+  LmsCertificate: ['certificateId'],
 };
 
 /**
@@ -37,7 +41,11 @@ const AUTH_GATED_ROUTES: ReadonlySet<ScreenName> = new Set<ScreenName>([
   'VideoPlayer',
   'Assessment',
   'Results',
+  'LmsCertificate',
   'Certificate',
+  'CoursePlayer',
+  'AssessmentTaking',
+  'AssessmentResults',
 ]);
 
 export function isAuthGatedRoute(screen: ScreenName): boolean {
@@ -239,6 +247,13 @@ function buildParams(match: PathMatch, query: Record<string, string>): Record<st
     }
   }
 
+  const numericParams: Partial<Record<ScreenName, readonly string[]>> = {
+    CoursePlayer: ['courseId', 'lessonId'], AssessmentTaking: ['assessmentId', 'enrollmentId'],
+    AssessmentResults: ['assessmentId', 'attemptId'], LmsCertificate: ['certificateId'],
+  };
+  for (const key of numericParams[match.screen] ?? []) {
+    if (key in params) params[key] = Number(params[key]);
+  }
   return params;
 }
 

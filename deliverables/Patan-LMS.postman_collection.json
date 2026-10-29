@@ -1,0 +1,608 @@
+{
+  "info": {
+    "name": "Patan LMS APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "id",
+      "value": "1"
+    },
+    {
+      "key": "enrollmentId",
+      "value": "1"
+    },
+    {
+      "key": "lessonId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Learner profile and last 10 activities",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/me"
+      }
+    },
+    {
+      "name": "Update own display name",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/me",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Patan\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Own enrollments and completion summaries",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/enrollments"
+      }
+    },
+    {
+      "name": "Active course catalog",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/courses"
+      }
+    },
+    {
+      "name": "Owned course hierarchy, lesson content and progress",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/courses/{{id}}/player"
+      }
+    },
+    {
+      "name": "Owned lesson content",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/enrollments/{{enrollmentId}}/lessons/{{lessonId}}/content"
+      }
+    },
+    {
+      "name": "Get private lesson notes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/enrollments/{{enrollmentId}}/lessons/{{lessonId}}/notes"
+      }
+    },
+    {
+      "name": "Save private lesson notes",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/enrollments/{{enrollmentId}}/lessons/{{lessonId}}/notes",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"My lesson notes\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Sync progress; server version wins conflicts",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/progress/sync",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"updates\": [\n    {\n      \"lessonId\": 1,\n      \"enrollmentId\": 1,\n      \"watchedSeconds\": 60,\n      \"updatedAt\": \"2026-10-22T10:00:00Z\",\n      \"baseVersion\": null\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Start or resume timed attempt without answer keys",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/assessments/{{id}}/start",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"enrollmentId\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Idempotent submission and durable auto-grading",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/assessments/{{id}}/submit",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"attemptId\": 1,\n  \"answers\": [\n    {\n      \"questionId\": 1,\n      \"selectedOptionId\": 1\n    }\n  ],\n  \"flaggedQuestionIds\": [\n    1\n  ],\n  \"timestamp\": \"2026-10-22T10:00:00Z\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Owned results; poll until GRADED or FAILED",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/attempts/{{id}}/results"
+      }
+    },
+    {
+      "name": "Generate eligible certificate, upload PDF and queue email",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/certificates/generate",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"enrollmentId\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Owned certificate with signed download URL",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/certificates/{{id}}"
+      }
+    },
+    {
+      "name": "Run sandbox code in Python, JavaScript, Java or C++",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/code/execute",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"language\": \"python\",\n  \"sourceCode\": \"print(42)\",\n  \"timeout\": 30,\n  \"testCases\": [\n    {\n      \"input\": \"\",\n      \"expectedOutput\": \"42\"\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Admin KPI, enrollment trend and course performance",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/analytics"
+      }
+    },
+    {
+      "name": "Staff list courses",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/admin/courses"
+      }
+    },
+    {
+      "name": "Staff create courses",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/admin/courses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"New course\",\n  \"description\": \"Course description\",\n  \"category\": \"Programming\",\n  \"price\": 0,\n  \"duration\": \"1 hour\",\n  \"completionThreshold\": 80\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Staff update courses",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/admin/courses/{{id}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Updated title\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Staff delete courses",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/admin/courses/{{id}}"
+      }
+    },
+    {
+      "name": "Staff list modules",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/admin/modules"
+      }
+    },
+    {
+      "name": "Staff create modules",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/admin/modules",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"courseId\": 1,\n  \"title\": \"Module 1\",\n  \"order\": 0\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Staff update modules",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/admin/modules/{{id}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Updated title\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Staff delete modules",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/admin/modules/{{id}}"
+      }
+    },
+    {
+      "name": "Staff list lessons",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/admin/lessons"
+      }
+    },
+    {
+      "name": "Staff create lessons",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/admin/lessons",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"moduleId\": 1,\n  \"title\": \"Lesson 1\",\n  \"order\": 0,\n  \"durationSeconds\": 120,\n  \"videoBytes\": 1000000,\n  \"videoUrl\": \"https://example.invalid/video.mp4\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Staff update lessons",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/admin/lessons/{{id}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Updated title\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Staff delete lessons",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/admin/lessons/{{id}}"
+      }
+    },
+    {
+      "name": "Staff inspect ordered course hierarchy",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/admin/courses/{{id}}/hierarchy"
+      }
+    },
+    {
+      "name": "Reorder all modules",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/admin/courses/{{id}}/order",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"ids\": [\n    1,\n    2\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Reorder all lessons",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/admin/modules/{{id}}/order",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"ids\": [\n    1,\n    2\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Staff list enrollments",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/admin/enrollments"
+      }
+    },
+    {
+      "name": "Staff create locked enrollment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/admin/enrollments",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"studentName\": \"Patan\",\n  \"studentEmail\": \"patan@example.invalid\",\n  \"batchId\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Staff change enrollment status",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/admin/enrollments/{{id}}/status",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"SUSPENDED\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Staff remove enrollment",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/admin/enrollments/{{id}}"
+      }
+    },
+    {
+      "name": "Admin analytics CSV/PDF export",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/analytics/export?format=csv&bucket=quarterly&from=2026-01-01&to=2026-12-31"
+      }
+    },
+    {
+      "name": "Admin scheduled report status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/lms/analytics/report-status"
+      }
+    },
+    {
+      "name": "Staff assessment completion rules",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/lms/admin/assessments/{{assessmentId}}/rules",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"passPercentage\": 60,\n  \"maxAttempts\": 3\n}"
+        }
+      }
+    },
+    {
+      "name": "Execute code using older Desktop field names",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/code/execute",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"language\": \"python\",\n  \"source_code\": \"print(42)\",\n  \"timeout\": 30,\n  \"test_cases\": [\n    {\n      \"input\": \"\",\n      \"expected_output\": \"42\"\n    }\n  ]\n}"
+        }
+      }
+    }
+  ]
+}

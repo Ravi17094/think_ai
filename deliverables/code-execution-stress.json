@@ -1,0 +1,622 @@
+{
+  "startedAt": "2026-10-26T15:05:05.343Z",
+  "finishedAt": "2026-10-26T15:05:23.729Z",
+  "mode": "live code execution",
+  "concurrency": 20,
+  "stats": {
+    "python": {
+      "samples": 5,
+      "passed": 5,
+      "failed": 0,
+      "p50Ms": 3827,
+      "p95Ms": 5494,
+      "p99Ms": 5494
+    },
+    "javascript": {
+      "samples": 5,
+      "passed": 5,
+      "failed": 0,
+      "p50Ms": 3675,
+      "p95Ms": 5760,
+      "p99Ms": 5760
+    },
+    "java": {
+      "samples": 5,
+      "passed": 5,
+      "failed": 0,
+      "p50Ms": 6975,
+      "p95Ms": 8831,
+      "p99Ms": 8831
+    },
+    "cpp": {
+      "samples": 5,
+      "passed": 5,
+      "failed": 0,
+      "p50Ms": 5361,
+      "p95Ms": 7573,
+      "p99Ms": 7573
+    }
+  },
+  "executions": [
+    {
+      "language": "python",
+      "latencyMs": 1401,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "javascript",
+      "latencyMs": 1227,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "java",
+      "latencyMs": 8831,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "cpp",
+      "latencyMs": 7573,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "python",
+      "latencyMs": 2347,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "javascript",
+      "latencyMs": 3675,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "java",
+      "latencyMs": 3215,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "cpp",
+      "latencyMs": 2357,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "python",
+      "latencyMs": 5166,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "javascript",
+      "latencyMs": 1815,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "java",
+      "latencyMs": 8295,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "cpp",
+      "latencyMs": 4900,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "python",
+      "latencyMs": 3827,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "javascript",
+      "latencyMs": 4751,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "java",
+      "latencyMs": 3348,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "cpp",
+      "latencyMs": 5361,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "python",
+      "latencyMs": 5494,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "javascript",
+      "latencyMs": 5760,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "java",
+      "latencyMs": 6975,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    },
+    {
+      "language": "cpp",
+      "latencyMs": 6091,
+      "httpStatus": 200,
+      "passed": true,
+      "code": null,
+      "statuses": [
+        3
+      ],
+      "sanitized": true,
+      "friendlyError": false
+    }
+  ],
+  "timeoutProbe": {
+    "language": "python",
+    "latencyMs": 8022,
+    "httpStatus": 200,
+    "passed": false,
+    "code": null,
+    "statuses": [
+      5
+    ],
+    "sanitized": true,
+    "friendlyError": false
+  },
+  "timeoutVerified": true,
+  "timeoutEvidence": "Judge0 returned terminal Time Limit Exceeded status.",
+  "sanitizerProbe": {
+    "language": "python",
+    "latencyMs": 2498,
+    "httpStatus": 200,
+    "passed": true,
+    "code": null,
+    "statuses": [
+      3
+    ],
+    "sanitized": true,
+    "friendlyError": false
+  },
+  "sanitizerLoad": {
+    "startedAt": "2026-10-26T15:05:14.194Z",
+    "finishedAt": "2026-10-26T15:05:22.217Z",
+    "concurrency": 20,
+    "peakConcurrency": 20,
+    "peakSanitizerConcurrency": 19,
+    "probeCount": 19,
+    "settled": 19,
+    "completed": 19,
+    "verifiedAll": true,
+    "probes": [
+      {
+        "language": "python",
+        "latencyMs": 2498,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 1077,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 1347,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 2477,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 3059,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 3281,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 4362,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 4556,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 2504,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 4800,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 5824,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 6038,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 6299,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 5870,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 6894,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 7375,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 1138,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 1736,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      },
+      {
+        "language": "python",
+        "latencyMs": 7863,
+        "httpStatus": 200,
+        "passed": true,
+        "code": null,
+        "statuses": [
+          3
+        ],
+        "sanitized": true,
+        "friendlyError": false
+      }
+    ]
+  },
+  "sanitizerVerified": true,
+  "fallbackVerified": null,
+  "apiStillHealthy": true,
+  "resources": {
+    "source": "docker stats via SSH in local Judge0 VM",
+    "samples": [
+      {
+        "at": "2026-10-26T15:05:05.342Z",
+        "cpuPercent": 1.8,
+        "memoryUsage": "367.6MiB / 3.82GiB",
+        "memoryPercent": 9.4
+      },
+      {
+        "at": "2026-10-26T15:05:07.567Z",
+        "cpuPercent": 148.32,
+        "memoryUsage": "503.4MiB / 3.82GiB",
+        "memoryPercent": 12.87
+      },
+      {
+        "at": "2026-10-26T15:05:09.615Z",
+        "cpuPercent": 151.92,
+        "memoryUsage": "438.1MiB / 3.82GiB",
+        "memoryPercent": 11.2
+      },
+      {
+        "at": "2026-10-26T15:05:11.621Z",
+        "cpuPercent": 177.17,
+        "memoryUsage": "431.1MiB / 3.82GiB",
+        "memoryPercent": 11.02
+      },
+      {
+        "at": "2026-10-26T15:05:13.631Z",
+        "cpuPercent": 90.33,
+        "memoryUsage": "372.7MiB / 3.82GiB",
+        "memoryPercent": 9.53
+      },
+      {
+        "at": "2026-10-26T15:05:15.632Z",
+        "cpuPercent": 149.3,
+        "memoryUsage": "426.7MiB / 3.82GiB",
+        "memoryPercent": 10.91
+      },
+      {
+        "at": "2026-10-26T15:05:17.671Z",
+        "cpuPercent": 158.24,
+        "memoryUsage": "467.1MiB / 3.82GiB",
+        "memoryPercent": 11.94
+      },
+      {
+        "at": "2026-10-26T15:05:19.707Z",
+        "cpuPercent": 164.37,
+        "memoryUsage": "469.5MiB / 3.82GiB",
+        "memoryPercent": 12
+      },
+      {
+        "at": "2026-10-26T15:05:21.721Z",
+        "cpuPercent": 111.93,
+        "memoryUsage": "373.1MiB / 3.82GiB",
+        "memoryPercent": 9.54
+      },
+      {
+        "at": "2026-10-26T15:05:23.727Z",
+        "cpuPercent": 1.29,
+        "memoryUsage": "373.2MiB / 3.82GiB",
+        "memoryPercent": 9.54
+      }
+    ],
+    "errors": [],
+    "peakCpuPercent": 177.17,
+    "peakMemoryPercent": 12.87
+  },
+  "executionStatus": "PASS",
+  "scaling": "Validated 20 concurrent requests in this run only. Run increasing levels on the approved sandbox and compare p95 and resource saturation before setting a production threshold."
+}

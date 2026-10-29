@@ -1,0 +1,13 @@
+{
+  "status": "NOT_RUN",
+  "missing": [
+    "LMS_E2E_DATABASE_URL",
+    "LMS_E2E_RECIPIENT",
+    "LMS_CERTIFICATE_BUCKET",
+    "SENDGRID_API_KEY",
+    "FROM_EMAIL",
+    "LMS_BRANDING_FILE",
+    "LMS_E2E_ENVIRONMENT=staging"
+  ],
+  "note": "No staging data, cloud writes or emails were created. Local isolated integration tests cover the flow with test adapters, separately."
+}

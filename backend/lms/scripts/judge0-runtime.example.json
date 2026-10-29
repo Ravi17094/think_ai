@@ -1,0 +1,7 @@
+{
+  "runtimeDir": "D:/LocalSandboxes/think-ai-judge0",
+  "sshPort": 22722,
+  "apiPort": 2358,
+  "guestStateFile": "/var/lib/think-ai-judge0/state.json",
+  "startupSeconds": 1800
+}

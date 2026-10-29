@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-14T13:50:06.945Z",
+  "passed": true,
+  "platform": "Android 14 API 34, x86_64 emulator-5554",
+  "app": "com.thinkzai.mobile, own debug APK; Hermes / React Native 0.74.5",
+  "method": "Actual Android UI actions through adb/UI Automator, followed by read-only database/file assertions",
+  "completedLessons": 2,
+  "savedPlaybackSeconds": 5.054,
+  "notesSaved": true,
+  "offlineNoteSynced": true,
+  "assessments": [
+    {
+      "title": "Patan knowledge check",
+      "score": 10,
+      "totalMarks": 10,
+      "status": "GRADED",
+      "submissionId": 27
+    },
+    {
+      "title": "Patan coding check",
+      "score": 10,
+      "totalMarks": 10,
+      "status": "GRADED",
+      "submissionId": 28
+    }
+  ],
+  "realJudge0Verdict": true,
+  "certificateNo": "CERT-2026-3a45ff33-f795-4628-bf3f-5a1f37443411",
+  "nativePdfPreview": "Visually verified",
+  "nativeShareChooser": "Verified with actual PDF attached",
+  "nativeSave": "Saved through Android Print → Save as PDF → Downloads, retrieved and PDF signature verified",
+  "additionalNativeScreens": [
+    "Analytics calendar, horizontal table and score sorting",
+    "Monaco editor and real Python output",
+    "Profile edit persisted; original demo name restored"
+  ],
+  "cloud": "Local development storage; S3/email settings absent. No live cloud-delivery claim.",
+  "ios": "JavaScript/Hermes export only; no iOS device test",
+  "productionDatabaseTouched": false
+}

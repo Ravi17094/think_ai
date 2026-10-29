@@ -1,0 +1,249 @@
+{
+  "info": {
+    "name": "Thinkz AI · Code Execution",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "courseId",
+      "value": "1"
+    },
+    {
+      "key": "moduleId",
+      "value": "1"
+    },
+    {
+      "key": "lessonId",
+      "value": "1"
+    },
+    {
+      "key": "enrollmentId",
+      "value": "1"
+    },
+    {
+      "key": "assessmentId",
+      "value": "1"
+    },
+    {
+      "key": "batchId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Execute python",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{learnerToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/code/execute",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"language\": \"python\",\n  \"source_code\": \"print(\\\"hello\\\")\",\n  \"test_cases\": [\n    {\n      \"input\": \"\",\n      \"expected_output\": \"hello\"\n    }\n  ],\n  \"timeout\": 30\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Request succeeds\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Execute javascript",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{learnerToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/code/execute",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"language\": \"javascript\",\n  \"source_code\": \"console.log(\\\"hello\\\")\",\n  \"test_cases\": [\n    {\n      \"input\": \"\",\n      \"expected_output\": \"hello\"\n    }\n  ],\n  \"timeout\": 30\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Request succeeds\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Execute java",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{learnerToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/code/execute",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"language\": \"java\",\n  \"source_code\": \"public class Main { public static void main(String[] args) { System.out.println(\\\"hello\\\"); } }\",\n  \"test_cases\": [\n    {\n      \"input\": \"\",\n      \"expected_output\": \"hello\"\n    }\n  ],\n  \"timeout\": 30\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Request succeeds\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Execute cpp",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{learnerToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/code/execute",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"language\": \"cpp\",\n  \"source_code\": \"#include <iostream>\\nint main(){std::cout << \\\"hello\\\";}\",\n  \"test_cases\": [\n    {\n      \"input\": \"\",\n      \"expected_output\": \"hello\"\n    }\n  ],\n  \"timeout\": 30\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Request succeeds\", () => pm.expect(pm.response.code).to.be.within(200, 299));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Timeout example",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{learnerToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/code/execute",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"language\": \"javascript\",\n  \"source_code\": \"while(true){}\",\n  \"timeout\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Execution bounded\", () => pm.expect([200,504]).to.include(pm.response.code));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

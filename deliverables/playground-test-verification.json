@@ -1,0 +1,71 @@
+{
+  "verifiedDate": "2026-10-27",
+  "backendSourceChanged": false,
+  "before": {
+    "backendLmsPassed": 148,
+    "backendCiPassed": 25,
+    "mobilePassed": 401,
+    "mobileSuites": 38,
+    "typecheck": "PASS"
+  },
+  "after": {
+    "backendLmsPassed": 148,
+    "backendCiPassed": 25,
+    "mobilePassed": 461,
+    "mobileSuites": 41,
+    "typecheck": "PASS"
+  },
+  "initialFinalRun": {
+    "passed": 460,
+    "failed": 1,
+    "reason": "First Playground case exceeded the default 5000ms test limit during cold React Native loading."
+  },
+  "unchangedWarmRerun": {
+    "status": "PASS",
+    "passed": 461,
+    "suites": 41,
+    "seconds": 47.978
+  },
+  "commands": [
+    "npm run test:patan",
+    "npm run test:ci",
+    "npm run typecheck",
+    "npm test -- --runInBand --cacheDirectory <writable-local-cache>"
+  ],
+  "realPrograms": {
+    "date": "2026-10-26",
+    "passed": 10,
+    "total": 10,
+    "evidence": "playground-program-verification.json"
+  },
+  "currentServiceAvailability": "Not claimed; the services were not listening at the 27 October check.",
+  "logs": {
+    "before-backend-verified.log": {
+      "sha256": "e83f253096eac7c134beded0587697849928364d920a9198198b668759054b2a"
+    },
+    "before-ci.log": {
+      "sha256": "561d1e08e8ad7fc88f97ead12aff3c96c9b7b1ea92eff1f95b09dc1670e25737"
+    },
+    "before-mobile.log": {
+      "sha256": "9efb90dae5982b4442dcaddbb073baabb73387b7443544c62d2593b1fabd9201"
+    },
+    "before-typecheck.log": {
+      "sha256": "e01308900b128b4d33be0270b9ba249eff74922c5651b55ed561e8e87ed7eec7"
+    },
+    "after-backend.log": {
+      "sha256": "e77fdd22ec6dfeef948085aa193e07d0e4662926269ce88cf640362796ff430d"
+    },
+    "after-ci.log": {
+      "sha256": "8f97777cef3c44dc49919aa86e6fd2c2dc00776567d0765db60c7c18c0ec6c67"
+    },
+    "final-typecheck.log": {
+      "sha256": "e01308900b128b4d33be0270b9ba249eff74922c5651b55ed561e8e87ed7eec7"
+    },
+    "final-mobile.log": {
+      "sha256": "c8abe70e7d17983f86156dcdbbab7d56d2e5f2e54d8ec1112e82e5841dececd3"
+    },
+    "final-mobile-rerun.log": {
+      "sha256": "92b078667c47bb5f8bf2774c19ad05bbea5f979a0e8431c69cd9b4b388c4499f"
+    }
+  }
+}

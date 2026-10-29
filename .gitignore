@@ -1,3 +1,20 @@
+
+# Local configuration, development data and generated artifacts
+.env
+.env.*
+!.env.example
+!.env.patan.example
+.local/
+node_modules/
+.expo/
+.web-build/
+dist/
+coverage/
+patan-ui-artifacts/
+*.log
+.preview-runtime/
+.preview-state.json
+mobile/web-preview/
 # Dependencies
 node_modules/
 frontend/node_modules/

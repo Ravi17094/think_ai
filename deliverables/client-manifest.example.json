@@ -1,0 +1,6 @@
+{
+  "_note": "FORMAT EXAMPLE ONLY. Replace all IDs, keys, checksums, rules and question content with approved client values.",
+  "bucket": "YOUR_APPROVED_MEDIA_BUCKET",
+  "videos": [{"key":"videos/lesson-1.mp4","md5":"00000000000000000000000000000000","bytes":123456}],
+  "courses": [{"id":1,"completionThreshold":80,"modules":[{"id":1,"lessonIds":[1,2]}],"assessments":[{"id":1,"passPercentage":60,"maxAttempts":3,"questions":[{"id":1,"text":"Approved question text","explanation":"Approved explanation","correctOptionIds":[1]}]}]}]
+}

@@ -1,0 +1,11 @@
+{
+  "environment": "Local practice server",
+  "verifiedAt": "2026-10-23T10:03:32.677Z",
+  "checks": [
+    "analytics",
+    "analytics/export csv",
+    "analytics/export pdf",
+    "analytics/report-status"
+  ],
+  "reportDelivery": "Disabled; missing real recipients and sender credentials. No email sent."
+}

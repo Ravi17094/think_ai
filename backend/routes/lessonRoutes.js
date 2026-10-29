@@ -1,6 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
+const { authenticateToken, authorizeRoles } = require("../middleware/lmsLegacyAccess");
 
 
 const {
@@ -136,6 +137,8 @@ router.get(
  */
 router.post(
     "/",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     validateLessonCreate,
     createLesson
 );
@@ -232,6 +235,8 @@ router.get(
  */
 router.put(
     "/:id",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     validateLessonId,
     validateLessonUpdate,
     updateLesson
@@ -266,6 +271,8 @@ router.put(
  */
 router.delete(
     "/:id",
+    authenticateToken,
+    authorizeRoles('ADMIN'),
     validateLessonId,
     deleteLesson
 );

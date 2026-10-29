@@ -1,0 +1,157 @@
+{
+  "startedAt": "2026-10-26T15:03:49.191Z",
+  "mode": "real local HTTP and Judge0",
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "unauthenticated API execution denied",
+      "passed": true,
+      "latencyMs": 4,
+      "httpStatus": 401
+    },
+    {
+      "name": "unauthenticated direct sandbox denied",
+      "passed": true,
+      "latencyMs": 9,
+      "httpStatus": 401
+    },
+    {
+      "name": "python real stdout",
+      "passed": true,
+      "latencyMs": 1153,
+      "language": "python",
+      "httpStatus": 200,
+      "statusId": 3,
+      "stdout": "42\n",
+      "cpuTimeSeconds": "0.012",
+      "memoryKiB": 3136
+    },
+    {
+      "name": "javascript real stdout",
+      "passed": true,
+      "latencyMs": 1118,
+      "language": "javascript",
+      "httpStatus": 200,
+      "statusId": 3,
+      "stdout": "42\n",
+      "cpuTimeSeconds": "0.033",
+      "memoryKiB": 8800
+    },
+    {
+      "name": "java real stdout",
+      "passed": true,
+      "latencyMs": 1100,
+      "language": "java",
+      "httpStatus": 200,
+      "statusId": 3,
+      "stdout": "42\n",
+      "cpuTimeSeconds": "0.047",
+      "memoryKiB": 10140
+    },
+    {
+      "name": "cpp real stdout",
+      "passed": true,
+      "latencyMs": 1095,
+      "language": "cpp",
+      "httpStatus": 200,
+      "statusId": 3,
+      "stdout": "42\n",
+      "cpuTimeSeconds": "0.004",
+      "memoryKiB": 880
+    },
+    {
+      "name": "stdin and matching expected output",
+      "passed": true,
+      "latencyMs": 1109,
+      "statusId": 3,
+      "stdout": "42\n",
+      "expectedMatched": true
+    },
+    {
+      "name": "mismatched expected output is false",
+      "passed": true,
+      "latencyMs": 1102,
+      "statusId": 3,
+      "expectedMatched": false
+    },
+    {
+      "name": "real Java compile error returned",
+      "passed": true,
+      "latencyMs": 1107,
+      "statusId": 6,
+      "compileOutputPresent": true
+    },
+    {
+      "name": "real Python runtime error returned",
+      "passed": true,
+      "latencyMs": 1123,
+      "statusId": 11,
+      "runtimeErrorPresent": true
+    },
+    {
+      "name": "HTML ANSI and shell-like stdin sanitized after real execution",
+      "passed": true,
+      "latencyMs": 1104,
+      "statusId": 3,
+      "rawExpectedMatched": true,
+      "sanitizedStdout": "; echo SHELL_PAYLOAD $(id) alert(1)\n"
+    },
+    {
+      "name": "CPU-bound loop is actually terminated by sandbox",
+      "passed": true,
+      "latencyMs": 6475,
+      "statusId": 5,
+      "cpuTimeSeconds": "5.052",
+      "memoryKiB": 3220
+    },
+    {
+      "name": "sandbox rejects prohibited enable_network",
+      "passed": true,
+      "latencyMs": 10,
+      "httpStatus": 422,
+      "rejectedField": "enable_network"
+    },
+    {
+      "name": "sandbox rejects prohibited compiler_options",
+      "passed": true,
+      "latencyMs": 12,
+      "httpStatus": 422,
+      "rejectedField": "compiler_options"
+    },
+    {
+      "name": "sandbox rejects prohibited command_line_arguments",
+      "passed": true,
+      "latencyMs": 7,
+      "httpStatus": 422,
+      "rejectedField": "command_line_arguments"
+    },
+    {
+      "name": "sandbox rejects prohibited callback_url",
+      "passed": true,
+      "latencyMs": 8,
+      "httpStatus": 422,
+      "rejectedField": "callback_url"
+    },
+    {
+      "name": "sandbox rejects prohibited additional_files",
+      "passed": true,
+      "latencyMs": 7,
+      "httpStatus": 422,
+      "rejectedField": "additional_files"
+    },
+    {
+      "name": "30 second wall limit kills a low CPU sleeping program",
+      "passed": true,
+      "latencyMs": 31308,
+      "statusId": 5,
+      "wallTimeSeconds": "30.003",
+      "cpuTimeSeconds": "0.012",
+      "totalObservedMs": 31308,
+      "completedAfterSleep": false
+    }
+  ],
+  "finishedAt": "2026-10-26T15:04:37.292Z",
+  "passed": 18,
+  "failed": 0,
+  "note": "Actual real local sandbox results only. This run does not establish production capacity, cloud certificates or native-device behavior. No learner source was executed on the Windows host."
+}
