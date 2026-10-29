@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppState, Text, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Video, ResizeMode } from "expo-av";
+import { useVideoPlayer, VideoView } from "expo-video";
 import { AppButton } from "@/components/common/AppButton";
 import { ProgressBar } from "@/components/common/ProgressBar";
 import type { ScreenProps } from "@/navigation/types";
@@ -121,9 +121,25 @@ export function CoursePlayerScreen({
   route,
   navigation,
 }: ScreenProps<"CoursePlayer">) {
-  const { resource, lesson, lessons, uri, message, download, video,
+  const { resource, lesson, lessons, uri, message, download,
     initialPosition, completed, online, playback, downloadCurrent, setSelected } =
     useCoursePlayer(route.params.courseId, route.params.lessonId);
+  const player = useVideoPlayer(uri, (current) => {
+    current.timeUpdateEventInterval = 1;
+    current.currentTime = initialPosition / 1000;
+  });
+  useEffect(() => {
+    const timeUpdate = player.addListener("timeUpdate", (event) =>
+      playback(event.currentTime),
+    );
+    const completed = player.addListener("playToEnd", () =>
+      playback(lesson?.durationSeconds ?? 0, true),
+    );
+    return () => {
+      timeUpdate.remove();
+      completed.remove();
+    };
+  }, [player, playback, lesson?.durationSeconds]);
   return (
     <Screen title={resource.data?.course.title || "Course player"}>
       <LoadState {...resource} retry={resource.refresh} />
@@ -131,16 +147,12 @@ export function CoursePlayerScreen({
         <>
           <Text style={styles.heading}>{lesson.title}</Text>
           {uri ? (
-            <Video
-              ref={video}
+            <VideoView
               key={`${lesson.id}:${uri}`}
-              source={{ uri }}
+              player={player}
               style={{ width: "100%", height: 230, backgroundColor: "#000" }}
-              useNativeControls
-              resizeMode={ResizeMode.CONTAIN}
-              positionMillis={initialPosition}
-              progressUpdateIntervalMillis={1000}
-              onPlaybackStatusUpdate={playback}
+              nativeControls
+              contentFit="contain"
             />
           ) : (
             <Message text="Video unavailable for this lesson." />
@@ -180,7 +192,7 @@ export function CoursePlayerScreen({
                   title={`${l.id === lesson.id ? "▶ " : ""}${l.title}`}
                   variant={l.id === lesson.id ? "primary" : "secondary"}
                   onPress={() => {
-                    void video.current?.pauseAsync();
+                    player.pause();
                     setSelected(l.id);
                   }}
                 />
