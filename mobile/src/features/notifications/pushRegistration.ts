@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
@@ -23,7 +23,7 @@ export async function registerPushNotifications(): Promise<string | null> {
 export function subscribeToNotificationDeepLinks(): () => void {
   const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
     const url = response.notification.request.content.data?.url;
-    if (typeof url === 'string' && url.startsWith('thinkzai://')) void import('expo-linking').then(({ openURL }) => openURL(url));
+    if (typeof url === 'string' && url.startsWith('thinkzai://')) void Linking.openURL(url);
   });
   return () => subscription.remove();
 }
