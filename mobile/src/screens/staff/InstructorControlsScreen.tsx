@@ -1,18 +1,26 @@
 import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ApiError } from '@/api/http';
+import { getInstructorControls, saveInstructorControls, type InstructorControls } from '@/api/staffApi';
+import { checklistItems } from './staffStorage';
 import { palette, radii, spacing, typography } from '@/theme/tokens';
-import { CHECKLIST_KEY, checklistItems, loadStored, saveStored } from './staffStorage';
 
-type Controls = { muted: boolean; chatDisabled: boolean; spotlight: boolean; recording: boolean };
-const initialControls: Controls = { muted: false, chatDisabled: false, spotlight: false, recording: false };
+const SESSION_ID = 'demo-live-session';
+const initialControls: InstructorControls = { muted: false, chatDisabled: false, spotlight: false, recording: false };
+
 export function InstructorControlsScreen() {
-  const [done, setDone] = useState<string[]>([]); const [controls, setControls] = useState<Controls>(initialControls); const [notice, setNotice] = useState('Loading preparation checklist…');
-  useEffect(() => { loadStored<string[]>(CHECKLIST_KEY, []).then((value) => { setDone(value); setNotice('Your saved session preparation checklist is ready.'); }); }, []);
-  const toggleCheck = async (item: string) => { const next = done.includes(item) ? done.filter((value) => value !== item) : [...done, item]; setDone(next); await saveStored(CHECKLIST_KEY, next); };
-  const toggle = (key: keyof Controls, label: string) => { setControls((current) => ({ ...current, [key]: !current[key] })); setNotice(`${label} updated in the mobile control panel.`); };
-  return <SafeAreaView edges={['top','left','right']} style={styles.safe}><ScrollView contentContainerStyle={styles.content}><Text style={styles.title}>Instructor controls</Text><Text style={styles.note}>{notice}</Text><Text style={styles.section}>Session preparation</Text>
-    {checklistItems.map((item) => <Pressable key={item} onPress={() => toggleCheck(item)} style={styles.item}><Text style={done.includes(item) ? styles.done : styles.itemText}>{done.includes(item) ? '✓ ' : '○ '}{item}</Text></Pressable>)}<Text style={styles.progress}>{done.length} of {checklistItems.length} checks complete</Text><Text style={styles.section}>Live controls</Text><View style={styles.grid}>
+  const [done, setDone] = useState<string[]>([]);
+  const [controls, setControls] = useState<InstructorControls>(initialControls);
+  const [notice, setNotice] = useState('Loading server-saved session preparation…');
+  const [saving, setSaving] = useState(false);
+  const load = async () => { try { const value = await getInstructorControls(SESSION_ID); setDone(value.checklist); setControls(value.controls); setNotice(value.updatedAt ? 'Loaded the shared server copy.' : 'Start the shared preparation checklist.'); } catch (error) { setNotice(error instanceof ApiError ? error.message : 'Could not load controls.'); } };
+  useEffect(() => { void load(); }, []);
+  const persist = async (nextDone: string[], nextControls: InstructorControls, label: string) => { setDone(nextDone); setControls(nextControls); setSaving(true); try { await saveInstructorControls(SESSION_ID, nextDone, nextControls); setNotice(`${label} saved for everyone on this session.`); } catch (error) { setNotice(error instanceof ApiError ? error.message : 'Save failed. Tap the change again to retry.'); } finally { setSaving(false); } };
+  const toggleCheck = (item: string) => { const next = done.includes(item) ? done.filter((value) => value !== item) : [...done, item]; void persist(next, controls, 'Checklist'); };
+  const toggle = (key: keyof InstructorControls, label: string) => { const next = { ...controls, [key]: !controls[key] }; void persist(done, next, label); };
+  return <SafeAreaView edges={['top','left','right']} style={styles.safe}><ScrollView contentContainerStyle={styles.content}><Text style={styles.title}>Instructor controls</Text><Text style={styles.note}>{saving ? 'Saving…' : notice}</Text><Text style={styles.section}>Session preparation</Text>
+    {checklistItems.map((item) => <Pressable disabled={saving} key={item} onPress={() => toggleCheck(item)} style={styles.item}><Text style={done.includes(item) ? styles.done : styles.itemText}>{done.includes(item) ? '✓ ' : '○ '}{item}</Text></Pressable>)}<Text style={styles.progress}>{done.length} of {checklistItems.length} checks complete</Text><Text style={styles.section}>Live controls</Text><View style={styles.grid}>
     <Control label={controls.muted ? 'Unmute all' : 'Mute all'} onPress={() => toggle('muted','Mute all')} /><Control label={controls.chatDisabled ? 'Enable chat' : 'Disable chat'} onPress={() => toggle('chatDisabled','Chat')} /><Control label={controls.spotlight ? 'Remove spotlight' : 'Spotlight speaker'} onPress={() => toggle('spotlight','Spotlight')} /><Control label={controls.recording ? 'Stop recording' : 'Start recording'} onPress={() => toggle('recording','Recording')} /></View>
     <Text style={styles.section}>Post-session summary</Text><View style={styles.summary}><Text style={styles.summaryText}>Attendance: available in the attendance register</Text><Text style={styles.summaryText}>Grading: available in the grading queue</Text><Text style={styles.summaryText}>Recording: {controls.recording ? 'recording in progress' : 'not started'}</Text></View>
   </ScrollView></SafeAreaView>;

@@ -5,6 +5,8 @@ const {
   getPreferencesByUserId,
   upsertPreferences,
 } = require("../services/notificationPreferenceService");
+const prisma = require("../config/database");
+const requireRole = require("../middleware/requireRole");
 
 /**
  * GET /notifications/preferences/:userId
@@ -63,6 +65,24 @@ router.put("/preferences/:userId", (req, res, next) => {
  */
 router.get("/queue/status", (req, res) => {
   res.status(200).json({ success: true, data: getQueueStatus() });
+});
+
+router.put("/device-token", requireRole(["Admin", "Instructor", "TA", "Learner"]), async (req, res) => {
+  const expoPushToken = String(req.body?.expoPushToken || "").trim();
+  const platform = String(req.body?.platform || "unknown").slice(0, 20);
+  if (!/^ExponentPushToken\[.+\]$|^ExpoPushToken\[.+\]$/.test(expoPushToken)) {
+    return res.status(400).json({ success: false, message: "A valid Expo push token is required." });
+  }
+  try {
+    const token = await prisma.devicePushToken.upsert({
+      where: { expoPushToken },
+      create: { expoPushToken, platform, userId: String(req.user.id) },
+      update: { platform, userId: String(req.user.id) },
+    });
+    return res.json({ success: true, data: { id: token.id, updatedAt: token.updatedAt } });
+  } catch {
+    return res.status(500).json({ success: false, message: "Could not register this device." });
+  }
 });
 
 module.exports = router;

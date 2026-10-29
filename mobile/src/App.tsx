@@ -3,6 +3,7 @@ import {
   NavigationContainer,
   useNavigationContainerRef,
 } from '@react-navigation/native';
+import { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -31,12 +32,15 @@ import { AssessmentScreen } from '@/screens/learning/AssessmentScreen';
 import { CertificateScreen } from '@/screens/learning/CertificateScreen';
 import { StaffToolsScreen } from '@/screens/staff/StaffToolsScreen';
 import { AttendanceRegisterScreen } from '@/screens/staff/AttendanceRegisterScreen';
+import { AttendanceReportScreen } from '@/screens/staff/AttendanceReportScreen';
 import { GradingQueueScreen } from '@/screens/staff/GradingQueueScreen';
 import { InstructorControlsScreen } from '@/screens/staff/InstructorControlsScreen';
 import { RbacMatrixScreen } from '@/screens/staff/RbacMatrixScreen';
+import { LiveStudioScreen } from '@/screens/staff/LiveStudioScreen';
 import { ResultsScreen } from '@/screens/learning/ResultsScreen';
 import { VideoPlayerScreen } from '@/screens/learning/VideoPlayerScreen';
 import { palette } from '@/theme/tokens';
+import { subscribeToNotificationDeepLinks } from '@/features/notifications/pushRegistration';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -72,9 +76,11 @@ const ResultsRoute = withErrorBoundary(ResultsScreen, 'results');
 const CertificateRoute = withErrorBoundary(CertificateScreen, 'certificate');
 const StaffToolsRoute = withErrorBoundary(StaffToolsScreen, 'staff-tools');
 const AttendanceRegisterRoute = withErrorBoundary(AttendanceRegisterScreen, 'attendance-register');
+const AttendanceReportRoute = withErrorBoundary(AttendanceReportScreen, 'attendance-report');
 const GradingQueueRoute = withErrorBoundary(GradingQueueScreen, 'grading-queue');
 const InstructorControlsRoute = withErrorBoundary(InstructorControlsScreen, 'instructor-controls');
 const RbacMatrixRoute = withErrorBoundary(RbacMatrixScreen, 'rbac-matrix');
+const LiveStudioRoute = withErrorBoundary(LiveStudioScreen, 'live-studio');
 
 const navigationTheme = {
   ...DarkTheme,
@@ -198,7 +204,9 @@ export function RootNavigator() {
           options={{ title: 'Certificate' }}
         />
         <Stack.Screen component={StaffToolsRoute} name="StaffTools" options={{ title: 'Teaching tools' }} />
+        <Stack.Screen component={LiveStudioRoute} name="LiveStudio" options={{ title: 'Live Studio' }} />
         <Stack.Screen component={AttendanceRegisterRoute} name="AttendanceRegister" options={{ title: 'Attendance register' }} />
+        <Stack.Screen component={AttendanceReportRoute} name="AttendanceReport" options={{ title: 'Attendance report' }} />
         <Stack.Screen component={GradingQueueRoute} name="GradingQueue" options={{ title: 'Grading queue' }} />
         <Stack.Screen component={InstructorControlsRoute} name="InstructorControls" options={{ title: 'Instructor controls' }} />
         <Stack.Screen component={RbacMatrixRoute} name="RbacMatrix" options={{ title: 'Role permissions' }} />
@@ -208,6 +216,9 @@ export function RootNavigator() {
 }
 
 export function App() {
+  // Foreground notifications display through Expo; notification taps reuse the
+  // app's established deep-link paths.
+  useEffect(() => subscribeToNotificationDeepLinks(), []);
   return (
     <SafeAreaProvider>
       <ApiClientProvider>

@@ -7,7 +7,7 @@ function authenticateStudioSocket(socket, next) {
 
     try {
         if (token) {
-            const decoded = jwt.verify(String(token).replace("Bearer ", ""), process.env.JWT_SECRET);
+            const decoded = jwt.verify(String(token).replace("Bearer ", ""), process.env.JWT_SECRET || "fallback_secret");
             socket.user = {
                 id: String(decoded.id || decoded.userId),
                 role: decoded.role || "LEARNER",

@@ -610,6 +610,31 @@ model LivePollVote {
   @@index([userId])
 }
 
+// One persisted preparation/control state per instructor and live session.
+// JSON keeps the checklist extensible without storing device-local state.
+model InstructorSessionControl {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  sessionId String
+  checklist Json     @default("[]")
+  controls  Json     @default("{}")
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, sessionId])
+  @@index([sessionId])
+}
+
+model DevicePushToken {
+  id            Int      @id @default(autoincrement())
+  userId        String
+  expoPushToken String   @unique
+  platform      String
+  updatedAt     DateTime @updatedAt
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+}
+
 model BreakoutRoom {
   id        Int         @id @default(autoincrement())
   sessionId String

@@ -121,4 +121,20 @@ router.get("/ta/report", requireRole(["TA", "Instructor", "Admin"]), async (req,
   }
 });
 
+router.get("/ta/attendance-report", requireRole(["TA", "Instructor", "Admin"]), async (req, res) => {
+  try {
+    const where = {};
+    const status = String(req.query.status || '').toUpperCase();
+    if (allowedStatuses.includes(status)) where.status = status;
+    if (req.query.from || req.query.to) {
+      where.sessionDate = {};
+      if (req.query.from) where.sessionDate.gte = parseSessionDate(req.query.from);
+      if (req.query.to) where.sessionDate.lte = parseSessionDate(req.query.to);
+    }
+    const rows = await prisma.attendanceRecord.findMany({ where, include: { enrollment: { select: { studentName: true, studentEmail: true, batch: { include: { course: { select: { title: true } } } } } } }, orderBy: [{ sessionDate: 'desc' }, { enrollment: { studentName: 'asc' } }] });
+    const data = rows.map((row) => ({ studentName: row.enrollment.studentName, studentEmail: row.enrollment.studentEmail, courseTitle: row.enrollment.batch.course.title, sessionDate: row.sessionDate.toISOString().slice(0, 10), sessionTitle: row.sessionTitle, status: normalizeAttendanceStatus(row.status), notes: row.notes || '' }));
+    return res.json({ success: true, data });
+  } catch (error) { return res.status(400).json({ success: false, message: error.message || 'Could not load attendance report.' }); }
+});
+
 module.exports = router;

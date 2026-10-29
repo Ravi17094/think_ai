@@ -38,7 +38,9 @@ export type RootStackParamList = {
   Results: { assessmentId: string; score: number; passed: boolean };
   Certificate: { courseId: string };
   StaffTools: undefined;
+  LiveStudio: undefined;
   AttendanceRegister: undefined;
+  AttendanceReport: undefined;
   GradingQueue: undefined;
   InstructorControls: undefined;
   RbacMatrix: undefined;

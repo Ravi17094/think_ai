@@ -11,6 +11,7 @@ import {
 
 import { API_BASE_URL } from '@/api/http';
 import { signIn } from '@/api/session';
+import { registerPushNotifications } from '@/features/notifications/pushRegistration';
 import type { ScreenProps } from '@/navigation/types';
 import { palette, radii, spacing, typography } from '@/theme/tokens';
 
@@ -49,6 +50,8 @@ export function LoginScreen({ navigation }: ScreenProps<'Login'>) {
         throw new Error(payload?.error ?? payload?.message ?? 'Sign-in failed.');
       }
       await signIn(String(payload.user.id), payload.token);
+      // Permission may be declined; that must never block sign-in.
+      void registerPushNotifications().catch(() => undefined);
       navigation.replace('LearnerDashboard');
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : 'Could not sign in. Check your details and try again.');

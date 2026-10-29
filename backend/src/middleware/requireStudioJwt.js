@@ -8,7 +8,9 @@ module.exports = function requireStudioJwt(req, res, next) {
         return res.status(401).json({ success: false, message: "A valid login token is required" });
     }
     try {
-        const decoded = jwt.verify(authorization.slice(7), process.env.JWT_SECRET);
+        // Keep Studio authentication aligned with the main login controller in
+        // local development. Production must provide JWT_SECRET explicitly.
+        const decoded = jwt.verify(authorization.slice(7), process.env.JWT_SECRET || "fallback_secret");
         req.user = {
             id: String(decoded.id || decoded.userId || decoded.sub),
             name: decoded.name || decoded.email || "Participant",

@@ -5,7 +5,9 @@ import type { ScreenProps } from '@/navigation/types';
 import { palette, radii, spacing, typography } from '@/theme/tokens';
 
 const tools = [
+  { route: 'LiveStudio' as const, title: 'Live Studio', detail: 'Join a live session, chat, run polls, view attendees, and manage breakout rooms.' },
   { route: 'AttendanceRegister' as const, title: 'Attendance register', detail: 'Mark Present, Tardy, Absent, or Excused and save the register.' },
+  { route: 'AttendanceReport' as const, title: 'Attendance report', detail: 'Filter attendance history and share a CSV report.' },
   { route: 'GradingQueue' as const, title: 'Grading queue', detail: 'Review learner submissions, scores, and feedback.' },
   { route: 'InstructorControls' as const, title: 'Instructor controls', detail: 'Complete session preparation and manage live-session controls.' },
   { route: 'RbacMatrix' as const, title: 'Role permissions', detail: 'Review and stage role-based access permissions.' },

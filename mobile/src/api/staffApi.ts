@@ -36,6 +36,11 @@ export function getAttendanceRegister(sessionDate: string, sessionTitle: string)
   });
 }
 
+export type AttendanceReportRow = { studentName: string; studentEmail: string; courseTitle: string; sessionDate: string; sessionTitle: string; status: AttendanceStatus; notes: string };
+export function getAttendanceReport(from?: string, to?: string, status?: string) {
+  return apiData<AttendanceReportRow[]>('/attendance/ta/attendance-report', { query: { from, to, status } });
+}
+
 export function saveAttendance(record: AttendanceRecord, sessionDate: string, sessionTitle: string) {
   return apiRequest('/attendance/ta/record', {
     method: 'PUT',
@@ -75,3 +80,12 @@ export function gradeSubmission(submissionId: number, score: number, feedback: s
     body: { score, feedback },
   });
 }
+
+export function bulkGradeSubmissions(submissions: Array<{ id: number; score: number; feedback: string }>) {
+  return apiData<GradingSubmission[]>('/ta/submissions/bulk-grade', { method: 'POST', body: { submissions } });
+}
+
+export type InstructorControls = { muted: boolean; chatDisabled: boolean; spotlight: boolean; recording: boolean };
+export type InstructorControlState = { checklist: string[]; controls: InstructorControls; updatedAt: string | null };
+export const getInstructorControls = (sessionId: string) => apiData<InstructorControlState>(`/instructor-controls/${encodeURIComponent(sessionId)}`);
+export const saveInstructorControls = (sessionId: string, checklist: string[], controls: InstructorControls) => apiData<InstructorControlState>(`/instructor-controls/${encodeURIComponent(sessionId)}`, { method: 'PUT', body: { checklist, controls } });

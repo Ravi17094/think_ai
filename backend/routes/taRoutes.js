@@ -67,4 +67,33 @@ router.patch('/submissions/:id/grade', staffOnly, async (req, res) => {
   }
 });
 
+// Batch grading keeps validation and audit fields identical to single grading.
+// The transaction makes the action all-or-nothing for the selected learners.
+router.post('/submissions/bulk-grade', staffOnly, async (req, res) => {
+  const submissions = Array.isArray(req.body?.submissions) ? req.body.submissions : [];
+  if (!submissions.length || submissions.length > 100) {
+    return res.status(400).json({ success: false, message: 'Select between 1 and 100 submissions.' });
+  }
+  try {
+    const ids = submissions.map((item) => Number(item?.id));
+    if (ids.some((id) => !Number.isInteger(id) || id <= 0) || new Set(ids).size !== ids.length) {
+      return res.status(400).json({ success: false, message: 'Each selected submission must have a unique valid id.' });
+    }
+    const existing = await prisma.assessmentSubmission.findMany({ where: { id: { in: ids } }, select: { id: true, totalMarks: true } });
+    if (existing.length !== ids.length) return res.status(404).json({ success: false, message: 'One or more submissions were not found.' });
+    const marks = new Map(existing.map((item) => [item.id, item.totalMarks]));
+    const now = new Date();
+    await prisma.$transaction(submissions.map((item) => {
+      const id = Number(item.id); const score = Number(item.score); const totalMarks = marks.get(id);
+      if (!Number.isFinite(score) || score < 0 || score > totalMarks) throw new Error(`Invalid score for submission ${id}.`);
+      const feedback = typeof item.feedback === 'string' ? item.feedback.trim() : '';
+      return prisma.assessmentSubmission.update({ where: { id }, data: { score, percentage: totalMarks ? Number(((score / totalMarks) * 100).toFixed(2)) : 0, feedback: feedback || null, gradedBy: req.user?.email || req.user?.id || req.user?.role || 'TA', gradedAt: now, status: 'GRADED' } });
+    }));
+    const rows = await prisma.assessmentSubmission.findMany({ where: { id: { in: ids } }, include: { assessment: { select: { title: true } }, enrollment: { select: { studentName: true, studentEmail: true } } } });
+    return res.json({ success: true, data: rows.map(serialize), message: `${rows.length} grades saved.` });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message || 'Could not save selected grades.' });
+  }
+});
+
 module.exports = router;

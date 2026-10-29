@@ -6,11 +6,16 @@ const liveController = require("../live/liveController");
 const liveValidation = require("../live/liveValidation");
 const requireStudioJwt = require("../middleware/requireStudioJwt");
 
+// Every Live Studio action uses the authenticated account.  Previously only
+// the Jitsi-token endpoint did this, leaving the remaining handlers without
+// req.user and causing joins, messages, polls and breakouts to fail.
+router.use(requireStudioJwt);
+
 // Sessions
 router.get("/sessions/:id", liveValidation.validateSessionId, liveController.getSession);
 router.post("/sessions/:id/join", liveValidation.validateSessionId, liveController.joinSession);
 router.patch("/sessions/:id/status", liveValidation.validateSessionId, liveController.updateSessionStatus);
-router.post("/sessions/:id/jitsi-token", requireStudioJwt, liveValidation.validateSessionId, liveController.createJitsiToken);
+router.post("/sessions/:id/jitsi-token", liveValidation.validateSessionId, liveController.createJitsiToken);
 
 // Messages
 router.get("/sessions/:id/messages", liveValidation.validateSessionId, liveController.getMessages);
