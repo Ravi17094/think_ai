@@ -62,38 +62,37 @@ export function LearnerDashboardScreen({
         }
         testID="dashboard-scroll-view">
         <ScreenHeader
-          right={
-            <View style={styles.headerRight}>
-              <Pressable
-                accessibilityRole="button"
-                onPress={() => navigation.navigate('NotificationPreferences')}
-                style={styles.browseButton}
-                testID="notification-settings">
-                <Text style={styles.browseLabel}>Alerts</Text>
-              </Pressable>
-              <Pressable
-                accessibilityRole="button"
-                onPress={() => navigation.navigate('MyCourses')}
-                style={styles.browseButton}
-                testID="browse-tab">
-                <Text style={styles.browseLabel}>Browse</Text>
-              </Pressable>
-              <Pressable
-                accessibilityRole="button"
-                onPress={() => navigation.navigate('StaffTools')}
-                style={styles.browseButton}
-                testID="staff-tools">
-                <Text style={styles.browseLabel}>Teaching</Text>
-              </Pressable>
-              <View style={styles.stat} testID="dashboard-enrollment-count">
-                <Text style={styles.statLabel}>Enrolled</Text>
-                <Text style={styles.statValue}>{enrollments.length}</Text>
-              </View>
-            </View>
-          }
           subtitle={`${completedCount} completed · ${enrollments.length - completedCount} in progress`}
           title="My Learning"
         />
+
+        <View style={styles.actionRow}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => navigation.navigate('NotificationPreferences')}
+            style={styles.browseButton}
+            testID="notification-settings">
+            <Text style={styles.browseLabel}>Alerts</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => navigation.navigate('MyCourses')}
+            style={styles.browseButton}
+            testID="browse-tab">
+            <Text style={styles.browseLabel}>Browse</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => navigation.navigate('StaffTools')}
+            style={styles.browseButton}
+            testID="staff-tools">
+            <Text style={styles.browseLabel}>Teaching</Text>
+          </Pressable>
+          <View style={styles.stat} testID="dashboard-enrollment-count">
+            <Text style={styles.statLabel}>Enrolled</Text>
+            <Text style={styles.statValue}>{enrollments.length}</Text>
+          </View>
+        </View>
 
         {showSkeleton ? (
           <View style={styles.section}>
@@ -146,12 +145,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     marginTop: spacing.xs,
   },
-  headerRight: {
+  actionRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.sm,
     gap: spacing.xs,
   },
   browseButton: {
+    minHeight: 40,
+    justifyContent: 'center',
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: 16,
@@ -162,6 +166,7 @@ const styles = StyleSheet.create({
     color: palette.accent,
   },
   stat: {
+    minWidth: 76,
     alignItems: 'center',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,

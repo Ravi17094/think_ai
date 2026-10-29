@@ -13,7 +13,7 @@ const tools = [
 export function StaffToolsScreen({ navigation }: ScreenProps<'StaffTools'>) {
   return <SafeAreaView edges={['top', 'left', 'right']} style={styles.safe}><ScrollView contentContainerStyle={styles.content}>
     <Text style={styles.kicker}>TEACHING WORKSPACE</Text><Text style={styles.title}>TA & instructor tools</Text>
-    <Text style={styles.note}>These tools save demonstration data securely on this device until the staff API is connected.</Text>
+    <Text style={styles.note}>Attendance, grading, and role permissions use the secured staff API. Sign in with a TA, Instructor, or Admin account.</Text>
     {tools.map((tool) => <Pressable key={tool.route} onPress={() => navigation.navigate(tool.route)} style={styles.card} accessibilityRole="button">
       <View><Text style={styles.cardTitle}>{tool.title}</Text><Text style={styles.detail}>{tool.detail}</Text></View><Text style={styles.arrow}>›</Text>
     </Pressable>)}

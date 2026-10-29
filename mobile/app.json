@@ -6,10 +6,6 @@
     "orientation": "portrait",
     "scheme": "thinkzai",
     "userInterfaceStyle": "light",
-    "splash": {
-      "resizeMode": "contain",
-      "backgroundColor": "#0B1020"
-    },
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
