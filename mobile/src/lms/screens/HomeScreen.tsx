@@ -34,6 +34,11 @@ export function LmsHomeScreen({ navigation }: ScreenProps<"LmsHome">) {
           variant="secondary"
           onPress={() => navigation.navigate("Downloads")}
         />
+        <AppButton
+          title="Teaching tools"
+          variant="secondary"
+          onPress={() => navigation.navigate("StaffTools")}
+        />
       </View>
       <LoadState {...resource} retry={resource.refresh} />
       {resource.data?.length === 0 ? (
