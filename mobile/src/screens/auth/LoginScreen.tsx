@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 
+import { API_BASE_URL } from '@/api/http';
 import { signIn } from '@/api/session';
 import type { ScreenProps } from '@/navigation/types';
 import { palette, radii, spacing, typography } from '@/theme/tokens';
@@ -32,10 +33,25 @@ export function LoginScreen({ navigation }: ScreenProps<'Login'>) {
     setSubmitting(true);
     setError(null);
     try {
-      await signIn(email.trim().toLowerCase());
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+      });
+      const payload = await response.json().catch(() => null) as {
+        success?: boolean;
+        token?: string;
+        user?: { id?: string | number };
+        error?: string;
+        message?: string;
+      } | null;
+      if (!response.ok || !payload?.success || !payload.token || !payload.user?.id) {
+        throw new Error(payload?.error ?? payload?.message ?? 'Sign-in failed.');
+      }
+      await signIn(String(payload.user.id), payload.token);
       navigation.replace('LearnerDashboard');
-    } catch {
-      setError('Could not sign in. Check your details and try again.');
+    } catch (loginError) {
+      setError(loginError instanceof Error ? loginError.message : 'Could not sign in. Check your details and try again.');
     } finally {
       setSubmitting(false);
     }
