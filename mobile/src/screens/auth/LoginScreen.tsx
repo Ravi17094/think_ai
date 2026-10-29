@@ -33,11 +33,14 @@ export function LoginScreen({ navigation }: ScreenProps<'Login'>) {
     }
     setSubmitting(true);
     setError(null);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+        signal: controller.signal,
       });
       const payload = await response.json().catch(() => null) as {
         success?: boolean;
@@ -54,8 +57,15 @@ export function LoginScreen({ navigation }: ScreenProps<'Login'>) {
       void registerPushNotifications().catch(() => undefined);
       navigation.replace('LearnerDashboard');
     } catch (loginError) {
-      setError(loginError instanceof Error ? loginError.message : 'Could not sign in. Check your details and try again.');
+      setError(
+        loginError instanceof Error && loginError.name === 'AbortError'
+          ? 'The server did not respond. Start the backend and check that your phone and laptop use the same Wi-Fi.'
+          : loginError instanceof Error
+            ? loginError.message
+            : 'Could not sign in. Check your details and try again.',
+      );
     } finally {
+      clearTimeout(timeout);
       setSubmitting(false);
     }
   };
