@@ -131,17 +131,22 @@ export function useCoursePlayer(courseId: number, requestedLessonId?: number) {
     },
     [lesson?.id, resource.data, session.userId, versions],
   );
+  const saveOnLeave = useRef(saveProgress);
   useEffect(() => {
+    saveOnLeave.current = saveProgress;
+  }, [saveProgress]);
+  useEffect(() => {
+    if (!lesson || !resource.data) return;
     const sub = AppState.addEventListener("change", (s) => {
       if (s !== "active" && position.current > 0)
-        void saveProgress(position.current).catch(() => undefined);
+        void saveOnLeave.current(position.current).catch(() => undefined);
     });
     return () => {
       sub.remove();
       if (position.current > 0)
-        void saveProgress(position.current).catch(() => undefined);
+        void saveOnLeave.current(position.current).catch(() => undefined);
     };
-  }, [saveProgress]);
+  }, [lesson?.id, resource.data?.enrollmentId, session.userId]);
   function playback(status: AVPlaybackStatus) {
     if (!status.isLoaded) {
       if (status.error) setMessage(status.error);

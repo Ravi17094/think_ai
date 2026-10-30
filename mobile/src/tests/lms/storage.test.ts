@@ -131,3 +131,20 @@ test("queue corruption is removed and source code cannot escape the editor docum
   const html = editorHtml("</script><script>alert(1)</script>", "javascript");
   expect(html).not.toContain("</script><script>alert(1)");
 });
+
+test("progress with the same millisecond timestamp is not mistaken for the sent snapshot", async () => {
+  const first = { lessonId: 1, enrollmentId: 2, watchedSeconds: 15,
+    updatedAt: "2026-10-22T00:00:00Z", baseVersion: null };
+  await enqueueProgress("patan", first);
+  await enqueueProgress("patan", { ...first, watchedSeconds: 30 });
+  await acknowledgeProgress("patan", [first]);
+  expect((await loadQueue("patan"))[0]?.watchedSeconds).toBe(30);
+});
+
+test("coalescing preserves a null original base version", async () => {
+  const first = { lessonId: 1, enrollmentId: 2, watchedSeconds: 15,
+    updatedAt: "2026-10-22T00:00:00Z", baseVersion: null };
+  await enqueueProgress("patan", first);
+  await enqueueProgress("patan", { ...first, watchedSeconds: 30, baseVersion: "2026-10-22T00:01:00Z" });
+  expect((await loadQueue("patan"))[0]?.baseVersion).toBeNull();
+});

@@ -62,3 +62,43 @@ test("administrator reconnect never uploads a learner progress queue", async () 
   expect(lmsApi.sync).not.toHaveBeenCalled();
   expect(await loadQueue("1")).toEqual([update]);
 });
+
+test("playback during sync uses the acknowledged version and saves the newer progress", async () => {
+  let completeFirst!: (value: any) => void;
+  const first = new Promise(resolve => { completeFirst = resolve; });
+  const v1 = "2026-10-27T13:00:00Z", v2 = "2026-10-27T13:01:00Z";
+  (lmsApi.sync as jest.Mock).mockReset().mockReturnValueOnce(first).mockImplementation(async (rows) =>
+    rows.map((row: any) => ({ enrollmentId: 2, lessonId: 3, conflict: row.baseVersion !== v1,
+      progress: { ...row, watchedSeconds: row.baseVersion === v1 ? 100 : 90, updatedAt: v2 } })),
+  );
+  const view = render(<LmsProvider><Probe /></LmsProvider>);
+  await waitFor(() => expect(view.getByText("Offline - progress stays on this device")).toBeTruthy());
+  await enqueueProgress("1", update);
+  await act(async () => { mockNetwork({ isConnected: true }); });
+  await waitFor(() => expect(lmsApi.sync).toHaveBeenCalledTimes(1));
+  await enqueueProgress("1", { ...update, watchedSeconds: 100, updatedAt: "2026-10-27T12:01:00Z" });
+  await act(async () => { completeFirst([{ enrollmentId: 2, lessonId: 3, conflict: false,
+    progress: { ...update, updatedAt: v1 } }]); });
+  await waitFor(() => expect(lmsApi.sync).toHaveBeenCalledTimes(2));
+  expect((lmsApi.sync as jest.Mock).mock.calls[1][0][0].baseVersion).toBe(v1);
+  await waitFor(() => expect(view.getByText("100")).toBeTruthy());
+  expect(await loadQueue("1")).toEqual([]);
+  expect(view.getByText("Up to date")).toBeTruthy();
+});
+
+test("a genuine server conflict keeps server progress even when more playback was queued", async () => {
+  let completeFirst!: (value: any) => void;
+  (lmsApi.sync as jest.Mock).mockReset().mockReturnValueOnce(new Promise(resolve => { completeFirst = resolve; }));
+  const view = render(<LmsProvider><Probe /></LmsProvider>);
+  await waitFor(() => expect(view.getByText("Offline - progress stays on this device")).toBeTruthy());
+  await enqueueProgress("1", update);
+  await act(async () => { mockNetwork({ isConnected: true }); });
+  await waitFor(() => expect(lmsApi.sync).toHaveBeenCalledTimes(1));
+  await enqueueProgress("1", { ...update, watchedSeconds: 100, updatedAt: "2026-10-27T12:01:00Z" });
+  await act(async () => { completeFirst([{ enrollmentId: 2, lessonId: 3, conflict: true,
+    progress: { ...update, watchedSeconds: 20, updatedAt: "2026-10-27T13:00:00Z" } }]); });
+  await waitFor(() => expect(view.getByText("Synced; newer server progress kept.")).toBeTruthy());
+  expect(view.getByText("20")).toBeTruthy();
+  expect(await loadQueue("1")).toEqual([]);
+  expect(lmsApi.sync).toHaveBeenCalledTimes(1);
+});

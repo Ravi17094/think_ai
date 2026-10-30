@@ -29,7 +29,8 @@ export function useAssessment(
     submitted = useRef(false),
     busy = useRef(false),
     active = useRef(true),
-    expirySubmitted = useRef(false);
+    expirySubmitted = useRef(false),
+    submissionFailed = useRef(false);
   const cacheKey = storageKey(userId, `attempt:${assessmentId}`);
   const initialize = useCallback(
     async (resume?: Draft | null) => {
@@ -37,6 +38,7 @@ export function useAssessment(
       setError(null);
       submitted.current = false;
       expirySubmitted.current = false;
+      submissionFailed.current = false;
       try {
         let value: Attempt;
         try {
@@ -138,6 +140,7 @@ export function useAssessment(
   const submit = useCallback(async () => {
     if (!attempt || busy.current || submitted.current) return;
     busy.current = true;
+    submissionFailed.current = false;
     setSubmitting(true);
     setError(null);
     try {
@@ -154,6 +157,7 @@ export function useAssessment(
       snapshot.current = null;
       onSubmitted(result.attemptId);
     } catch (e) {
+      submissionFailed.current = true;
       if (active.current)
         setError(
           e instanceof Error
@@ -215,6 +219,13 @@ export function useAssessment(
     savedAt,
     submit,
     persist,
+    retry: async () => {
+      if (submissionFailed.current) await submit();
+      else if (attempt) {
+        setError(null);
+        await persist();
+      } else await initialize(pendingDraft);
+    },
     initialize,
     discard,
     resume: () => initialize(pendingDraft),

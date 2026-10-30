@@ -45,7 +45,7 @@ export function useProgressSync(session: SessionState, online: boolean, role: st
             result.map((r) => [`${r.enrollmentId}:${r.lessonId}`, r.progress]),
           ),
         }));
-        await acknowledgeProgress(userId, sent);
+        await acknowledgeProgress(userId, sent, result);
         queue = await loadQueue(userId);
       }
       if (getSession().userId === userId)
