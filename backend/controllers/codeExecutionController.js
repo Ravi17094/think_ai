@@ -1,15 +1,30 @@
 const codeExecutionService =
     require("../services/codeExecutionService");
 
+const assessmentService =
+    require("../services/assessmentService");
 
-// ============================================================
-// RUN CODE
-// ============================================================
 
-const executeCode = async (
-    req,
-    res
-) => {
+/*
+ * Execute source code using Judge0
+ *
+ * Flow:
+ *
+ * Client
+ *   ↓
+ * LMS
+ *   ↓
+ * Judge0
+ *   ↓
+ * Judge0 token
+ *   ↓
+ * Save token in DB
+ *   ↓
+ * Judge0 executes asynchronously
+ *   ↓
+ * Judge0 callback
+ */
+const executeCode = async (req, res) => {
 
     try {
 
@@ -17,24 +32,20 @@ const executeCode = async (
             language,
             code,
             stdin,
-            submissionId,
-            questionId,
-            testCaseId
+            submissionId
         } = req.body;
 
 
+        /*
+         * Validate submission ID
+         */
         const parsedSubmissionId =
             Number(submissionId);
 
-        const parsedQuestionId =
-            Number(questionId);
-
-        const parsedTestCaseId =
-            Number(testCaseId);
-
-
         if (
-            !Number.isInteger(parsedSubmissionId) ||
+            !Number.isInteger(
+                parsedSubmissionId
+            ) ||
             parsedSubmissionId <= 0
         ) {
 
@@ -46,32 +57,9 @@ const executeCode = async (
         }
 
 
-        if (
-            !Number.isInteger(parsedQuestionId) ||
-            parsedQuestionId <= 0
-        ) {
-
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Question ID must be a positive integer"
-            });
-        }
-
-
-        if (
-            !Number.isInteger(parsedTestCaseId) ||
-            parsedTestCaseId <= 0
-        ) {
-
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Test Case ID must be a positive integer"
-            });
-        }
-
-
+        /*
+         * Validate language
+         */
         if (
             typeof language !== "string" ||
             !language.trim()
@@ -85,6 +73,9 @@ const executeCode = async (
         }
 
 
+        /*
+         * Validate source code
+         */
         if (
             typeof code !== "string" ||
             !code.trim()
@@ -98,68 +89,82 @@ const executeCode = async (
         }
 
 
-        if (
-            stdin !== undefined &&
-            stdin !== null &&
-            typeof stdin !== "string"
-        ) {
-
-            return res.status(400).json({
-                success: false,
-                message:
-                    "stdin must be a string"
-            });
-        }
-
-
+        /*
+         * Judge0 callback URL
+         *
+         * This must be reachable from the
+         * Judge0 Docker container.
+         */
         const callbackUrl =
             process.env.JUDGE0_CALLBACK_URL ||
             null;
 
 
         /*
-         * Execute and WAIT for Judge0.
+         * Send code to Judge0
          */
         const result =
-            await codeExecutionService
-                .executeCode({
+            await codeExecutionService.executeCode({
 
-                    language,
+                language,
 
-                    code,
+                code,
 
-                    stdin:
-                        stdin || "",
+                stdin:
+                    stdin || "",
 
-                    callbackUrl
-                });
+                callbackUrl
+            });
 
 
         /*
-         * Run Code response.
-         *
-         * No IN_QUEUE response.
+         * Get Judge0 token
          */
-        return res.status(200).json({
+        const judge0Token =
+            result.data?.token;
+
+
+        if (!judge0Token) {
+
+            return res.status(502).json({
+                success: false,
+                message:
+                    "Judge0 did not return a submission token"
+            });
+        }
+
+
+        /*
+         * Save Judge0 token in
+         * AssessmentSubmission.
+         */
+        const submission =
+            await assessmentService
+                .saveJudge0Token(
+                    parsedSubmissionId,
+                    judge0Token
+                );
+
+
+        /*
+         * Judge0 is processing asynchronously.
+         *
+         * The final result will come through
+         * /api/code/callback.
+         */
+        return res.status(202).json({
 
             success: true,
 
             message:
-                "Code execution completed",
+                "Code submitted successfully. Judge0 is processing the submission.",
 
             data: {
 
                 submissionId:
-                    parsedSubmissionId,
+                    submission.id,
 
-                questionId:
-                    parsedQuestionId,
-
-                testCaseId:
-                    parsedTestCaseId,
-
-                judge0Token:
-                    result.data.token,
+                judge0Token,
 
                 status:
                     result.data.status,
@@ -181,7 +186,6 @@ const executeCode = async (
             }
         });
 
-
     } catch (error) {
 
         console.error(
@@ -195,19 +199,77 @@ const executeCode = async (
             "Code execution failed";
 
 
+        /*
+         * Judge0 not configured
+         */
         if (
             message.includes(
-                "must be a positive integer"
-            ) ||
+                "JUDGE0_URL is not configured"
+            )
+        ) {
+
+            return res.status(503).json({
+                success: false,
+                message
+            });
+        }
+
+
+        /*
+         * Judge0 callback configuration
+         */
+        if (
+            message.includes(
+                "callbackUrl must be a valid"
+            )
+        ) {
+
+            return res.status(400).json({
+                success: false,
+                message
+            });
+        }
+
+
+        /*
+         * Programming language
+         */
+        if (
             message.includes(
                 "Programming language is required"
             ) ||
             message.includes(
                 "Unsupported language"
-            ) ||
+            )
+        ) {
+
+            return res.status(400).json({
+                success: false,
+                message
+            });
+        }
+
+
+        /*
+         * Source code
+         */
+        if (
             message.includes(
                 "Source code is required"
-            ) ||
+            )
+        ) {
+
+            return res.status(400).json({
+                success: false,
+                message
+            });
+        }
+
+
+        /*
+         * stdin
+         */
+        if (
             message.includes(
                 "stdin must be a string"
             )
@@ -220,22 +282,38 @@ const executeCode = async (
         }
 
 
+        /*
+         * Submission does not exist
+         */
         if (
             message.includes(
-                "JUDGE0_URL is not configured"
+                "Record to update not found"
+            ) ||
+            message.includes(
+                "Submission not found"
             )
         ) {
 
-            return res.status(503).json({
+            return res.status(404).json({
                 success: false,
-                message
+                message:
+                    "Assessment submission not found"
             });
         }
 
 
+        /*
+         * Judge0 connection problem
+         */
         if (
             message.includes(
-                "Judge0"
+                "Unable to connect to Judge0"
+            ) ||
+            message.includes(
+                "Judge0 submission failed"
+            ) ||
+            message.includes(
+                "Judge0 request timed out"
             )
         ) {
 
@@ -246,10 +324,11 @@ const executeCode = async (
         }
 
 
+        /*
+         * Unknown error
+         */
         return res.status(500).json({
-
             success: false,
-
             message:
                 "Code execution service failed"
         });
@@ -257,230 +336,14 @@ const executeCode = async (
 };
 
 
-// ============================================================
-// SUBMIT CODE
-// ============================================================
-
-const submitCode = async (
-    req,
-    res
-) => {
-
-    try {
-
-        const {
-            submissionId,
-            questionId,
-            language,
-            code
-        } = req.body;
-
-
-        const parsedSubmissionId =
-            Number(submissionId);
-
-        const parsedQuestionId =
-            Number(questionId);
-
-
-        /*
-         * DEBUG:
-         * Verify that frontend sends the actual
-         * AssessmentSubmission ID.
-         */
-        console.log(
-            "DEBUG submitCode controller:",
-            {
-                receivedSubmissionId:
-                    submissionId,
-
-                parsedSubmissionId:
-                    parsedSubmissionId,
-
-                questionId:
-                    parsedQuestionId,
-
-                language
-            }
-        );
-
-
-        if (
-            !Number.isInteger(
-                parsedSubmissionId
-            ) ||
-            parsedSubmissionId <= 0
-        ) {
-
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Submission ID must be a positive integer"
-            });
-        }
-
-
-        if (
-            !Number.isInteger(
-                parsedQuestionId
-            ) ||
-            parsedQuestionId <= 0
-        ) {
-
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Question ID must be a positive integer"
-            });
-        }
-
-
-        if (
-            typeof language !== "string" ||
-            !language.trim()
-        ) {
-
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Programming language is required"
-            });
-        }
-
-
-        if (
-            typeof code !== "string" ||
-            !code.trim()
-        ) {
-
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Source code is required"
-            });
-        }
-
-
-        const callbackUrl =
-            process.env.JUDGE0_CALLBACK_URL ||
-            null;
-
-
-        /*
-         * This waits for ALL test cases.
-         */
-        const result =
-            await codeExecutionService
-                .submitCode({
-
-                    submissionId:
-                        parsedSubmissionId,
-
-                    questionId:
-                        parsedQuestionId,
-
-                    language,
-
-                    code,
-
-                    callbackUrl
-                });
-
-
-        /*
-         * GFG-style final response.
-         */
-        return res.status(200).json({
-
-            success: true,
-
-            message:
-                "Code submitted and evaluated successfully",
-
-            data:
-                result.data
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            "Code submission error:",
-            error
-        );
-
-
-        const message =
-            error?.message ||
-            "Code submission failed";
-
-
-        if (
-            message.includes(
-                "must be a positive integer"
-            ) ||
-            message.includes(
-                "Programming language is required"
-            ) ||
-            message.includes(
-                "Unsupported language"
-            ) ||
-            message.includes(
-                "Source code is required"
-            ) ||
-            message.includes(
-                "No coding test cases found"
-            )
-        ) {
-
-            return res.status(400).json({
-                success: false,
-                message
-            });
-        }
-
-
-        if (
-            message.includes(
-                "JUDGE0_URL is not configured"
-            )
-        ) {
-
-            return res.status(503).json({
-                success: false,
-                message
-            });
-        }
-
-
-        if (
-            message.includes(
-                "Judge0"
-            )
-        ) {
-
-            return res.status(502).json({
-                success: false,
-                message
-            });
-        }
-
-
-        return res.status(500).json({
-
-            success: false,
-
-            message:
-                "Code submission service failed"
-        });
-    }
-};
-
-
-// ============================================================
-// JUDGE0 CALLBACK
-// ============================================================
-
+/*
+ * ====================================================
+ * JUDGE0 CALLBACK
+ * ====================================================
+ *
+ * Judge0 calls this endpoint automatically
+ * after execution finishes.
+ */
 const gradingCallback = async (
     req,
     res
@@ -492,21 +355,25 @@ const gradingCallback = async (
             req.body;
 
 
+        /*
+         * Validate callback body
+         */
         if (
             !result ||
             typeof result !== "object"
         ) {
 
             return res.status(400).json({
-
                 success: false,
-
                 message:
                     "Invalid Judge0 callback data"
             });
         }
 
 
+        /*
+         * Get Judge0 token
+         */
         const token =
             result.token;
 
@@ -517,9 +384,7 @@ const gradingCallback = async (
         ) {
 
             return res.status(400).json({
-
                 success: false,
-
                 message:
                     "Judge0 token is required"
             });
@@ -527,47 +392,237 @@ const gradingCallback = async (
 
 
         /*
-         * Callback remains available for Judge0.
-         *
-         * Students do NOT call this endpoint.
-         *
-         * The main Run/Submit flow already waits
-         * for Judge0 and grades internally.
+         * Find assessment submission
+         * using Judge0 token.
          */
+        const submission =
+            await assessmentService
+                .getSubmissionByJudge0Token(
+                    token
+                );
+
+
+        if (!submission) {
+
+            console.warn(
+                `Assessment submission not found for Judge0 token: ${token}`
+            );
+
+            return res.status(404).json({
+                success: false,
+                message:
+                    "Assessment submission not found"
+            });
+        }
+
+
+        /*
+         * Get Judge0 status
+         */
+        const judge0Status =
+            result.status?.description ||
+            "UNKNOWN";
+
+
+        /*
+         * Judge0 status IDs:
+         *
+         * 1  In Queue
+         * 2  Processing
+         * 3  Accepted
+         * 4  Wrong Answer
+         * 5  Time Limit Exceeded
+         * 6  Compilation Error
+         * 7  Runtime Error
+         * etc.
+         *
+         * Only final statuses should update
+         * the submission as completed/failed.
+         */
+        const statusId =
+            Number(
+                result.status?.id
+            );
+
+
+        /*
+         * Still processing
+         */
+        if (
+            statusId === 1 ||
+            statusId === 2
+        ) {
+
+            return res.status(202).json({
+
+                success: true,
+
+                message:
+                    "Judge0 submission is still being processed",
+
+                data: {
+                    judge0Token: token,
+                    judge0Status
+                }
+            });
+        }
+
+
+        /*
+         * Determine LMS submission status.
+         */
+        let submissionStatus;
+
+
+        if (
+            statusId === 3 ||
+            judge0Status === "Accepted"
+        ) {
+
+            submissionStatus =
+                "COMPLETED";
+
+        } else {
+
+            /*
+             * Any final Judge0 failure:
+             *
+             * Wrong Answer
+             * Compilation Error
+             * Runtime Error
+             * Time Limit Exceeded
+             * Memory Limit Exceeded
+             * etc.
+             */
+            submissionStatus =
+                "FAILED";
+        }
+
+
+        /*
+         * IMPORTANT:
+         *
+         * Pass the complete Judge0 result
+         * to the assessment service.
+         */
+        const updatedSubmission =
+            await assessmentService
+                .updateAssessmentSubmissionStatus(
+
+                    submission.id,
+
+                    {
+
+                        status:
+                            submissionStatus,
+
+                        judge0Status,
+
+                        stdout:
+                            result.stdout ??
+                            null,
+
+                        stderr:
+                            result.stderr ??
+                            null,
+
+                        compileOutput:
+                            result.compile_output ??
+                            null,
+
+                        time:
+                            result.time ??
+                            null,
+
+                        memory:
+                            result.memory ??
+                            null
+                    }
+                );
+
+
         console.log(
-            "DEBUG Judge0 callback received:",
-            {
-                token,
-                status:
-                    result.status?.description ||
-                    "UNKNOWN"
-            }
+            "===================================="
+        );
+
+        console.log(
+            "Judge0 grading completed"
+        );
+
+        console.log(
+            "Submission ID:",
+            submission.id
+        );
+
+        console.log(
+            "Judge0 token:",
+            token
+        );
+
+        console.log(
+            "Judge0 status:",
+            judge0Status
+        );
+
+        console.log(
+            "LMS status:",
+            submissionStatus
+        );
+
+        console.log(
+            "===================================="
         );
 
 
+        /*
+         * Return callback response
+         */
         return res.status(200).json({
 
             success: true,
 
             message:
-                "Judge0 callback received",
+                "Grading result processed successfully",
 
             data: {
+
+                submissionId:
+                    updatedSubmission.id,
 
                 judge0Token:
                     token,
 
-                judge0Status:
-                    result.status?.description ||
-                    "UNKNOWN"
+                status:
+                    submissionStatus,
+
+                judge0Status,
+
+                stdout:
+                    result.stdout ??
+                    null,
+
+                stderr:
+                    result.stderr ??
+                    null,
+
+                compileOutput:
+                    result.compile_output ??
+                    null,
+
+                time:
+                    result.time ??
+                    null,
+
+                memory:
+                    result.memory ??
+                    null
             }
         });
-
 
     } catch (error) {
 
         console.error(
-            "Judge0 callback error:",
+            "Judge0 grading callback error:",
             error
         );
 
@@ -577,50 +632,13 @@ const gradingCallback = async (
             success: false,
 
             message:
-                "Failed to process Judge0 callback"
+                "Failed to process grading result"
         });
     }
 };
 
-const practiceRun = async (req, res) => {
-  try {
-    const { language, code, stdin } = req.body;
 
-    if (typeof language !== "string" || !language.trim()) {
-      return res.status(400).json({ success: false, message: "Programming language is required" });
-    }
-    if (typeof code !== "string" || !code.trim()) {
-      return res.status(400).json({ success: false, message: "Source code is required" });
-    }
-    if (stdin !== undefined && stdin !== null && typeof stdin !== "string") {
-      return res.status(400).json({ success: false, message: "stdin must be a string" });
-    }
-
-    // No submissionId, no callbackUrl — nothing is persisted.
-    const result = await codeExecutionService.executeCode({
-      language,
-      code,
-      stdin: stdin || "",
-    });
-
-    return res.status(200).json({ success: true, message: "Code execution completed", data: result.data });
-
-  } catch (error) {
-    console.error("Practice run error:", error);
-    const message = error?.message || "Code execution failed";
-
-    if (message.includes("Programming language is required") || message.includes("Unsupported language") ||
-        message.includes("Source code is required") || message.includes("stdin must be a string")) {
-      return res.status(400).json({ success: false, message });
-    }
-    if (message.includes("JUDGE0_URL is not configured")) {
-      return res.status(503).json({ success: false, message });
-    }
-    if (message.includes("Judge0")) {
-      return res.status(502).json({ success: false, message });
-    }
-    return res.status(500).json({ success: false, message: "Code execution service failed" });
-  }
+module.exports = {
+    executeCode,
+    gradingCallback
 };
-
-module.exports = { executeCode, submitCode, gradingCallback, practiceRun };

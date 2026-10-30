@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Video, type AVPlaybackStatus } from "expo-av";
 import { lmsApi, LmsApiError } from "@/lms/api";
 import { downloadLesson, localVideo } from "@/lms/downloads";
 import { useLms } from "@/lms/LmsProvider";
@@ -39,6 +40,7 @@ export function useCoursePlayer(courseId: number, requestedLessonId?: number) {
   const [uri, setUri] = useState<string | null>(null),
     [message, setMessage] = useState(""),
     [download, setDownload] = useState<number | null>(null);
+  const video = useRef<Video>(null);
   const lastSaved = useRef(0);
   const position = useRef(0);
   const restoredPosition = useRef(0);
@@ -129,27 +131,40 @@ export function useCoursePlayer(courseId: number, requestedLessonId?: number) {
     },
     [lesson?.id, resource.data, session.userId, versions],
   );
+  const saveOnLeave = useRef(saveProgress);
   useEffect(() => {
+    saveOnLeave.current = saveProgress;
+  }, [saveProgress]);
+  useEffect(() => {
+    if (!lesson || !resource.data) return;
     const sub = AppState.addEventListener("change", (s) => {
       if (s !== "active" && position.current > 0)
-        void saveProgress(position.current).catch(() => undefined);
+        void saveOnLeave.current(position.current).catch(() => undefined);
     });
     return () => {
       sub.remove();
       if (position.current > 0)
-        void saveProgress(position.current).catch(() => undefined);
+        void saveOnLeave.current(position.current).catch(() => undefined);
     };
-  }, [saveProgress]);
-  function playback(seconds: number, didFinish = false) {
-    position.current = seconds;
+  }, [lesson?.id, resource.data?.enrollmentId, session.userId]);
+  function playback(status: AVPlaybackStatus) {
+    if (!status.isLoaded) {
+      if (status.error) setMessage(status.error);
+      return;
+    }
+    position.current = status.positionMillis / 1000;
     if (
-      didFinish ||
+      status.didJustFinish ||
       Math.abs(position.current - lastSaved.current) >= 15 ||
-      position.current > 0
+      (!status.isPlaying &&
+        position.current > 0 &&
+        position.current !== lastSaved.current)
     ) {
       lastSaved.current = position.current;
       void saveProgress(
-        didFinish && lesson ? lesson.durationSeconds : position.current,
+        status.didJustFinish && lesson
+          ? lesson.durationSeconds
+          : position.current,
       )
         .then(() => {
           if (online) void sync();
@@ -178,6 +193,6 @@ export function useCoursePlayer(courseId: number, requestedLessonId?: number) {
       (hasCompletedLesson(l, localWatched[l.id] ?? 0) &&
         l.durationSeconds > 0),
   ).length;
-  return { resource, lesson, lessons, uri, message, download,
+  return { resource, lesson, lessons, uri, message, download, video,
     initialPosition, completed, online, playback, downloadCurrent, setSelected };
 }

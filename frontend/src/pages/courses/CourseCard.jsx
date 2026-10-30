@@ -66,7 +66,7 @@ export default function CourseCard({ course, isAdmin, onEdit, onDelete, onView }
             {/* Duration Badge */}
             {course.duration && (
               <span className="absolute bottom-2 left-3 z-10 text-[10px] text-slate-700 font-medium bg-white/90 px-2.5 py-1 rounded-md backdrop-blur-sm border border-slate-200 shadow-sm">
-                <i className="fa-regular fa-clock mr-1 text-purple-600"></i>{course.duration} days
+                <i className="fa-regular fa-clock mr-1 text-purple-600"></i>{course.duration}
               </span>
             )}
 

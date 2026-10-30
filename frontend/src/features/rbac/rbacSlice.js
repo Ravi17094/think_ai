@@ -18,7 +18,7 @@ export const fetchMatrix = createAsyncThunk(
     try {
       return await fetchRoleMatrix();
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to load RBAC matrix');
+      return rejectWithValue(err.message || 'Failed to load RBAC matrix');
     }
   }
 );
@@ -27,9 +27,12 @@ export const toggleRolePermission = createAsyncThunk(
   'rbac/togglePermission',
   async ({ role, permission, granted }, { rejectWithValue }) => {
     try {
+      // Audit logging happens server-side inside the toggle endpoint itself —
+      // no separate POST /api/audit-logs call from the frontend (confirmed:
+      // that route only exposes GET).
       return await togglePermission(role, permission, granted);
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to toggle permission');
+      return rejectWithValue(err.message || 'Failed to toggle permission');
     }
   }
 );

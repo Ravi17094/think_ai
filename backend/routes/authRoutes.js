@@ -88,8 +88,6 @@ router.post('/login', login);
  *       401:
  *         description: Unauthorized / Invalid token
  */
-router.post('/register', register);
-router.post('/login', login);
 router.get('/me', requireRole(['Admin', 'Instructor', 'TA', 'Learner']), getCurrentUser);
 
 module.exports = router;

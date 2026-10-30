@@ -4,7 +4,6 @@ const router = express.Router();
 
 const {
     executeCode,
-    submitCode,
     gradingCallback
 } = require("../controllers/codeExecutionController");
 
@@ -32,87 +31,56 @@ router.post("/practice-run", ...learnerOnly, practiceRun);
  * @swagger
  * tags:
  *   name: Code Execution
- *   description: GeeksforGeeks-style Coding APIs
+ *   description: Judge0 Code Execution Proxy APIs
  */
 
 
 /**
  * @swagger
- * /api/code/run:
+ * /api/code/execute:
  *   post:
- *     summary: Run code against a test case
- *     description: |
- *       Runs student code against one selected test case.
- *       This is the Run Code functionality.
- *
- *       Running code does not calculate assessment marks.
- *
+ *     summary: Execute source code using Judge0
  *     tags: [Code Execution]
- *
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *
  *             required:
  *               - language
  *               - code
  *               - submissionId
- *               - questionId
- *               - testCaseId
- *
  *             properties:
- *
  *               language:
  *                 type: string
- *                 example: python
+ *                 example: javascript
  *                 description: Programming language
- *
  *               code:
  *                 type: string
- *                 example: |
- *                   n = int(input())
- *                   arr = list(map(int, input().split()))
- *                   print(max(arr))
- *
+ *                 example: console.log("Hello World");
+ *                 description: Source code to execute
  *               stdin:
  *                 type: string
- *                 example: |
- *                   5
- *                   10 20 5 40 30
- *
+ *                 example: ""
+ *                 description: Standard input for the program
  *               submissionId:
  *                 type: integer
- *                 example: 6
- *
- *               questionId:
- *                 type: integer
- *                 example: 23
- *
- *               testCaseId:
- *                 type: integer
  *                 example: 1
+ *                 description: Assessment submission ID
  *
  *     responses:
- *
- *       202:
- *         description: Code submitted to Judge0
- *
+ *       201:
+ *         description: Code submission created successfully
  *       400:
  *         description: Invalid code execution request
- *
- *       404:
- *         description: Submission, question, or test case not found
- *
  *       502:
  *         description: Judge0 execution service failed
- *
  *       503:
  *         description: Judge0 is not configured
  */
 router.post(
+    "/execute",
     "/run",
     ...learnerOnly,
     requireOwnedCodeAttempt({ publicTestCase: true }),
@@ -215,86 +183,49 @@ router.post(
  * /api/code/callback:
  *   put:
  *     summary: Receive Judge0 grading callback
- *     description: |
- *       Internal callback endpoint used by Judge0.
- *
- *       Judge0 sends the final execution result here.
- *
- *       The backend:
- *
- *       - Finds the coding test case execution
- *       - Updates execution status
- *       - Compares output
- *       - Calculates pass/fail
- *       - Calculates marks
- *       - Recalculates the assessment score
- *
- *       Students should never call this endpoint directly.
- *
  *     tags: [Code Execution]
- *
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *
- *             required:
- *               - token
- *
  *             properties:
- *
  *               token:
  *                 type: string
  *                 example: "8a5f5d9b-edff-48c1-8172-c4c315b3d28e"
- *
  *               status:
  *                 type: object
  *                 properties:
- *
  *                   id:
  *                     type: integer
  *                     example: 3
- *
  *                   description:
  *                     type: string
  *                     example: Accepted
- *
  *               stdout:
  *                 type: string
- *                 example: "40"
- *
+ *                 example: "Hello World"
  *               stderr:
  *                 type: string
  *                 nullable: true
- *
  *               compile_output:
  *                 type: string
  *                 nullable: true
- *
  *               time:
  *                 type: string
  *                 example: "0.015"
- *
  *               memory:
  *                 type: integer
  *                 example: 10240
  *
  *     responses:
- *
  *       200:
  *         description: Grading result processed successfully
- *
- *       202:
- *         description: Judge0 execution is still processing
- *
  *       400:
  *         description: Judge0 token is missing
- *
  *       404:
- *         description: Coding test case execution not found
- *
+ *         description: Assessment submission not found
  *       500:
  *         description: Failed to process grading result
  */
@@ -309,32 +240,21 @@ router.put(
  * @swagger
  * /api/code/submissions/{submissionId}:
  *   get:
- *     summary: Get coding submission result
- *     description: |
- *       Returns the coding submission result.
- *
- *       Includes:
- *
- *       - Score
- *       - Percentage
- *       - Submission status
- *       - Coding execution results
- *
+ *     summary: Get code execution result
+ *     description: Returns the Judge0 execution result and assessment submission status.
  *     tags: [Code Execution]
- *
  *     parameters:
- *
  *       - in: path
  *         name: submissionId
  *         required: true
  *         schema:
  *           type: integer
- *           example: 6
+ *           example: 1
+ *         description: Assessment submission ID
  *
  *     responses:
- *
  *       200:
- *         description: Coding submission result retrieved successfully
+ *         description: Code execution result retrieved successfully
  *
  *       400:
  *         description: Invalid submission ID
@@ -343,7 +263,7 @@ router.put(
  *         description: Assessment submission not found
  *
  *       500:
- *         description: Failed to get submission result
+ *         description: Failed to get assessment submission result
  */
 router.get(
     "/submissions/:submissionId",

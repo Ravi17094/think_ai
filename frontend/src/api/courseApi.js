@@ -3,7 +3,7 @@ import api from "./axios";
 export const getCourses = (
   search = "",
   page = 1,
-  limit = 6
+  limit = 5
 ) =>
   api.get(
     `/courses?search=${search}&page=${page}&limit=${limit}`

@@ -4,28 +4,9 @@ const router = express.Router();
 
 const {
     createAssessment,
-    getAllAssessments,
-    updateAssessment,
-    deleteAssessment,
     getAssessmentById,
     submitAssessment,
-    startAssessment,
-    getAssessmentAnalytics,
-    getAssessmentSubmissions,
-    getEnrollmentAssessmentStatus,
-
-    // Admin coding questions
-    createCodingQuestion,
-    getCodingQuestions,
-    getCodingQuestionById,
-    updateCodingQuestion,
-    deleteCodingQuestion,
-
-    // Admin coding test cases
-    createCodingTestCase,
-    getCodingTestCases,
-    updateCodingTestCase,
-    deleteCodingTestCase
+    getAssessmentAnalytics
 } = require("../controllers/assessmentController");
 
 const {
@@ -44,9 +25,9 @@ const {
 const adminOnly = [authenticateToken, authorizeRoles("Admin")];
 const learnerOnly = [authenticateToken, authorizeRoles("Learner")];
 
-// ============================================================
-// SWAGGER
-// ============================================================
+// ----------------------------------------------------
+// Swagger
+// ----------------------------------------------------
 
 /**
  * @swagger
@@ -55,16 +36,6 @@ const learnerOnly = [authenticateToken, authorizeRoles("Learner")];
  *   description: Assessment Engine APIs
  */
 
-/**
- * @swagger
- * tags:
- *   name: Admin Coding Questions
- *   description: Admin APIs for GeeksforGeeks-style coding questions
- */
-
-// ============================================================
-// CREATE ASSESSMENT
-// ============================================================
 
 /**
  * @swagger
@@ -80,7 +51,6 @@ const learnerOnly = [authenticateToken, authorizeRoles("Learner")];
  *             type: object
  *             required:
  *               - title
- *               - type
  *               - totalMarks
  *               - moduleId
  *               - questions
@@ -91,13 +61,6 @@ const learnerOnly = [authenticateToken, authorizeRoles("Learner")];
  *               description:
  *                 type: string
  *                 example: Basic Java assessment
- *               type:
- *                 type: string
- *                 enum:
- *                   - MCQ
- *                   - CODING
- *                 example: MCQ
- *                 description: Type of assessment
  *               totalMarks:
  *                 type: integer
  *                 example: 10
@@ -106,6 +69,9 @@ const learnerOnly = [authenticateToken, authorizeRoles("Learner")];
  *                 example: 30
  *               status:
  *                 type: string
+ *                 enum:
+ *                   - ACTIVE
+ *                   - INACTIVE
  *                 example: ACTIVE
  *               moduleId:
  *                 type: integer
@@ -114,6 +80,10 @@ const learnerOnly = [authenticateToken, authorizeRoles("Learner")];
  *                 type: array
  *                 items:
  *                   type: object
+ *                   required:
+ *                     - questionText
+ *                     - marks
+ *                     - options
  *                   properties:
  *                     questionText:
  *                       type: string
@@ -149,7 +119,6 @@ const learnerOnly = [authenticateToken, authorizeRoles("Learner")];
  *       500:
  *         description: Internal server error
  */
-
 router.post(
     "/",
     ...adminOnly,
@@ -274,7 +243,6 @@ router.post("/evaluate-coding", ...adminOnly, async (req, res) => {
  *       500:
  *         description: Internal server error
  */
-
 router.get(
     "/:id/analytics",
     ...adminOnly,    validateAssessmentId,
@@ -402,7 +370,6 @@ router.get(
  *       500:
  *         description: Internal server error
  */
-
 router.get(
     "/:id",
     ...adminOnly,
@@ -410,19 +377,12 @@ router.get(
     getAssessmentById
 );
 
-// ============================================================
-// SUBMIT ASSESSMENT
-// ============================================================
-
-// ============================================================
-// SUBMIT ASSESSMENT
-// ============================================================
 
 /**
  * @swagger
  * /api/assessments/{id}/submit:
  *   post:
- *     summary: Submit assessment
+ *     summary: Submit assessment and automatically grade MCQ answers
  *     tags: [Assessments]
  *     parameters:
  *       - in: path
@@ -450,29 +410,22 @@ router.get(
  *                   type: object
  *                   required:
  *                     - questionId
+ *                     - selectedOptionId
  *                   properties:
  *                     questionId:
  *                       type: integer
  *                       example: 1
  *                     selectedOptionId:
  *                       type: integer
- *                       nullable: true
  *                       example: 2
- *                     code:
- *                       type: string
- *                       nullable: true
- *                       example: |
- *                         def solution(arr):
- *                             return max(arr)
  *     responses:
  *       201:
- *         description: Assessment submitted successfully
+ *         description: Assessment submitted and graded successfully
  *       400:
  *         description: Invalid assessment submission
  *       500:
  *         description: Internal server error
  */
-
 router.post(
     "/:id/submit",
     ...learnerOnly,

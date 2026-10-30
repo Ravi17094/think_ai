@@ -16,9 +16,9 @@ export default function Modal({ isOpen, onClose, title, children }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
       <div className="absolute inset-0" onClick={onClose} />
       
-      <div className="relative bg-[#112435] border border-gray-800 rounded-2xl w-full max-w-md shadow-2xl z-10 max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-[#112435] border border-gray-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-200">
         
-        <div className="flex justify-between items-center p-6 border-b border-gray-800/60 bg-[#0D1220]/50 shrink-0 rounded-t-2xl">
+        <div className="flex justify-between items-center p-6 border-b border-gray-800/60 bg-[#0D1220]/50">
           <h2 className="text-xl font-semibold text-white">{title}</h2>
           <button 
             onClick={onClose} 
@@ -30,7 +30,7 @@ export default function Modal({ isOpen, onClose, title, children }) {
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto">
+        <div className="p-6">
           {children}
         </div>
       </div>

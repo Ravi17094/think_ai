@@ -110,3 +110,50 @@ test("failed submit preserves recoverable draft", async () => {
   expect((await loadDraft("patan", 1))?.answers["1"]?.selectedOptionId).toBe(1);
   hook.unmount();
 });
+
+test("Retry retains answers and flags and resubmits the same attempt", async () => {
+  (lmsApi.submit as jest.Mock).mockRejectedValueOnce(new Error("Offline"));
+  const submitted = jest.fn();
+  const hook = renderHook(() => useAssessment(1, 2, submitted));
+  await waitFor(() => expect(hook.result.current.attempt).not.toBeNull());
+  act(() => {
+    hook.result.current.answer({ questionId: 1, selectedOptionId: 1 });
+    hook.result.current.toggleFlag(1);
+  });
+  await act(async () => { await hook.result.current.submit(); });
+  expect(hook.result.current.error).toBe("Offline");
+  const expiry = hook.result.current.attempt!.expiresAt;
+  await act(async () => { await hook.result.current.retry(); });
+  expect(lmsApi.start).toHaveBeenCalledTimes(1);
+  expect(lmsApi.submit).toHaveBeenLastCalledWith(1, 4, [{ questionId: 1, selectedOptionId: 1 }], [1]);
+  expect(hook.result.current.answers["1"]!.selectedOptionId).toBe(1);
+  expect(hook.result.current.flags).toEqual([1]);
+  expect(hook.result.current.attempt!.expiresAt).toBe(expiry);
+  expect(submitted).toHaveBeenCalledWith(4);
+  expect(await loadDraft("patan", 1)).toBeNull();
+  hook.unmount();
+});
+
+test("initial-load Retry starts the assessment without submitting it", async () => {
+  (lmsApi.start as jest.Mock).mockRejectedValueOnce(new Error("Server unavailable"));
+  const hook = renderHook(() => useAssessment(1, 2, jest.fn()));
+  await waitFor(() => expect(hook.result.current.error).toBe("Server unavailable"));
+  await act(async () => { await hook.result.current.retry(); });
+  expect(hook.result.current.attempt?.attemptId).toBe(4);
+  expect(lmsApi.submit).not.toHaveBeenCalled();
+  hook.unmount();
+});
+
+test("Retry after an autosave error preserves the active draft without submitting", async () => {
+  const hook = renderHook(() => useAssessment(1, 2, jest.fn()));
+  await waitFor(() => expect(hook.result.current.attempt).not.toBeNull());
+  act(() => hook.result.current.answer({ questionId: 1, selectedOptionId: 1 }));
+  (AsyncStorage.setItem as jest.Mock).mockRejectedValueOnce(new Error("Storage unavailable"));
+  await act(async () => { await hook.result.current.persist(); });
+  expect(hook.result.current.error).toContain("Draft could not be saved");
+  await act(async () => { await hook.result.current.retry(); });
+  expect(hook.result.current.error).toBeNull();
+  expect(lmsApi.submit).not.toHaveBeenCalled();
+  expect((await loadDraft("patan", 1))?.answers["1"]!.selectedOptionId).toBe(1);
+  hook.unmount();
+});

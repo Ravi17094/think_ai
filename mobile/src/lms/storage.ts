@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { Draft, HistoryEntry, ProgressUpdate } from "./types";
+import type { Draft, HistoryEntry, Progress, ProgressUpdate } from "./types";
 // All learner data is scoped to the actual authenticated account, including on shared devices.
 export const storageKey = (userId: string, kind: string) =>
   `thinkz:lms:v1:${encodeURIComponent(userId)}:${kind}`;
@@ -118,18 +118,39 @@ export const enqueueProgress = (userId: string, update: ProgressUpdate) =>
     // Preserve baseVersion of the first unsynced update; changes are compared to that server snapshot.
     return [
       ...rows.filter((r) => r !== old),
-      { ...update, baseVersion: old?.baseVersion ?? update.baseVersion },
+      { ...update, baseVersion: old ? old.baseVersion : update.baseVersion },
     ];
   });
-export const acknowledgeProgress = (userId: string, sent: ProgressUpdate[]) =>
+export const acknowledgeProgress = (
+  userId: string,
+  sent: ProgressUpdate[],
+  results?: {
+    enrollmentId: number;
+    lessonId: number;
+    conflict: boolean;
+    progress: Progress | null;
+  }[],
+) =>
   mutate(storageKey(userId, "progress"), isQueue, [], (rows) =>
-    rows.filter(
-      (row) =>
-        !sent.some(
-          (s) =>
-            s.enrollmentId === row.enrollmentId &&
-            s.lessonId === row.lessonId &&
-            s.updatedAt === row.updatedAt,
-        ),
-    ),
+    rows.flatMap((row) => {
+      const previous = sent.find(
+        (s) => s.enrollmentId === row.enrollmentId && s.lessonId === row.lessonId,
+      );
+      if (!previous) return [row];
+      const result = results?.find(
+        (r) => r.enrollmentId === row.enrollmentId && r.lessonId === row.lessonId,
+      );
+      if (results && !result) return [row];
+      // A genuine server conflict keeps the canonical server progress.
+      if (result?.conflict) return [];
+      const unchanged = previous.updatedAt === row.updatedAt &&
+        previous.watchedSeconds === row.watchedSeconds &&
+        previous.baseVersion === row.baseVersion;
+      if (unchanged) return [];
+      // Playback continued while this device's previous snapshot was in flight.
+      // Rebase that newer local update only after a successful acknowledgement.
+      return result
+        ? [{ ...row, baseVersion: result.progress?.updatedAt ?? null }]
+        : [row];
+    }),
   );

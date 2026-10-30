@@ -1,48 +1,5 @@
 const prisma = require("../config/database");
 
-const updateWatchProgress = async (enrollmentId, lessonId, watchedSeconds, totalDuration) => {
-  const watchPercentage = totalDuration > 0 ? Math.min(100, (watchedSeconds / totalDuration) * 100) : 0;
-  const isCompleted = watchPercentage >= 80;
-
-  // Find existing progress to ensure we keep the highest watch time recorded
-  const existing = await prisma.lessonProgress.findUnique({
-    where: { enrollmentId_lessonId: { enrollmentId, lessonId } }
-  });
-
-  let finalWatchedSeconds = watchedSeconds;
-  let finalPercentage = watchPercentage;
-  let completed = isCompleted || (existing ? existing.completed : false);
-
-  if (existing) {
-    if (existing.watchedSeconds > watchedSeconds) {
-      finalWatchedSeconds = existing.watchedSeconds;
-      finalPercentage = existing.watchPercentage;
-    }
-  }
-
-  return await prisma.lessonProgress.upsert({
-    where: {
-      enrollmentId_lessonId: { enrollmentId, lessonId }
-    },
-    update: {
-      watchedSeconds: finalWatchedSeconds,
-      totalDuration,
-      watchPercentage: finalPercentage,
-      completed,
-      completedAt: completed && !existing?.completed ? new Date() : existing?.completedAt
-    },
-    create: {
-      enrollmentId,
-      lessonId,
-      watchedSeconds: finalWatchedSeconds,
-      totalDuration,
-      watchPercentage: finalPercentage,
-      completed,
-      completedAt: completed ? new Date() : null
-    }
-  });
-};
-
 
 /*
  * Get all lesson progress for an enrollment
@@ -431,7 +388,5 @@ module.exports = {
 
     completeLesson,
 
-    getProgressSummary,
-
-    updateWatchProgress
+    getProgressSummary
 };

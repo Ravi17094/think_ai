@@ -38,7 +38,7 @@ export function AssessmentTakingScreen({
       <LoadState
         loading={model.loading}
         error={model.error}
-        retry={() => model.initialize(model.pendingDraft)}
+        retry={model.retry}
       />
       {model.pendingDraft ? (
         <Card>

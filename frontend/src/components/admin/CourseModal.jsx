@@ -6,6 +6,7 @@ import Button from '../common/Button';
 const EMPTY_COURSE = {
   title: '',
   description: '',
+  instructor: '',
   duration: '',
   category: '',
   level: 'Beginner',
@@ -26,8 +27,6 @@ export default function CourseModal({ isOpen, onClose, course, onSave }) {
     }
   }, [course, isOpen]);
 
-  if (!isOpen) return null;
-
   const handleChange = (e) => {
     const { name, value, type } = e.target;
     setFormData({
@@ -38,7 +37,7 @@ export default function CourseModal({ isOpen, onClose, course, onSave }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (onSave) onSave(formData);
+    onSave(formData);
   };
 
   return (
@@ -73,6 +72,17 @@ export default function CourseModal({ isOpen, onClose, course, onSave }) {
             className="w-full bg-[#0D1220] border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors"
           />
         </div>
+
+        <InputField
+          label="Instructor Name"
+          id="instructor"
+          name="instructor"
+          type="text"
+          value={formData.instructor}
+          onChange={handleChange}
+          placeholder="e.g. Priya Sharma"
+          required
+        />
 
         <div className="grid grid-cols-2 gap-4">
           <InputField
@@ -156,7 +166,7 @@ export default function CourseModal({ isOpen, onClose, course, onSave }) {
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors cursor-pointer"
+            className="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors"
           >
             Cancel
           </button>
@@ -169,3 +179,4 @@ export default function CourseModal({ isOpen, onClose, course, onSave }) {
     </Modal>
   );
 }
+

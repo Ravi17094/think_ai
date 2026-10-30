@@ -50,17 +50,6 @@ export default function UserModal({ isOpen, onClose, user, onSave }) {
           required
         />
 
-        <InputField
-          label="Password"
-          id="password"
-          name="password"
-          type="password"
-          value={formData.password || ''} // Added fallback in case an edited user object doesn't contain a password
-          onChange={handleChange}
-          placeholder="••••••••"
-          required={!user} // Only make password required if creating a NEW user
-        />
-
         <div>
           <label htmlFor="role" className="block text-sm font-medium text-gray-300 mb-1.5">
             System Role

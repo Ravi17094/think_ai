@@ -2,7 +2,7 @@ const { io } = require('socket.io-client');
 
 // Use a FIXED user id via demo-role header won't let us fix userId directly,
 // so instead we simulate by reusing the SAME socket's reconnection feature.
-const socket = io('http://localhost:5000', {
+const socket = io('http://localhost:3000', {
   extraHeaders: { 'x-demo-role': 'admin' , 'x-demo-user-id': `demo-fixed-user-1`},
   reconnection: true,
   reconnectionDelay: 1000,

@@ -34,24 +34,22 @@ export default function FeedbackHeader({
     : currentStyle.title;
 
   return (
-    <div className={`mb-2 lg:mb-2 text-${align} w-full`}>
+    <div className={`mb-6 lg:mb-8 text-${align} w-full`}>
       
       <h1 className={`${titleClassBase} text-2xl lg:text-3xl font-semibold mb-2 tracking-tight`}>
         {title}
       </h1>
 
-      {description && (
-        <p className="text-white text-xs lg:text-sm max-w-lg mx-auto leading-relaxed">
-          {description}
-        </p>
-      )}
+      <p className="text-white text-xs lg:text-sm max-w-lg mx-auto leading-relaxed">
+        {description}
+      </p>
     </div>
   );
 }
 
 FeedbackHeader.propTypes = {
   title: PropTypes.string.isRequired,
-  description: PropTypes.string,
+  description: PropTypes.string.isRequired,
   status: PropTypes.oneOf(['default', 'success', 'error', 'warning']),
   align: PropTypes.oneOf(['left', 'center', 'right']),
 };

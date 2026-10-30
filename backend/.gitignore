@@ -67,20 +67,6 @@ storybook-static/
 # OS Files
 # ================================
 .DS_Store
-Thumbs.db
-desktop.ini
-
-# ================================
-# Editor Files
-# ================================
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# ================================
-# Temporary Files
-# ================================
-*.tmp
-*.temp
-*.bak
+npm-debug.log
+.env
+node_modules/

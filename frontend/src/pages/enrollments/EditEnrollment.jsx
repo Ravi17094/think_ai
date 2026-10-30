@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { getEnrollmentById, updateEnrollment } from "../../api/enrollmentApi";
+import {
+  getEnrollmentById,
+  updateEnrollment,
+} from "../../api/enrollmentApi";
 import { getBatches } from "../../api/batchApi";
 
 function EditEnrollment() {
@@ -9,52 +12,50 @@ function EditEnrollment() {
   const navigate = useNavigate();
 
   const [batches, setBatches] = useState([]);
-  const [loadingBatches, setLoadingBatches] = useState(true);
 
   const [enrollment, setEnrollment] = useState({
     studentName: "",
     studentEmail: "",
     batchId: "",
-    enrollmentStatus: "ENROLLED",
+    enrollmentStatus: "ACTIVE",
   });
 
   useEffect(() => {
     loadBatches();
     loadEnrollment();
-  }, [id]);
+  }, []);
 
   const loadBatches = async () => {
     try {
-      setLoadingBatches(true);
       const response = await getBatches();
       setBatches(response.data.data || []);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to load batches", { theme: "dark" });
-    } finally {
-      setLoadingBatches(false);
+      toast.error("Failed to load batches");
     }
   };
 
   const loadEnrollment = async () => {
     try {
       const response = await getEnrollmentById(id);
+
       const data = response.data.data;
 
       setEnrollment({
-        studentName: data.studentName || "",
-        studentEmail: data.studentEmail || "",
-        batchId: data.batchId || data.batch?.id || "",
-        enrollmentStatus: data.enrollmentStatus || "ENROLLED",
+        studentName: data.studentName,
+        studentEmail: data.studentEmail,
+        batchId: data.batchId,
+        enrollmentStatus: data.enrollmentStatus,
       });
     } catch (error) {
       console.error(error);
-      toast.error("Failed to load enrollment", { theme: "dark" });
+      toast.error("Failed to load enrollment");
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setEnrollment({
       ...enrollment,
       [name]: name === "batchId" ? Number(value) : value,
@@ -65,46 +66,53 @@ function EditEnrollment() {
     e.preventDefault();
 
     try {
-      const payload = {
-        studentName: enrollment.studentName,
-        studentEmail: enrollment.studentEmail,
-        batchId: Number(enrollment.batchId),
-        enrollmentStatus: enrollment.enrollmentStatus,
-      };
+      await updateEnrollment(id, enrollment);
 
-      await updateEnrollment(id, payload);
-      toast.success("Enrollment Updated Successfully", { theme: "dark" });
-      navigate("/admin/enrollments");
+      toast.success("Enrollment Updated Successfully");
+
+      navigate("/enrollments");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to Update Enrollment", { theme: "dark" });
+
+      if (error.response) {
+        console.log(error.response.data);
+      }
+
+      toast.error("Failed to Update Enrollment");
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto text-gray-900 dark:text-gray-100 transition-colors duration-200">
-      <div className="flex justify-between items-center mb-7">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Edit Enrollment
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Update enrollment information.
-          </p>
-        </div>
+    <div className="bg-white shadow rounded-lg p-8">
+
+      <div className="flex justify-between items-center mb-6">
+
+        <h1 className="text-3xl font-bold">
+          Edit Enrollment
+        </h1>
+
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg"
+        >
+          ← Back
+        </button>
+
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white dark:bg-[#2b2b2b] border border-gray-200 dark:border-[#3f3f3f] rounded-2xl p-8 grid grid-cols-2 gap-6 shadow-xl"
+        className="grid grid-cols-2 gap-5"
       >
+
         <input
           type="text"
           name="studentName"
           placeholder="Student Name"
           value={enrollment.studentName}
           onChange={handleChange}
-          className="bg-gray-50 dark:bg-[#212121] border border-gray-300 dark:border-[#3f3f3f] rounded-xl p-3 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+          className="border p-3 rounded"
           required
         />
 
@@ -114,7 +122,7 @@ function EditEnrollment() {
           placeholder="Student Email"
           value={enrollment.studentEmail}
           onChange={handleChange}
-          className="bg-gray-50 dark:bg-[#212121] border border-gray-300 dark:border-[#3f3f3f] rounded-xl p-3 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+          className="border p-3 rounded"
           required
         />
 
@@ -122,15 +130,16 @@ function EditEnrollment() {
           name="batchId"
           value={enrollment.batchId}
           onChange={handleChange}
-          className="bg-gray-50 dark:bg-[#212121] border border-gray-300 dark:border-[#3f3f3f] rounded-xl p-3 text-gray-900 dark:text-white focus:outline-none focus:border-purple-500 cursor-pointer"
+          className="border p-3 rounded"
           required
-          disabled={loadingBatches}
         >
-          <option value="">
-            {loadingBatches ? "Loading batches..." : "Select Batch"}
-          </option>
+          <option value="">Select Batch</option>
+
           {batches.map((batch) => (
-            <option key={batch.id} value={batch.id}>
+            <option
+              key={batch.id}
+              value={batch.id}
+            >
               {batch.name}
             </option>
           ))}
@@ -140,22 +149,21 @@ function EditEnrollment() {
           name="enrollmentStatus"
           value={enrollment.enrollmentStatus}
           onChange={handleChange}
-          className="bg-gray-50 dark:bg-[#212121] border border-gray-300 dark:border-[#3f3f3f] rounded-xl p-3 text-gray-900 dark:text-white focus:outline-none focus:border-purple-500 cursor-pointer"
+          className="border p-3 rounded"
         >
-          <option value="ENROLLED">ENROLLED</option>
-          <option value="COMPLETED">COMPLETED</option>
-          <option value="CANCELLED">CANCELLED</option>
+          <option value="ACTIVE">ACTIVE</option>
+          <option value="INACTIVE">INACTIVE</option>
         </select>
 
-        <div className="col-span-2 flex justify-center pt-2">
-          <button
-            type="submit"
-            className="px-8 py-3.5 text-sm font-bold bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white border-0 rounded-xl transition-all shadow-md uppercase tracking-wider cursor-pointer"
-          >
-            Update Enrollment
-          </button>
-        </div>
+        <button
+          type="submit"
+          className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded col-span-2"
+        >
+          Update Enrollment
+        </button>
+
       </form>
+
     </div>
   );
 }
