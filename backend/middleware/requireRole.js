@@ -1,50 +1,16 @@
-const jwt = require('jsonwebtoken');
-const { roleSatisfies } = require("../config/roleHierarchy"); // Ensure this file exists, or handle role matching directly
-
+// TEMPORARY: role passed via header or bearer token until real login/auth system exists
 function requireRole(allowedRoles) {
   return (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    const demoRole = req.headers["x-demo-role"];
-    const demoUserId = req.headers["x-demo-user-id"];
+    let userRole = req.headers["x-user-role"];
 
-    let userRole = null;
-
-    // 1. Check for standard Bearer JWT Token
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      const token = authHeader.split(" ")[1];
-      try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
-        req.user = decoded; // Attach decoded user info (id, email, role)
-        userRole = req.user.role;
-      } catch (error) {
-        return res.status(401).json({ success: false, message: "Invalid or expired token" });
-      }
-    } 
-    // 2. Fallback to Dev/Demo Mode Headers (matching socket middleware pattern)
-    else if (demoRole) {
-      req.user = {
-        id: demoUserId || "demo-user-1",
-        role: demoRole
-      };
-      userRole = demoRole;
-    } 
-    // 3. No authentication method found
-    else {
-      return res.status(401).json({
-        success: false,
-        message: "Authentication required: No token or demo role provided"
-      });
+    if (!userRole && req.headers.authorization?.startsWith("Bearer ")) {
+      userRole = req.headers.authorization.split(" ")[1];
     }
 
-    // Check role permissions using roleHierarchy config or simple array check
-    const hasPermission = typeof roleSatisfies === 'function' 
-      ? roleSatisfies(userRole, allowedRoles) 
-      : allowedRoles.includes(userRole);
-
-    if (!hasPermission) {
+    if (!userRole || !allowedRoles.includes(userRole)) {
       return res.status(403).json({ success: false, message: "Forbidden: insufficient role" });
     }
-
+    req.user = { role: userRole };
     next();
   };
 }

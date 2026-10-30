@@ -4,7 +4,6 @@ import { toast } from 'react-toastify';
 import CourseList from './CourseList';
 import AddModal from './AddCourse';
 import { useNavigate } from 'react-router-dom';
-import { notificationReceived, showToast } from '../../features/preferenceNotification/preferenceNotificationSlice';
 import {
   fetchCourses,
   createCourse,
@@ -82,30 +81,7 @@ export default function CoursesPage() {
     const result = await dispatch(thunk);
 
     if (result.meta.requestStatus === 'fulfilled') {
-      const actionTitle = isEdit ? 'Course Updated' : 'New Course Created';
-      const actionMsg = isEdit 
-        ? `"${cleanData.title}" was successfully updated.` 
-        : `"${cleanData.title}" was successfully added to the platform.`;
-
       toast.success(isEdit ? 'Course updated successfully' : 'Course created successfully', { theme: "dark" });
-      
-      // Dispatch notification to Redux state so the notification bell lights up instantly
-      dispatch(notificationReceived({
-        id: `course_${Date.now()}`,
-        title: actionTitle,
-        message: actionMsg,
-        type: 'course',
-        read: false,
-        createdAt: new Date().toISOString(),
-      }));
-
-      // Trigger a popup toast banner as well
-      dispatch(showToast({
-        title: actionTitle,
-        message: actionMsg,
-        type: 'success'
-      }));
-
       setIsModalOpen(false);
       dispatch(fetchCourses({ page: currentPage, limit: ITEMS_PER_PAGE, search: debouncedSearch }));
     } else {
@@ -119,17 +95,6 @@ export default function CoursesPage() {
     const result = await dispatch(deleteCourse(id));
     if (result.meta.requestStatus === 'fulfilled') {
       toast.success('Course deleted', { theme: "dark" });
-      
-      // Optional deletion notification
-      dispatch(notificationReceived({
-        id: `course_del_${Date.now()}`,
-        title: 'Course Deleted',
-        message: `A course was removed from the system.`,
-        type: 'course',
-        read: false,
-        createdAt: new Date().toISOString(),
-      }));
-
       dispatch(fetchCourses({ page: currentPage, limit: ITEMS_PER_PAGE, search: debouncedSearch }));
 
       if (currentCourses.length === 1 && currentPage > 1) {
@@ -143,23 +108,25 @@ export default function CoursesPage() {
   const hasNextPage = currentCourses.length === ITEMS_PER_PAGE;
 
   return (
-    <div className="relative flex flex-col space-y-6 bg-white dark:bg-[#212121] text-gray-900 dark:text-gray-100 p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-[#3f3f3f] shadow-lg transition-colors duration-200">
-      
+    <div className="relative flex flex-col h-auto md:h-full min-h-full overflow-y-auto md:overflow-hidden px-4 sm:px-6 py-2 -mt-2 space-y-4 bg-gradient-to-br from-[#0c0914] via-[#151025] to-[#1a1438] rounded-3xl border border-purple-500/10 shadow-2xl">
+      <div className="absolute -top-24 -left-24 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+
       {/* Header */}
       <div className="relative z-10 flex flex-row items-center justify-between shrink-0">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-wide">
+        <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-200 to-fuchsia-400 tracking-wide">
           Courses
         </h1>
-        <div className="rounded-xl">
+        <div className="shadow-[0_0_20px_rgba(168,85,247,0.3)] rounded-xl">
           <button
             onClick={() => handleOpenModal()}
-            className="px-6 py-2 text-sm font-bold bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white rounded-xl transition-all shadow-md cursor-pointer"
+            className="px-6 py-2 text-sm font-bold bg-gradient-to-r from-indigo-500 to-cyan-400 hover:from-indigo-400 hover:to-cyan-300 text-white border-0 rounded-xl transition-all duration-300 shadow-lg"
           >
             + New Course
           </button>
         </div>
       </div>
 
+      {/* Extracted Course List Component */}
       <CourseList
         courses={currentCourses}
         loading={loading}
@@ -175,6 +142,7 @@ export default function CoursesPage() {
         onRetry={() => dispatch(fetchCourses({ page: currentPage, limit: ITEMS_PER_PAGE, search: debouncedSearch }))}
       />
 
+      {/* Extracted Course Details Modal (Add/Edit) */}
       <AddModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

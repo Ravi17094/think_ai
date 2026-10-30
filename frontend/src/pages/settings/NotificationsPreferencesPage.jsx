@@ -22,45 +22,17 @@ export default function NotificationPreferencesPage() {
   // Track if item has been added to cart from this page
   const [addedToCart, setAddedToCart] = useState(false);
 
-  const getRoleBasedCategories = (role) => {
-    switch (role?.toLowerCase()) {
-      case 'instructor':
-        return {
-          courseUpdates: true,
-          studentSubmissions: true,
-          batchAlerts: true,
-          systemAnnouncements: true,
-        };
-      case 'ta':
-        return {
-          studentQueries: true,
-          assignmentGrading: true,
-          batchAlerts: true,
-        };
-      case 'admin':
-        return {
-          systemAnnouncements: true,
-          userRegistrations: true,
-          endpointErrors: true,
-          paymentAlerts: true,
-        };
-      default: // Learner
-        return {
-          courseUpdates: true,
-          paymentAlerts: true,
-          forumReplies: true,
-          systemAnnouncements: true,
-          liveSessions: true,
-        };
-    }
-  };
-
-  const defaultCategories = getRoleBasedCategories(user?.role);
-
   // Fetch preferences on mount
   useEffect(() => {
     dispatch(fetchPreferences(userId));
   }, [dispatch, userId]);
+
+  const defaultCategories = {
+    courseUpdates: true,
+    paymentAlerts: true,
+    forumReplies: true,
+    systemAnnouncements: true,
+  };
 
   const currentCategories = preferences?.categories && Object.keys(preferences.categories).length > 0
     ? preferences.categories
@@ -184,7 +156,7 @@ export default function NotificationPreferencesPage() {
       <div id="preferences-panel" className="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl space-y-6">
         <div>
           <h1 className="text-xl font-bold text-white">Notification Preferences</h1>
-          <p className="text-sm text-slate-400 mt-1">Control how and when you receive alerts based on your role ({user?.role || 'Learner'}).</p>
+          <p className="text-sm text-slate-400 mt-1">Control how and when you receive alerts from Thinkz.ai.</p>
         </div>
 
         {/* Channels */}
@@ -203,7 +175,7 @@ export default function NotificationPreferencesPage() {
           ))}
         </div>
 
-        {/* Categories (Role-Based) */}
+        {/* Categories */}
         <div className="space-y-3">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-purple-400">Categories</h3>
           {Object.keys(currentCategories).map((catKey) => (

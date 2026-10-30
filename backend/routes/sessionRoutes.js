@@ -36,4 +36,7 @@ router.get("/sessions/:id/join-token", sessionController.getJoinToken);
 // Connects to your controller endpoint handling recording completion events
 router.post("/sessions/callback/recording", internalCallbackAuth("recording"), sessionController.saveRecordingCallback);
 
+// Connects to your controller endpoint handling live session broadcasting events
+router.post("/sessions/broadcast", sessionController.broadcastSessionEvent);
+
 module.exports = router;

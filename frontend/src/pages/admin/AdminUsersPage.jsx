@@ -1,59 +1,41 @@
-import { useEffect, useState, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import InputField from "../../components/common/InputField";
-import Button from "../../components/common/Button";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
-import ErrorState from "../../components/common/ErrorState";
-import ConfirmDialog from "../../components/common/ConfirmDialog";
-import { usePermission } from "../../hooks/usePermission";
-import useSessionTimeout from "../../hooks/useSessionTimeout";
-
-import AddUserModal from "../../pages/users/AddUserModal";
-import EditUserModal from "../../pages/users/EditUserModal";
-import UsersList from "../../pages/users/UsersList";
-
+import React, { useEffect, useState, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import InputField from '../../components/common/InputField';
+import Button from '../../components/common/Button';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
+import ErrorState from '../../components/common/ErrorState';
+import UserModal from '../../components/admin/UserModal';
+import { usePermission } from '../../hooks/usePermission';
 import {
   fetchUsers,
-  createUser,
-  updateUser,
-  deleteUser,
+  updateUserRole,
   selectAdminUsers,
   selectAdminUsersLoading,
   selectAdminUsersError,
-} from "../../features/adminUsers/adminUserSlice";
+} from '../../features/adminUsers/adminUserSlice';
+
+const ROLE_STYLES = {
+  Learner: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30',
+  Instructor: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+  TA: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+  Admin: 'bg-pink-500/10 text-pink-400 border-pink-500/30',
+};
 
 export default function AdminUsersPage() {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 8;
-
   const dispatch = useDispatch();
-  const rawUsers = useSelector(selectAdminUsers) ?? [];
+  const users = useSelector(selectAdminUsers) ?? [];
   const loading = useSelector(selectAdminUsersLoading);
   const error = useSelector(selectAdminUsersError);
-  useSessionTimeout();
-
-  const [confirmState, setConfirmState] = useState({ open: false, action: null, payload: null });
-
-  const canManageUsers = usePermission('manage_users') || usePermission('admin');
+  const canManageUsers = usePermission('USER_MANAGEMENT');
 
   useEffect(() => {
     dispatch(fetchUsers());
   }, [dispatch]);
-
-  const users = useMemo(() => {
-    return [...rawUsers].sort((a, b) => {
-      const idA = Number(a.id || a._id) || 0;
-      const idB = Number(b.id || b._id) || 0;
-      return idA - idB;
-    });
-  }, [rawUsers]);
 
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
@@ -65,102 +47,35 @@ export default function AdminUsersPage() {
     });
   }, [search, roleFilter, users]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search, roleFilter]);
+  const handleOpenModal = (user = null) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
+  };
 
-  const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
-  const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
-  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
-  const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
-
-  const handleActionClick = (actionType, user) => {
-    if (actionType === 'edit') {
-      setSelectedUser(user);
-      setIsEditModalOpen(true);
-    } else if (actionType === 'delete') {
-      askConfirm('delete', user);
-    } else if (actionType === 'toggleStatus') {
-      askConfirm('toggleStatus', user);
+  const handleSaveUser = async (userData) => {
+    if (userData.id) {
+      await dispatch(updateUserRole({ userId: userData.id, role: userData.role }));
     }
-  };
-
-  const handleSaveNewUser = async (userData) => {
-    const result = await dispatch(createUser(userData));
-    if (result.meta.requestStatus === 'fulfilled') {
-      toast.success('User created successfully', { theme: "dark" });
-      setIsAddModalOpen(false);
-    } else {
-      toast.error(result.payload || 'Failed to create user', { theme: "dark" });
-    }
-  };
-
-  const handleUpdateUser = async (userData) => {
-    const { id, ...data } = userData;
-    const result = await dispatch(updateUser({ userId: id, data }));
-    if (result.meta.requestStatus === 'fulfilled') {
-      toast.success('User updated successfully', { theme: "dark" });
-      setIsEditModalOpen(false);
-    } else {
-      toast.error(result.payload || 'Failed to update user', { theme: "dark" });
-    }
-  };
-
-  const handleToggleStatus = async (user) => {
-    const newStatus = user.status === 'inactive' ? 'active' : 'inactive';
-    const result = await dispatch(updateUser({ userId: user.id || user._id, data: { status: newStatus } }));
-    if (result.meta.requestStatus === 'fulfilled') {
-      toast.success(`User status updated to ${newStatus}`, { theme: "dark" });
-    } else {
-      toast.error(result.payload || 'Failed to update status', { theme: "dark" });
-    }
-  };
-
-  const handleDeleteUser = async (userId) => {
-    const result = await dispatch(deleteUser(userId));
-    if (result.meta.requestStatus === 'fulfilled') {
-      toast.success('User deleted successfully', { theme: "dark" });
-    } else {
-      toast.error(result.payload || 'Failed to delete user', { theme: "dark" });
-    }
-  };
-
-  const askConfirm = (action, payload) => setConfirmState({ open: true, action, payload });
-
-  const handleConfirmed = async () => {
-    const { action, payload } = confirmState;
-    const userId = payload?.id || payload?._id;
-    if (action === 'delete') await handleDeleteUser(userId);
-    if (action === 'toggleStatus') await handleToggleStatus(payload);
-    setConfirmState({ open: false, action: null, payload: null });
-  };
-
-  const confirmMessages = {
-    delete: `Permanently delete "${confirmState.payload?.name}"? This cannot be undone.`,
-    toggleStatus: `Set "${confirmState.payload?.name}" to ${confirmState.payload?.status === 'inactive' ? 'active' : 'inactive'}?`,
+    setIsModalOpen(false);
   };
 
   return (
-    <div className="relative flex flex-col h-full space-y-4 sm:space-y-6 overflow-hidden pb-2 text-gray-900 dark:text-gray-100 transition-colors duration-200">
-      <div className="flex items-center justify-between shrink-0 gap-4">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Users</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage learners, instructors, TAs and admins.</p>
+          <h1 className="text-2xl font-semibold">Users</h1>
+          <p className="text-sm text-gray-400 mt-1">Manage learners, instructors, TAs and admins.</p>
         </div>
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="px-6 py-2 text-sm font-bold bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white rounded-xl transition-all shadow-md cursor-pointer"
-        >
-          + New User
-        </button>
+        {canManageUsers && (
+          <Button label="+ Add User" onClick={() => handleOpenModal()} />
+        )}
       </div>
 
-
-      <div className="flex-1 flex flex-col bg-white dark:bg-[#2b2b2b] border border-gray-200 dark:border-[#3f3f3f] rounded-2xl p-4 sm:p-6 space-y-4 min-h-0 shadow-lg">
-        <div className="flex flex-col sm:flex-row gap-4 sm:items-center shrink-0">
-          <div className="w-full sm:max-w-md">
+      <div className="glass-panel rounded-2xl p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4 sm:items-end">
+          <div className="flex-1">
             <InputField
-              label="Search Users"
+              label="Search"
               id="user-search"
               type="text"
               value={search}
@@ -168,65 +83,85 @@ export default function AdminUsersPage() {
               placeholder="Search by name or email"
             />
           </div>
-          <div className="flex gap-2 flex-wrap sm:ml-auto pt-2 sm:pt-0">
+          <div className="flex gap-2">
             {['all', 'Learner', 'Instructor', 'TA', 'Admin'].map((role) => (
               <button
                 key={role}
                 onClick={() => setRoleFilter(role)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer ${roleFilter === role
-                    ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30 font-bold'
-                    : 'text-gray-600 dark:text-gray-400 border-gray-300 dark:border-[#3f3f3f] hover:bg-gray-100 dark:hover:bg-white/5'
-                  }`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                  roleFilter === role
+                    ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'
+                    : 'text-gray-400 border-gray-700 hover:border-gray-600'
+                }`}
               >
-                {role === 'all' ? 'All Roles' : role}
+                {role === 'all' ? 'All' : role}
               </button>
             ))}
           </div>
         </div>
 
-        {loading && <div className="flex-1 flex items-center justify-center"><LoadingSpinner label="Loading users..." /></div>}
+        {loading && <LoadingSpinner label="Loading users..." />}
 
         {!loading && error && (
-          <div className="flex-1 flex items-center justify-center">
-            <ErrorState message={error} onRetry={() => dispatch(fetchUsers())} />
-          </div>
+          <ErrorState
+            message={`${error} (expected until /admin/users is mounted on the backend)`}
+            onRetry={() => dispatch(fetchUsers())}
+          />
         )}
 
         {!loading && !error && (
-          <UsersList
-            currentUsers={currentUsers}
-            onAction={handleActionClick}
-            canManageUsers={canManageUsers}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            indexOfFirstItem={indexOfFirstItem}
-            indexOfLastItem={indexOfLastItem}
-            totalUsers={filteredUsers.length}
-            onPageChange={(page) => setCurrentPage(page)}
-          />
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-gray-400 border-b border-gray-700">
+                  <th className="py-3 font-medium">Name</th>
+                  <th className="py-3 font-medium">Email</th>
+                  <th className="py-3 font-medium">Role</th>
+                  <th className="py-3 font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.map((u) => (
+                  <tr key={u.id} className="border-b border-gray-900 hover:bg-gray-900/40">
+                    <td className="py-3 text-gray-200">{u.name}</td>
+                    <td className="py-3 text-gray-400">{u.email}</td>
+                    <td className="py-3">
+                      <span className={`px-2 py-0.5 rounded-full text-xs border ${ROLE_STYLES[u.role]}`}>
+                        {u.role}
+                      </span>
+                    </td>
+                    <td className="py-3 text-right">
+                      {canManageUsers ? (
+                        <button
+                          onClick={() => handleOpenModal(u)}
+                          className="text-gray-400 hover:text-cyan-400 text-xs transition-colors"
+                        >
+                          Change Role
+                        </button>
+                      ) : (
+                        <span className="text-gray-700 text-xs">View only</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {filteredUsers.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="py-8 text-center text-gray-500">
+                      No users match your search.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
-      <ConfirmDialog
-        open={confirmState.open}
-        title="Confirm action"
-        message={confirmMessages[confirmState.action] || 'Are you sure you want to proceed?'}
-        danger={confirmState.action === 'toggleStatus' || confirmState.action === 'delete'}
-        onConfirm={handleConfirmed}
-        onCancel={() => setConfirmState({ open: false, action: null, payload: null })}
-      />
-
-      <AddUserModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSave={handleSaveNewUser}
-      />
-
-      <EditUserModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
+      <UserModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
         user={selectedUser}
-        onSave={handleUpdateUser}
+        onSave={handleSaveUser}
       />
     </div>
   );

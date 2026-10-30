@@ -1,0 +1,345 @@
+{
+  "users": [
+    {
+      "id": "u1",
+      "username": "alex_codes",
+      "displayName": "Alex Rivera",
+      "avatar": "https://api.dicebear.com/9.x/initials/svg?seed=Alex%20Rivera&backgroundColor=2563eb&fontWeight=600",
+      "role": "Senior React Developer",
+      "reputation": 4820,
+      "joinedAt": "2021-03-14",
+      "postCount": 214
+    },
+    {
+      "id": "u2",
+      "username": "priya_dev",
+      "displayName": "Priya Sharma",
+      "avatar": "https://api.dicebear.com/9.x/initials/svg?seed=Priya%20Sharma&backgroundColor=db2777&fontWeight=600",
+      "role": "Java Backend Engineer",
+      "reputation": 3150,
+      "joinedAt": "2022-01-08",
+      "postCount": 158
+    },
+    {
+      "id": "u3",
+      "username": "sam_be",
+      "displayName": "Sam Okafor",
+      "avatar": "https://api.dicebear.com/9.x/initials/svg?seed=Sam%20Okafor&backgroundColor=16a34a&fontWeight=600",
+      "role": "Spring Boot Architect",
+      "reputation": 6890,
+      "joinedAt": "2019-11-02",
+      "postCount": 402
+    },
+    {
+      "id": "u4",
+      "username": "mia_ui",
+      "displayName": "Mia Chen",
+      "avatar": "https://api.dicebear.com/9.x/initials/svg?seed=Mia%20Chen&backgroundColor=ea580c&fontWeight=600",
+      "role": "Frontend Developer",
+      "reputation": 2210,
+      "joinedAt": "2022-06-19",
+      "postCount": 96
+    },
+    {
+      "id": "u5",
+      "username": "tom_rest",
+      "displayName": "Tom Becker",
+      "avatar": "https://api.dicebear.com/9.x/initials/svg?seed=Tom%20Becker&backgroundColor=9333ea&fontWeight=600",
+      "role": "Full-Stack Developer",
+      "reputation": 1780,
+      "joinedAt": "2023-02-27",
+      "postCount": 63
+    },
+    {
+      "id": "u6",
+      "username": "lena_sql",
+      "displayName": "Lena Fischer",
+      "avatar": "https://api.dicebear.com/9.x/initials/svg?seed=Lena%20Fischer&backgroundColor=0891b2&fontWeight=600",
+      "role": "Database Specialist",
+      "reputation": 3940,
+      "joinedAt": "2020-08-11",
+      "postCount": 187
+    },
+    {
+      "id": "u7",
+      "username": "raj_js",
+      "displayName": "Raj Patel",
+      "avatar": "https://api.dicebear.com/9.x/initials/svg?seed=Raj%20Patel&backgroundColor=4f46e5&fontWeight=600",
+      "role": "Node.js Developer",
+      "reputation": 1250,
+      "joinedAt": "2023-07-05",
+      "postCount": 41
+    },
+    {
+      "id": "u8",
+      "username": "sofia_ops",
+      "displayName": "Sofia Marin",
+      "avatar": "https://api.dicebear.com/9.x/initials/svg?seed=Sofia%20Marin&backgroundColor=65a30d&fontWeight=600",
+      "role": "DevOps Engineer",
+      "reputation": 5120,
+      "joinedAt": "2020-02-20",
+      "postCount": 233
+    }
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "authorId": "u1",
+      "title": "useEffect dependencies in React 18 — why does my fetch run twice?",
+      "content": "In React 18 StrictMode my useEffect fetch runs twice in development. I understand StrictMode double-invokes effects, but what is the recommended production-safe pattern to avoid duplicate API calls?",
+      "tags": ["React", "JavaScript", "Hooks"],
+      "upvotes": 142,
+      "downvotes": 3,
+      "views": 5120,
+      "replies": 18,
+      "isSolved": false,
+      "isPinned": true,
+      "createdAt": "2026-08-05T09:12:00Z"
+    },
+    {
+      "id": "p2",
+      "authorId": "u2",
+      "title": "Java Stream API — group a list of orders by customer without mutating state",
+      "content": "I need to group a large list of orders by customer using Collectors.groupingBy, but I also want to preserve insertion order and keep counts. What is the cleanest idiomatic approach in Java 17?",
+      "tags": ["Java", "Streams"],
+      "upvotes": 98,
+      "downvotes": 2,
+      "views": 3210,
+      "replies": 12,
+      "isSolved": true,
+      "isPinned": false,
+      "createdAt": "2026-08-04T14:40:00Z"
+    },
+    {
+      "id": "p3",
+      "authorId": "u3",
+      "title": "Spring Boot: Transaction not rolling back on RuntimeException in @Async method",
+      "content": "I have a @Transactional service method that invokes an @Async method. When the async method throws a RuntimeException the transaction does not roll back. Why is @Transactional ignored in self-invocation and async proxies?",
+      "tags": ["Spring Boot", "Java", "Transactions"],
+      "upvotes": 210,
+      "downvotes": 5,
+      "views": 8940,
+      "replies": 27,
+      "isSolved": false,
+      "isPinned": true,
+      "createdAt": "2026-08-03T11:05:00Z"
+    },
+    {
+      "id": "p4",
+      "authorId": "u4",
+      "title": "Responsive CSS grid: auto-fit vs auto-fill — which should I use?",
+      "content": "For a card gallery I keep flipping between grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) and auto-fill. What is the actual difference, and when does one create empty tracks?",
+      "tags": ["React", "CSS", "Responsive"],
+      "upvotes": 76,
+      "downvotes": 1,
+      "views": 2430,
+      "replies": 9,
+      "isSolved": false,
+      "isPinned": false,
+      "createdAt": "2026-08-02T16:22:00Z"
+    },
+    {
+      "id": "p5",
+      "authorId": "u5",
+      "title": "Securing a REST API with Spring Security and JWT — best practices for refresh tokens",
+      "content": "I'm implementing JWT auth in a Spring Boot REST API. Storing refresh tokens in localStorage feels unsafe. What is the recommended approach for web clients — httpOnly cookies, and how should rotation work?",
+      "tags": ["Spring Boot", "Security", "REST API"],
+      "upvotes": 165,
+      "downvotes": 6,
+      "views": 7310,
+      "replies": 21,
+      "isSolved": true,
+      "isPinned": false,
+      "createdAt": "2026-08-01T08:30:00Z"
+    },
+    {
+      "id": "p6",
+      "authorId": "u6",
+      "title": "PostgreSQL: N+1 query problem with JPA — how to debug and fix efficiently",
+      "content": "My Spring Data JPA entity relationships cause N+1 selects when serializing a list endpoint. I tried @EntityGraph but some paths still lazy-load. How do I confirm with Hibernate stats and pick between join fetch and batch fetching?",
+      "tags": ["Spring Boot", "JPA", "PostgreSQL"],
+      "upvotes": 188,
+      "downvotes": 4,
+      "views": 6450,
+      "replies": 24,
+      "isSolved": false,
+      "isPinned": false,
+      "createdAt": "2026-07-31T13:15:00Z"
+    },
+    {
+      "id": "p7",
+      "authorId": "u7",
+      "title": "React context re-renders every consumer on each state change — is this expected?",
+      "content": "Updating a Context provider state re-renders all consumers even those that only read unrelated slices. I know splitting contexts helps, but is there a canonical pattern using useMemo and separate providers?",
+      "tags": ["React", "JavaScript", "Hooks"],
+      "upvotes": 54,
+      "downvotes": 0,
+      "views": 1890,
+      "replies": 7,
+      "isSolved": false,
+      "isPinned": false,
+      "createdAt": "2026-07-30T10:45:00Z"
+    },
+    {
+      "id": "p8",
+      "authorId": "u8",
+      "title": "Dockerizing a Spring Boot app — multi-stage build tips for smaller images",
+      "content": "My Spring Boot image is 500MB+. I'm switching to a multi-stage build with jlink or a custom JRE. What base images and flags give the best size/startup trade-off for a REST service?",
+      "tags": ["Spring Boot", "Docker", "DevOps"],
+      "upvotes": 121,
+      "downvotes": 2,
+      "views": 4280,
+      "replies": 15,
+      "isSolved": false,
+      "isPinned": false,
+      "createdAt": "2026-07-29T09:00:00Z"
+    }
+  ],
+  "comments": [
+    {
+      "id": "c1",
+      "postId": "p1",
+      "authorId": "u7",
+      "content": "StrictMode double-invokes effects in development only. For production, gate your fetch with a ref or AbortController, or move to a data-fetching library that handles dedupe.",
+      "createdAt": "2026-08-05T10:02:00Z",
+      "upvotes": 24
+    },
+    {
+      "id": "c2",
+      "postId": "p1",
+      "authorId": "u5",
+      "content": "The double call is intentional to surface impure effects. Keep the cleanup symmetric (cancel the request) and the duplicate call is harmless in dev.",
+      "createdAt": "2026-08-05T11:30:00Z",
+      "upvotes": 31
+    },
+    {
+      "id": "c3",
+      "postId": "p1",
+      "authorId": "u4",
+      "content": "I switch off StrictMode in production builds; it never runs there anyway. The real fix is making your effect idempotent.",
+      "createdAt": "2026-08-05T12:45:00Z",
+      "upvotes": 9
+    },
+    {
+      "id": "c4",
+      "postId": "p2",
+      "authorId": "u1",
+      "content": "Use Collectors.groupingBy with a LinkedHashMap supplier to preserve insertion order, then map each value to its size.",
+      "createdAt": "2026-08-04T15:20:00Z",
+      "upvotes": 18
+    },
+    {
+      "id": "c5",
+      "postId": "p2",
+      "authorId": "u8",
+      "content": "groupingBy with counting() as downstream collector keeps it declarative and stream-safe.",
+      "createdAt": "2026-08-04T16:10:00Z",
+      "upvotes": 12
+    },
+    {
+      "id": "c6",
+      "postId": "p3",
+      "authorId": "u2",
+      "content": "@Transactional is proxied and self-invocation bypasses it. Move the async call into a separate bean, or use TransactionTemplate inside the async method.",
+      "createdAt": "2026-08-03T12:30:00Z",
+      "upvotes": 42
+    },
+    {
+      "id": "c7",
+      "postId": "p3",
+      "authorId": "u6",
+      "content": "Also note: async methods run in a different thread, so the transaction boundary from the caller does not propagate. Handle rollback inside the async task.",
+      "createdAt": "2026-08-03T13:05:00Z",
+      "upvotes": 27
+    },
+    {
+      "id": "c8",
+      "postId": "p3",
+      "authorId": "u7",
+      "content": "Adding @Async to a public method on a separate @Service and calling it via the injected proxy fixes both problems at once.",
+      "createdAt": "2026-08-03T14:22:00Z",
+      "upvotes": 15
+    },
+    {
+      "id": "c9",
+      "postId": "p4",
+      "authorId": "u1",
+      "content": "auto-fit collapses empty tracks; auto-fill keeps them. With minmax(250px, 1fr), auto-fit usually looks better for card galleries.",
+      "createdAt": "2026-08-02T17:00:00Z",
+      "upvotes": 21
+    },
+    {
+      "id": "c10",
+      "postId": "p4",
+      "authorId": "u3",
+      "content": "auto-fill preserves the column count when there are few items, so empty tracks remain. Great when you want a fixed grid feel.",
+      "createdAt": "2026-08-02T17:40:00Z",
+      "upvotes": 14
+    },
+    {
+      "id": "c11",
+      "postId": "p5",
+      "authorId": "u3",
+      "content": "httpOnly + Secure + SameSite cookies for the refresh token, with rotation and reuse detection. Keep the access token short-lived.",
+      "createdAt": "2026-08-01T09:15:00Z",
+      "upvotes": 38
+    },
+    {
+      "id": "c12",
+      "postId": "p5",
+      "authorId": "u6",
+      "content": "Store refresh tokens server-side keyed by a hashed token; revoke on rotation. This stops replay if a token leaks.",
+      "createdAt": "2026-08-01T10:05:00Z",
+      "upvotes": 26
+    },
+    {
+      "id": "c13",
+      "postId": "p6",
+      "authorId": "u5",
+      "content": "Turn on Hibernate format_sql and trace logging, then watch the query count. fetch join solves most to-one paths; batch fetching handles collections.",
+      "createdAt": "2026-07-31T14:00:00Z",
+      "upvotes": 19
+    },
+    {
+      "id": "c14",
+      "postId": "p6",
+      "authorId": "u1",
+      "content": "@EntityGraph covers the full graph in one query. Just avoid pagination on the collection side or you get in-memory pagination.",
+      "createdAt": "2026-07-31T15:30:00Z",
+      "upvotes": 22
+    },
+    {
+      "id": "c15",
+      "postId": "p7",
+      "authorId": "u5",
+      "content": "Split the context by domain slice and memoize providers. Consumers only subscribe to the slice they read, so unrelated updates do not re-render them.",
+      "createdAt": "2026-07-30T11:20:00Z",
+      "upvotes": 17
+    },
+    {
+      "id": "c16",
+      "postId": "p7",
+      "authorId": "u4",
+      "content": "Context value identity matters: memoize the object with useMemo or every consumer re-renders on each provider render.",
+      "createdAt": "2026-07-30T12:10:00Z",
+      "upvotes": 20
+    },
+    {
+      "id": "c17",
+      "postId": "p8",
+      "authorId": "u6",
+      "content": "eclipse-temurin + jlink custom runtime dropped my image from 500MB to ~120MB. Then strip debug symbols and use layer caching.",
+      "createdAt": "2026-07-29T09:40:00Z",
+      "upvotes": 28
+    },
+    {
+      "id": "c18",
+      "postId": "p8",
+      "authorId": "u2",
+      "content": "Copy the built jar in its own RUN layer so Gradle/Maven changes do not invalidate the app layer. Smallest is not always fastest to start.",
+      "createdAt": "2026-07-29T10:25:00Z",
+      "upvotes": 16
+    }
+  ],
+  "tags": ["React", "JavaScript", "Java", "Spring Boot", "Hooks", "Streams", "CSS", "Responsive", "Security", "REST API", "JPA", "PostgreSQL", "Transactions", "Docker", "DevOps"]
+}

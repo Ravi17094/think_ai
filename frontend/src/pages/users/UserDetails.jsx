@@ -1,64 +1,167 @@
-import React from 'react';
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { getUserById } from "../../api/userApi";
+import { DetailsSkeleton } from "../../components/common/LoadingSkeleton";
 
-const ROLE_STYLES = {
-  Learner: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/30',
-  Instructor: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30',
-  TA: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
-  Admin: 'bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/30',
-};
+function UserDetails() {
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-export default function UserDetails({ user, onAction, canManageUsers }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadUser();
+  }, [id]);
+
+  const loadUser = async () => {
+    try {
+      setLoading(true);
+
+      const response = await getUserById(id);
+
+      setUser(response.data.data);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load user");
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <DetailsSkeleton />;
+  }
+
+  if (!user) {
+    return (
+      <div className="bg-[#1A1F2B] border border-gray-800 rounded-2xl p-12 text-center">
+
+        <div className="text-5xl mb-4">
+          👤
+        </div>
+
+        <h2 className="text-2xl font-semibold text-gray-300">
+          User Not Found
+        </h2>
+
+        <p className="text-gray-500 mt-2">
+          The user you are looking for does not exist.
+        </p>
+
+        <button
+          type="button"
+          onClick={() => navigate("/admin/users")}
+          className="mt-6 bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-5 py-3 rounded-xl transition"
+        >
+          ← Back to Users
+        </button>
+
+      </div>
+    );
+  }
+
   return (
-    <tr className="border-b border-gray-200 dark:border-[#3f3f3f] hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors">
-      <td className="p-4 text-gray-900 dark:text-gray-200">
-        <p className="font-bold">{user.name}</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{user.email}</p>
-      </td>
-      <td className="p-4">
-        <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold tracking-widest uppercase border whitespace-nowrap ${ROLE_STYLES[user.role] || ROLE_STYLES.Learner}`}>
-          {user.role}
-        </span>
-      </td>
-      <td className="p-4">
-        <span className={`px-2 py-1 rounded-full text-[10px] uppercase font-semibold tracking-wider ${user.status === 'inactive' ? 'bg-rose-500/10 text-rose-500 dark:text-rose-400' : 'bg-emerald-500/10 text-emerald-500 dark:text-emerald-400'}`}>
-          {user.status || 'active'}
-        </span>
-      </td>
-      <td className="p-4 text-right">
-        {canManageUsers ? (
-          <div className="flex items-center justify-end gap-2">
-            <button
-              onClick={() => onAction('toggleStatus', user)}
-              title="Toggle Status"
-              className="p-2 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10 transition-all inline-flex items-center justify-center cursor-pointer"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-              </svg>
-            </button>
-            <button
-              onClick={() => onAction('edit', user)}
-              title="Edit Role"
-              className="p-2 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/10 transition-all inline-flex items-center justify-center cursor-pointer"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-              </svg>
-            </button>
-            <button
-              onClick={() => onAction('delete', user)}
-              title="Delete User"
-              className="p-2 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 transition-all inline-flex items-center justify-center cursor-pointer"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-              </svg>
-            </button>
-          </div>
-        ) : (
-          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">View Only</span>
-        )}
-      </td>
-    </tr>
+    <div>
+
+      <div className="flex justify-between items-center mb-8">
+
+        <div>
+          <h1 className="text-3xl font-bold text-white">
+            User Details
+          </h1>
+
+          <p className="text-gray-400 mt-1">
+            View complete user information.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => navigate("/admin/users")}
+          className="px-5 py-3 rounded-xl bg-[#1A1F2B] border border-gray-700 text-cyan-400 hover:bg-[#22283A] transition"
+        >
+          ← Back
+        </button>
+
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div className="bg-[#1A1F2B] border border-gray-800 rounded-2xl p-6">
+
+          <p className="text-gray-400 text-sm">
+            Name
+          </p>
+
+          <h2 className="text-white text-xl font-semibold mt-2">
+            {user.name}
+          </h2>
+
+        </div>
+
+        <div className="bg-[#1A1F2B] border border-gray-800 rounded-2xl p-6">
+
+          <p className="text-gray-400 text-sm">
+            Email
+          </p>
+
+          <h2 className="text-white text-xl font-semibold mt-2">
+            {user.email}
+          </h2>
+
+        </div>
+
+        <div className="bg-[#1A1F2B] border border-gray-800 rounded-2xl p-6">
+
+          <p className="text-gray-400 text-sm">
+            Role
+          </p>
+
+          <h2 className="text-white text-xl font-semibold mt-2">
+            {user.role}
+          </h2>
+
+        </div>
+
+        <div className="bg-[#1A1F2B] border border-gray-800 rounded-2xl p-6">
+
+          <p className="text-gray-400 text-sm">
+            Status
+          </p>
+
+          <span
+            className={`inline-block mt-2 px-4 py-2 rounded-full text-sm font-semibold ${
+              user.status === "ACTIVE"
+                ? "bg-green-500/20 text-green-400"
+                : "bg-red-500/20 text-red-400"
+            }`}
+          >
+            {user.status}
+          </span>
+
+        </div>
+
+        <div className="md:col-span-2 bg-[#1A1F2B] border border-gray-800 rounded-2xl p-6">
+
+          <p className="text-gray-400 text-sm">
+            Joined On
+          </p>
+
+          <p className="text-gray-300 mt-2">
+            {user.createdAt
+              ? new Date(user.createdAt).toLocaleDateString()
+              : "N/A"}
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
   );
 }
+
+export default UserDetails;

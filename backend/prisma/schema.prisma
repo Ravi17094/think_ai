@@ -3,24 +3,19 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-// ====================================================
-// ENUMS
-// ====================================================
-
-enum AssessmentType {
-  MCQ
-  CODING
-}
-
-// ====================================================
-// COURSE
-// ====================================================
-
 model Course {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  category    String
+  price       Float
+  duration    String
+  thumbnail   String?
+  status      String   @default("ACTIVE")
   id                Int     @id @default(autoincrement())
   title             String
   description       String
@@ -38,23 +33,18 @@ model Course {
   batches Batch[]
   modules Module[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  batches     Batch[]
 
-  @@index([status])
-  @@index([category])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-// ====================================================
-// BATCH
-// ====================================================
-
 model Batch {
-  id   Int    @id @default(autoincrement())
-  name String
+  id             Int      @id @default(autoincrement())
+  name           String
 
-  courseId Int
-  course   Course @relation(fields: [courseId], references: [id])
+  courseId       Int
+  course         Course   @relation(fields: [courseId], references: [id])
 
   instructorName String
   capacity       Int
@@ -62,21 +52,20 @@ model Batch {
   endDate        DateTime
   status         String   @default("ACTIVE")
 
-  enrollments Enrollment[]
+  enrollments    Enrollment[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([courseId])
-  @@index([status])
-  @@index([startDate])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
-// ====================================================
-// ENROLLMENT
-// ====================================================
-
 model Enrollment {
+  id               Int      @id @default(autoincrement())
+  studentName      String
+  studentEmail     String
+  batchId          Int
+  batch            Batch    @relation(fields: [batchId], references: [id])
+  enrollmentStatus String   @default("ENROLLED")
+  enrolledAt       DateTime @default(now())
   id           Int    @id @default(autoincrement())
   studentName  String
   studentEmail String
@@ -101,11 +90,45 @@ model Enrollment {
   @@index([courseAccess])
 }
 
-// ====================================================
-// USER
-// ====================================================
-
 model User {
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  hashedPassword String
+  role           String   @default("USER")
+  createdAt      DateTime @default(now())
+}
+model LiveSession {
+  id           String       @id @default(uuid())
+  title        String
+  description  String?
+  startTime    DateTime
+  endTime      DateTime
+  meetingUrl   String       // Stores Jitsi / Zoom link
+  hostId       String       // Teacher or Host ID
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  attendance   Attendance[]
+  recordings   Recording[]
+}
+
+model Attendance {
+  id            String      @id @default(uuid())
+  sessionId     String
+  session       LiveSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  userId        String      // Student ID
+  joinedAt      DateTime    @default(now())
+  leftAt        DateTime?
+  durationMins  Int?
+}
+
+model Recording {
+  id         String       @id @default(uuid())
+  sessionId  String
+  session    LiveSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  fileUrl    String       // Path to stored video
+  fileSize   Int?         // Size in MB
+  createdAt  DateTime     @default(now())
+}
   id        Int      @id @default(autoincrement())
   email     String   @unique
   password  String   @default("") // Added default

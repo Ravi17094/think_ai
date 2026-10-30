@@ -1,6 +1,6 @@
 const { io } = require("socket.io-client");
 
-const TARGET = "http://localhost:5000";
+const TARGET = "http://localhost:3000";
 const CONCURRENT_USERS = 220;
 
 let connected = 0;

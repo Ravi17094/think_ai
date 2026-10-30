@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const requireRole = require("../middleware/requireRole");
-const { getEntries, toCSV, toJSON } = require("../services/auditLogService");
+const { getEntries, toCSV } = require("../services/auditLogService");
 
 router.get("/", requireRole(["Admin"]), (req, res) => {
   const { role, action, from, to } = req.query;
@@ -10,15 +10,8 @@ router.get("/", requireRole(["Admin"]), (req, res) => {
 });
 
 router.get("/export", requireRole(["Admin"]), (req, res) => {
-  const { role, action, from, to, format } = req.query;
+  const { role, action, from, to } = req.query;
   const entries = getEntries({ role, action, from, to });
-
-  if (format === "json") {
-    res.setHeader("Content-Type", "application/json");
-    res.setHeader("Content-Disposition", "attachment; filename=audit-log.json");
-    return res.status(200).send(toJSON(entries));
-  }
-
   const csv = toCSV(entries);
   res.setHeader("Content-Type", "text/csv");
   res.setHeader("Content-Disposition", "attachment; filename=audit-log.csv");

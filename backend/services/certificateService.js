@@ -14,14 +14,6 @@ const {
     generateCertificatePdf
 } = require("../utils/certificatePdf");
 
-const {
-    enqueue
-} = require("./notificationQueueService");
-
-const {
-    certificateEmail
-} = require("./notificationService");
-
 
 const validateEnrollmentId = (value) => {
 
@@ -70,7 +62,7 @@ const generateCertificate = async (enrollmentId) => {
     const existingCertificate =
         await repository.getCertificateByEnrollment(id);
 
-    if (existingCertificate?.pdfUrl) {
+    if (existingCertificate) {
         return existingCertificate;
     }
 
@@ -128,7 +120,6 @@ const generateCertificate = async (enrollmentId) => {
             select: {
                 id: true,
                 studentName: true,
-                studentEmail: true,
 
                 batch: {
                     select: {
@@ -182,48 +173,45 @@ const generateCertificate = async (enrollmentId) => {
     /*
      * 8. Create certificate database record
      */
-    let certificate = existingCertificate;
+    let certificate;
 
-    if (!certificate) {
-        try {
+    try {
 
-            certificate =
-                await repository.createCertificate({
+        certificate =
+            await repository.createCertificate({
 
-                    certificateNo,
+                certificateNo,
 
-                    enrollmentId: id,
+                enrollmentId: id,
 
-                    studentName:
-                        enrollment.studentName,
+                studentName:
+                    enrollment.studentName,
 
-                    courseName:
-                        course.title,
+                courseName:
+                    course.title,
 
-                    instructorName:
-                        course.instructorName || null,
+                instructorName:
+                    course.instructorName || null,
 
-                    completionPercentage,
+                completionPercentage,
 
-                    verificationUrl
-                });
+                verificationUrl
+            });
 
-        } catch (error) {
+    } catch (error) {
 
-            /*
-             * Protect against concurrent certificate
-             * generation requests.
-             */
-            const existing =
-                await repository.getCertificateByEnrollment(id);
+        /*
+         * Protect against concurrent certificate
+         * generation requests.
+         */
+        const existing =
+            await repository.getCertificateByEnrollment(id);
 
-            if (existing) {
-                certificate = existing;
-            } else {
-                throw error;
-            }
+        if (existing) {
+            return existing;
         }
 
+        throw error;
     }
 
 
@@ -233,7 +221,7 @@ const generateCertificate = async (enrollmentId) => {
      * Admin controls the active template.
      */
     const template =
-        await repository.getActiveCertificateTemplate() || {};
+        await repository.getActiveCertificateTemplate();
 
 
     /*
@@ -280,22 +268,6 @@ const generateCertificate = async (enrollmentId) => {
                 pdfUrl: pdfPath
             }
         });
-
-    const email = certificateEmail({
-        name: enrollment.studentName,
-        courseName: course.title,
-        certificateId: updatedCertificate.certificateNo,
-        certificateUrl: verificationUrl
-    });
-
-    enqueue({
-        type: "certificate-issued",
-        to: enrollment.studentEmail,
-        recipientName: enrollment.studentName,
-        subject: email.subject,
-        text: email.text,
-        html: email.html
-    });
 
 
     return updatedCertificate;

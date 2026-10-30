@@ -24,6 +24,7 @@ function EditCourse() {
   const loadCourse = async () => {
     try {
       const response = await getCourseById(id);
+
       const data = response.data.data;
 
       setCourse({
@@ -43,6 +44,7 @@ function EditCourse() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setCourse({
       ...course,
       [name]: value,
@@ -64,39 +66,43 @@ function EditCourse() {
       };
 
       await updateCourse(id, payload);
+
       toast.success("Course Updated Successfully");
-      navigate("/admin/courses");
+
+      navigate("/courses");
     } catch (error) {
       console.error(error);
+
+      if (error.response) {
+        console.log(error.response.data);
+      }
+
       toast.error("Failed to Update Course");
     }
   };
 
   return (
-    <div className="max-w-5xl mx-auto text-gray-900 dark:text-gray-100">
+    <div className="bg-white p-8 rounded-lg shadow">
 
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Edit Course
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Update course information.
-          </p>
-        </div>
+      <div className="flex justify-between items-center mb-6">
+
+        <h1 className="text-3xl font-bold">
+          Edit Course
+        </h1>
 
         <button
           type="button"
-          onClick={() => navigate("/admin/courses")}
-          className="px-5 py-3 rounded-xl bg-gray-100 dark:bg-[#2b2b2b] border border-gray-300 dark:border-[#3f3f3f] text-purple-600 dark:text-purple-400 hover:bg-gray-200 dark:hover:bg-[#3f3f3f] transition cursor-pointer"
+          onClick={() => navigate(-1)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg"
         >
           ← Back
         </button>
+
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white dark:bg-[#2b2b2b] border border-gray-200 dark:border-[#3f3f3f] rounded-2xl p-8 grid grid-cols-2 gap-6 shadow-xl"
+        className="grid grid-cols-2 gap-5"
       >
 
         <input
@@ -105,7 +111,7 @@ function EditCourse() {
           placeholder="Course Title"
           value={course.title}
           onChange={handleChange}
-          className="bg-gray-50 dark:bg-[#212121] border border-gray-300 dark:border-[#3f3f3f] rounded-xl p-3 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+          className="border p-3 rounded"
           required
         />
 
@@ -115,7 +121,7 @@ function EditCourse() {
           placeholder="Category"
           value={course.category}
           onChange={handleChange}
-          className="bg-gray-50 dark:bg-[#212121] border border-gray-300 dark:border-[#3f3f3f] rounded-xl p-3 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+          className="border p-3 rounded"
           required
         />
 
@@ -125,7 +131,7 @@ function EditCourse() {
           placeholder="Price"
           value={course.price}
           onChange={handleChange}
-          className="bg-gray-50 dark:bg-[#212121] border border-gray-300 dark:border-[#3f3f3f] rounded-xl p-3 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+          className="border p-3 rounded"
           required
         />
 
@@ -135,24 +141,24 @@ function EditCourse() {
           placeholder="Duration"
           value={course.duration}
           onChange={handleChange}
-          className="bg-gray-50 dark:bg-[#212121] border border-gray-300 dark:border-[#3f3f3f] rounded-xl p-3 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+          className="border p-3 rounded"
           required
         />
 
         <input
           type="text"
           name="thumbnail"
-          placeholder="Thumbnail URL"
+          placeholder="Thumbnail"
           value={course.thumbnail}
           onChange={handleChange}
-          className="bg-gray-50 dark:bg-[#212121] border border-gray-300 dark:border-[#3f3f3f] rounded-xl p-3 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+          className="border p-3 rounded"
         />
 
         <select
           name="status"
           value={course.status}
           onChange={handleChange}
-          className="bg-gray-50 dark:bg-[#212121] border border-gray-300 dark:border-[#3f3f3f] rounded-xl p-3 text-gray-900 dark:text-white focus:outline-none focus:border-purple-500 cursor-pointer"
+          className="border p-3 rounded"
         >
           <option value="ACTIVE">ACTIVE</option>
           <option value="INACTIVE">INACTIVE</option>
@@ -160,22 +166,23 @@ function EditCourse() {
 
         <textarea
           name="description"
-          placeholder="Course Description"
+          placeholder="Description"
           value={course.description}
           onChange={handleChange}
+          className="border p-3 rounded col-span-2"
           rows="5"
           required
-          className="col-span-2 bg-gray-50 dark:bg-[#212121] border border-gray-300 dark:border-[#3f3f3f] rounded-xl p-3 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
         />
 
         <button
           type="submit"
-          className="col-span-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-xl transition cursor-pointer shadow-md"
+          className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded col-span-2"
         >
           Update Course
         </button>
 
       </form>
+
     </div>
   );
 }

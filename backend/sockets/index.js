@@ -2,9 +2,6 @@ const jwt = require("jsonwebtoken");
 
 const EVENTS = require("./events");
 const sessionManager = require("./sessionManager");
-const chatManager = require("./chatManager");
-const pollManager = require("./pollManager");
-const breakoutManager = require("./breakoutManager");
 
 // Notification Center: forwards the live-session lifecycle to every
 // connected socket whose user has live-session notifications enabled.
@@ -480,6 +477,7 @@ module.exports = function (io) {
                                 roomName
                         );
 
+
                 userSessions.forEach(
                     (session) => {
 
@@ -496,176 +494,8 @@ module.exports = function (io) {
 
 
         // ------------------------------------------------
-        // CHAT: MESSAGE
-        // ------------------------------------------------
-
-        socket.on(EVENTS.CHAT_MESSAGE, (payload, ack) => {
-            const { roomName, text } = payload || {};
-
-            if (!roomName || !text || typeof text !== "string") {
-                return ack?.({ ok: false, error: "roomName and text are required" });
-            }
-
-            const message = chatManager.addMessage(roomName, userId, text);
-
-            io.to(roomName).emit(EVENTS.CHAT_MESSAGE, message);
-
-            ack?.({ ok: true, message });
-        });
-
-
-        // ------------------------------------------------
-        // POLL: CREATE
-        // ------------------------------------------------
-
-        socket.on(EVENTS.POLL_CREATE, (payload, ack) => {
-            const { roomName, question, options } = payload || {};
-
-            if (!roomName || !question || !Array.isArray(options) || options.length < 2) {
-                return ack?.({ ok: false, error: "roomName, question, and at least 2 options are required" });
-            }
-
-            const poll = pollManager.createPoll(roomName, question, options);
-
-            io.to(roomName).emit(EVENTS.POLL_STARTED, {
-                pollId: poll.pollId,
-                question: poll.question,
-                options: poll.options,
-                roomName,
-                startedAt: poll.startedAt,
-            });
-
-            ack?.({ ok: true, pollId: poll.pollId });
-        });
-
-
-        // ------------------------------------------------
-        // POLL: VOTE
-        // ------------------------------------------------
-
-        socket.on(EVENTS.POLL_VOTE, (payload, ack) => {
-            const { roomName, optionIndex } = payload || {};
-
-            const poll = pollManager.castVote(roomName, userId, optionIndex);
-
-            if (!poll) {
-                return ack?.({ ok: false, error: "Invalid vote (no active poll, already voted, or bad option)" });
-            }
-
-            io.to(roomName).emit(EVENTS.POLL_RESULTS, {
-                pollId: poll.pollId,
-                question: poll.question,
-                options: poll.options,
-                votes: poll.votes,
-                roomName,
-            });
-
-            ack?.({ ok: true });
-        });
-
-
-        // ------------------------------------------------
-        // POLL: END
-        // ------------------------------------------------
-
-        socket.on(EVENTS.POLL_ENDED, (payload, ack) => {
-            const { roomName } = payload || {};
-
-            const poll = pollManager.endPoll(roomName);
-
-            if (!poll) {
-                return ack?.({ ok: false, error: "No active poll for this room" });
-            }
-
-            io.to(roomName).emit(EVENTS.POLL_ENDED, {
-                pollId: poll.pollId,
-                roomName,
-                endedAt: new Date().toISOString(),
-            });
-
-            ack?.({ ok: true });
-        });
-
-
-        // ------------------------------------------------
-        // BREAKOUT: CREATE
-        // ------------------------------------------------
-
-        socket.on(EVENTS.BREAKOUT_CREATE, (payload, ack) => {
-            const { roomName, groupCount } = payload || {};
-
-            if (!roomName || !groupCount || groupCount < 1) {
-                return ack?.({ ok: false, error: "roomName and groupCount (>=1) are required" });
-            }
-
-            const memberSocketIds = Array.from(roomMembers.get(roomName) || []);
-            const memberUserIds = memberSocketIds
-                .map((sid) => activeConnections.get(sid)?.userId)
-                .filter(Boolean);
-
-            const breakout = breakoutManager.createBreakout(roomName, memberUserIds, groupCount);
-
-            io.to(roomName).emit(EVENTS.BREAKOUT_STARTED, {
-                roomName,
-                groups: breakout.groups,
-                startedAt: breakout.startedAt,
-            });
-
-            ack?.({ ok: true, groups: breakout.groups });
-        });
-
-
-        // ------------------------------------------------
-        // BREAKOUT: ASSIGN
-        // ------------------------------------------------
-
-        socket.on(EVENTS.BREAKOUT_ASSIGN, (payload, ack) => {
-            const { roomName, groupName, userId: targetUserId } = payload || {};
-
-            const breakout = breakoutManager.assignUser(roomName, groupName, targetUserId || userId);
-
-            if (!breakout) {
-                return ack?.({ ok: false, error: "No active breakout or group not found" });
-            }
-
-            io.to(roomName).emit(EVENTS.BREAKOUT_ASSIGN, {
-                roomName,
-                groupName,
-                userId: targetUserId || userId,
-            });
-
-            ack?.({ ok: true, groups: breakout.groups });
-        });
-
-
-        // ------------------------------------------------
-        // BREAKOUT: END
-        // ------------------------------------------------
-
-        socket.on(EVENTS.BREAKOUT_ENDED, (payload, ack) => {
-            const { roomName } = payload || {};
-
-            const breakout = breakoutManager.endBreakout(roomName);
-
-            if (!breakout) {
-                return ack?.({ ok: false, error: "No active breakout for this room" });
-            }
-
-            io.to(roomName).emit(EVENTS.BREAKOUT_ENDED, {
-                roomName,
-                endedAt: new Date().toISOString(),
-            });
-
-            ack?.({ ok: true });
-        });
-
-
-        // ------------------------------------------------
         // DISCONNECT
         // ------------------------------------------------
-
-
-
 
         socket.on(
             "disconnect",

@@ -1,21 +1,18 @@
-import api from "./axios";
+import axiosInstance from "../api/axios";
 
-export const getAllLessons = () =>
-  api.get("/lessons");
+const BASE_URL = "/lessons";
 
-export const getLessons = getAllLessons;
-
-export const getLessonById = (id) =>
-  api.get(`/lessons/${id}`);
+export const getAllLessons = () => axiosInstance.get(BASE_URL);
 
 export const getLessonsByModuleId = (moduleId) =>
-  api.get(`/lessons/module/${moduleId}`);
+  axiosInstance.get(`${BASE_URL}/module/${moduleId}`);
 
-export const createLesson = (data) =>
-  api.post("/lessons", data);
+export const getLessonById = (id) => axiosInstance.get(`${BASE_URL}/${id}`);
 
-export const updateLesson = (id, data) =>
-  api.put(`/lessons/${id}`, data);
+export const createLesson = (payload) => axiosInstance.post(BASE_URL, payload);
 
-export const deleteLesson = (id) =>
-  api.delete(`/lessons/${id}`);
+export const updateLesson = (id, payload) =>
+  axiosInstance.put(`${BASE_URL}/${id}`, payload);
+
+export const deleteLesson = (id) => axiosInstance.delete(`${BASE_URL}/${id}`);
+
