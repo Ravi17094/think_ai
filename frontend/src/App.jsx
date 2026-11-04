@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Routes, Route, Navigate, Link } from "react-router-dom";
 
 import LoginPage from "./pages/auth/LoginPage";
@@ -6,12 +6,12 @@ import RegisterPage from "./pages/auth/RegisterPage";
 import LandingPage from "./pages/public/Landingpage";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
-import AdminRoutes from "./routes/AdminRoutes";
-
-// Your LMS Routes
-import InstructorRoutes from "./routes/InstructorRoutes";
-import LearnerRoutes from "./routes/LearnerRoutes";
-import TADashboard from "./pages/ta/TADashboard";
+// Load role workspaces only after a user opens them. This keeps a fault in one
+// role-specific page from preventing every other user from reaching login.
+const AdminRoutes = React.lazy(() => import("./routes/AdminRoutes"));
+const InstructorRoutes = React.lazy(() => import("./routes/InstructorRoutes"));
+const LearnerRoutes = React.lazy(() => import("./routes/LearnerRoutes"));
+const TADashboard = React.lazy(() => import("./pages/ta/TADashboard"));
 
 function RolePlaceholder({ label }) {
   return (
@@ -55,7 +55,9 @@ function App() {
         path="/admin/*"
         element={
           <ProtectedRoute allowedRoles={["Admin"]}>
-            <AdminRoutes />
+            <Suspense fallback={<RolePlaceholder label="Loading Admin workspace" />}>
+              <AdminRoutes />
+            </Suspense>
           </ProtectedRoute>
         }
       />
@@ -65,7 +67,9 @@ function App() {
         path="/learner/*"
         element={
           <ProtectedRoute allowedRoles={["Learner"]}>
-            <LearnerRoutes />
+            <Suspense fallback={<RolePlaceholder label="Loading Learner workspace" />}>
+              <LearnerRoutes />
+            </Suspense>
           </ProtectedRoute>
         }
       />
@@ -75,7 +79,9 @@ function App() {
         path="/instructor/*"
         element={
           <ProtectedRoute allowedRoles={["Instructor"]}>
-            <InstructorRoutes />
+            <Suspense fallback={<RolePlaceholder label="Loading Instructor workspace" />}>
+              <InstructorRoutes />
+            </Suspense>
           </ProtectedRoute>
         }
       />
@@ -85,7 +91,9 @@ function App() {
         path="/ta/*"
         element={
           <ProtectedRoute allowedRoles={["TA"]}>
-            <TADashboard />
+            <Suspense fallback={<RolePlaceholder label="Loading TA workspace" />}>
+              <TADashboard />
+            </Suspense>
           </ProtectedRoute>
         }
       />
