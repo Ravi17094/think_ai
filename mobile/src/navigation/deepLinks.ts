@@ -14,6 +14,7 @@ export type { ScreenName };
 /** Query parameters each screen understands (path params are always allowed). */
 const ROUTE_QUERY_PARAMS: Readonly<Partial<Record<ScreenName, readonly string[]>>> = {
   CourseDetail: ['courseId', 'moduleId'],
+  MyCourses: ['category'],
   ForumThread: ['threadId'],
   ForumHome: ['categoryId', 'threadId'],
   Checkout: ['courseId'],
@@ -34,6 +35,8 @@ const ROUTE_QUERY_PARAMS: Readonly<Partial<Record<ScreenName, readonly string[]>
  * signed out is bounced to the dashboard.
  */
 const AUTH_GATED_ROUTES: ReadonlySet<ScreenName> = new Set<ScreenName>([
+  'Wishlist',
+  'Profile',
   'CreatePost',
   'Bookmarks',
   'Moderation',

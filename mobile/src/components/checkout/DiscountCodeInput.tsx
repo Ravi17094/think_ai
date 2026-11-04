@@ -1,9 +1,10 @@
+import { useTheme } from "@/theme/ThemeProvider";
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-
-import { hitSlop, palette, radii, spacing, typography } from '@/theme/tokens';
+import { hitSlop, radii, spacing, typography } from '@/theme/tokens';
 import { formatINR } from '@/utils/pricing';
 import type { DiscountValidation } from '@/types/community';
-
 export interface DiscountCodeInputProps {
   value: string;
   onChange: (next: string) => void;
@@ -24,94 +25,45 @@ export function DiscountCodeInput({
   isChecking = false,
   validation = null,
   disabled = false,
-  testID = 'discount-input',
+  testID = 'discount-input'
 }: DiscountCodeInputProps) {
-  const statusTestId =
-    validation === null
-      ? null
-      : validation.valid
-        ? `${testID}-status-valid`
-        : `${testID}-status-invalid`;
-
-  return (
-    <View style={styles.container} testID={testID}>
+  const {
+    palette
+  } = useTheme();
+  const styles = useThemedStyles(createStyles);
+  const statusTestId = validation === null ? null : validation.valid ? `${testID}-status-valid` : `${testID}-status-invalid`;
+  return <View style={styles.container} testID={testID}>
       <View style={styles.row}>
-        <TextInput
-          accessibilityLabel="Discount code"
-          autoCapitalize="characters"
-          editable={!disabled && !isChecking}
-          maxLength={24}
-          onChangeText={(text) => onChange(text.toUpperCase())}
-          onSubmitEditing={onApply}
-          placeholder="DISCOUNT code"
-          placeholderTextColor={palette.textMuted}
-          returnKeyType="go"
-          style={styles.input}
-          testID={`${testID}-field`}
-          value={value}
-        />
-        <Pressable
-          accessibilityLabel="Apply discount code"
-          accessibilityRole="button"
-          accessibilityState={{
-            disabled: disabled || isChecking || value.trim() === '',
-            busy: isChecking,
-          }}
-          disabled={disabled || isChecking || value.trim() === ''}
-          onPress={onApply}
-          style={({ pressed }) => [
-            styles.applyButton,
-            (disabled || isChecking || value.trim() === '') && styles.disabled,
-            pressed && styles.pressed,
-          ]}
-          testID={`${testID}-apply`}>
+        <TextInput accessibilityLabel="Discount code" autoCapitalize="characters" editable={!disabled && !isChecking} maxLength={24} onChangeText={text => onChange(text.toUpperCase())} onSubmitEditing={onApply} placeholder="DISCOUNT code" placeholderTextColor={palette.textMuted} returnKeyType="go" style={styles.input} testID={`${testID}-field`} value={value} />
+        <Pressable accessibilityLabel="Apply discount code" accessibilityRole="button" accessibilityState={{
+        disabled: disabled || isChecking || value.trim() === '',
+        busy: isChecking
+      }} disabled={disabled || isChecking || value.trim() === ''} onPress={onApply} style={({
+        pressed
+      }) => [styles.applyButton, (disabled || isChecking || value.trim() === '') && styles.disabled, pressed && styles.pressed]} testID={`${testID}-apply`}>
           <Text style={styles.applyLabel}>
             {isChecking ? '…' : 'Apply'}
           </Text>
         </Pressable>
       </View>
 
-      {validation !== null ? (
-        <View
-          accessibilityLiveRegion="polite"
-          style={[
-            styles.status,
-            validation.valid ? styles.statusValid : styles.statusInvalid,
-          ]}
-          testID={statusTestId ?? `${testID}-status`}>
-          <Text
-            style={[
-              styles.statusText,
-              validation.valid ? styles.statusTextValid : styles.statusTextInvalid,
-            ]}
-            testID={`${testID}-message`}>
-            {validation.valid
-              ? `${validation.message} (${formatINR(validation.discountAmount)} off)`
-              : validation.message}
+      {validation !== null ? <View accessibilityLiveRegion="polite" style={[styles.status, validation.valid ? styles.statusValid : styles.statusInvalid]} testID={statusTestId ?? `${testID}-status`}>
+          <Text style={[styles.statusText, validation.valid ? styles.statusTextValid : styles.statusTextInvalid]} testID={`${testID}-message`}>
+            {validation.valid ? `${validation.message} (${formatINR(validation.discountAmount)} off)` : validation.message}
           </Text>
-          {validation.valid ? (
-            <Pressable
-              accessibilityLabel="Remove discount code"
-              accessibilityRole="button"
-              hitSlop={hitSlop}
-              onPress={onClear}
-              testID={`${testID}-clear`}>
+          {validation.valid ? <Pressable accessibilityLabel="Remove discount code" accessibilityRole="button" hitSlop={hitSlop} onPress={onClear} testID={`${testID}-clear`}>
               <Text style={styles.clearLabel}>Remove</Text>
-            </Pressable>
-          ) : null}
-        </View>
-      ) : null}
-    </View>
-  );
+            </Pressable> : null}
+        </View> : null}
+    </View>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   container: {
-    gap: spacing.xs,
+    gap: spacing.xs
   },
   row: {
     flexDirection: 'row',
-    gap: spacing.xs,
+    gap: spacing.xs
   },
   input: {
     ...typography.body,
@@ -124,7 +76,7 @@ const styles = StyleSheet.create({
     minHeight: 44,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
-    textTransform: 'uppercase',
+    textTransform: 'uppercase'
   },
   applyButton: {
     alignItems: 'center',
@@ -132,18 +84,18 @@ const styles = StyleSheet.create({
     backgroundColor: palette.brandAlt,
     borderRadius: radii.md,
     minHeight: 44,
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: spacing.md
   },
   disabled: {
-    opacity: 0.5,
+    opacity: 0.5
   },
   pressed: {
-    opacity: 0.8,
+    opacity: 0.8
   },
   applyLabel: {
     ...typography.label,
     color: palette.textInverse,
-    fontWeight: '700',
+    fontWeight: '700'
   },
   status: {
     flexDirection: 'row',
@@ -153,31 +105,30 @@ const styles = StyleSheet.create({
     borderRadius: radii.sm,
     borderWidth: 1,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    paddingVertical: spacing.xs
   },
   statusValid: {
     backgroundColor: 'rgba(52, 211, 153, 0.12)',
-    borderColor: palette.success,
+    borderColor: palette.success
   },
   statusInvalid: {
     backgroundColor: 'rgba(248, 113, 113, 0.12)',
-    borderColor: palette.danger,
+    borderColor: palette.danger
   },
   statusText: {
     ...typography.caption,
-    flex: 1,
+    flex: 1
   },
   statusTextValid: {
-    color: palette.success,
+    color: palette.success
   },
   statusTextInvalid: {
-    color: palette.danger,
+    color: palette.danger
   },
   clearLabel: {
     ...typography.label,
     color: palette.textSecondary,
-    textDecorationLine: 'underline',
-  },
+    textDecorationLine: 'underline'
+  }
 });
-
 export default DiscountCodeInput;

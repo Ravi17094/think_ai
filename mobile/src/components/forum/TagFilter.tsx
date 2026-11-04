@@ -1,67 +1,49 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
-
-import { hitSlop, palette, radii, spacing, typography } from '@/theme/tokens';
-
+import { hitSlop, radii, spacing, typography } from '@/theme/tokens';
 export interface TagFilterProps {
   tags: string[];
   selectedTags: string[];
   onChange: (nextSelected: string[]) => void;
   testID?: string;
 }
-
 export function TagFilter({
   tags,
   selectedTags,
   onChange,
-  testID = 'tag-filter',
+  testID = 'tag-filter'
 }: TagFilterProps) {
+  const styles = useThemedStyles(createStyles);
   if (tags.length === 0) {
     return null;
   }
-
   const toggle = (tag: string) => {
     if (selectedTags.includes(tag)) {
-      onChange(selectedTags.filter((entry) => entry !== tag));
+      onChange(selectedTags.filter(entry => entry !== tag));
       return;
     }
     // Multi-select: tapping an unselected tag adds it to the set.
     onChange([...selectedTags, tag]);
   };
-
-  return (
-    <ScrollView
-      contentContainerStyle={styles.content}
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      testID={testID}>
-      {tags.map((tag) => {
-        const isSelected = selectedTags.includes(tag);
-        return (
-          <Pressable
-            accessibilityLabel={tag}
-            accessibilityRole="checkbox"
-            accessibilityState={{ checked: isSelected }}
-            hitSlop={hitSlop}
-            key={tag}
-            onPress={() => toggle(tag)}
-            style={[styles.chip, isSelected && styles.chipSelected]}
-            testID={`${testID}-${tag}`}>
-            <Text
-              style={[styles.label, isSelected && styles.labelSelected]}>
+  return <ScrollView contentContainerStyle={styles.content} horizontal showsHorizontalScrollIndicator={false} testID={testID}>
+      {tags.map(tag => {
+      const isSelected = selectedTags.includes(tag);
+      return <Pressable accessibilityLabel={tag} accessibilityRole="checkbox" accessibilityState={{
+        checked: isSelected
+      }} hitSlop={hitSlop} key={tag} onPress={() => toggle(tag)} style={[styles.chip, isSelected && styles.chipSelected]} testID={`${testID}-${tag}`}>
+            <Text style={[styles.label, isSelected && styles.labelSelected]}>
               {isSelected ? `✓ ${tag}` : tag}
             </Text>
-          </Pressable>
-        );
-      })}
-    </ScrollView>
-  );
+          </Pressable>;
+    })}
+    </ScrollView>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   content: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xxs,
-    gap: spacing.xs,
+    gap: spacing.xs
   },
   chip: {
     paddingHorizontal: spacing.sm,
@@ -69,20 +51,19 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
     borderWidth: 1,
     borderColor: palette.border,
-    backgroundColor: palette.surface,
+    backgroundColor: palette.surface
   },
   chipSelected: {
     backgroundColor: palette.brandAlt,
-    borderColor: palette.brandAlt,
+    borderColor: palette.brandAlt
   },
   label: {
     ...typography.caption,
-    color: palette.textSecondary,
+    color: palette.textSecondary
   },
   labelSelected: {
     color: palette.textPrimary,
-    fontWeight: '700',
-  },
+    fontWeight: '700'
+  }
 });
-
 export default TagFilter;

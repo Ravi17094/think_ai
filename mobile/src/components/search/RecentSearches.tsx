@@ -1,7 +1,7 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-
-import { hitSlop, palette, radii, spacing, typography } from '@/theme/tokens';
-
+import { hitSlop, radii, spacing, typography } from '@/theme/tokens';
 export interface RecentSearchesProps {
   recent: string[];
   onSelect: (term: string) => void;
@@ -10,88 +10,58 @@ export interface RecentSearchesProps {
   isVisible?: boolean;
   testID?: string;
 }
-
 export function RecentSearches({
   recent,
   onSelect,
   onRemove,
   onClearAll,
   isVisible = true,
-  testID = 'recent-searches',
+  testID = 'recent-searches'
 }: RecentSearchesProps) {
+  const styles = useThemedStyles(createStyles);
   if (!isVisible || recent.length === 0) {
     return null;
   }
-
-  return (
-    <View style={styles.container} testID={testID}>
+  return <View style={styles.container} testID={testID}>
       <View style={styles.header}>
         <Text style={styles.title}>Recent searches</Text>
-        {onClearAll ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Clear recent searches"
-            hitSlop={hitSlop}
-            onPress={onClearAll}
-            testID={`${testID}-clear-all`}>
+        {onClearAll ? <Pressable accessibilityRole="button" accessibilityLabel="Clear recent searches" hitSlop={hitSlop} onPress={onClearAll} testID={`${testID}-clear-all`}>
             <Text style={styles.clearAll}>Clear</Text>
-          </Pressable>
-        ) : null}
+          </Pressable> : null}
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.chips}
-        horizontal
-        showsHorizontalScrollIndicator={false}>
-        {recent.map((term) => (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={term}
-            hitSlop={hitSlop}
-            key={term}
-            onPress={() => onSelect(term)}
-            style={styles.chip}
-            testID={`${testID}-item-${term}`}>
+      <ScrollView contentContainerStyle={styles.chips} horizontal showsHorizontalScrollIndicator={false}>
+        {recent.map(term => <Pressable accessibilityRole="button" accessibilityLabel={term} hitSlop={hitSlop} key={term} onPress={() => onSelect(term)} style={styles.chip} testID={`${testID}-item-${term}`}>
             <Text style={styles.chipText}>{term}</Text>
-            {onRemove ? (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={`Remove ${term}`}
-                hitSlop={hitSlop}
-                onPress={() => onRemove(term)}
-                testID={`${testID}-remove-${term}`}>
+            {onRemove ? <Pressable accessibilityRole="button" accessibilityLabel={`Remove ${term}`} hitSlop={hitSlop} onPress={() => onRemove(term)} testID={`${testID}-remove-${term}`}>
                 <Text style={styles.chipRemove}>✕</Text>
-              </Pressable>
-            ) : null}
-          </Pressable>
-        ))}
+              </Pressable> : null}
+          </Pressable>)}
       </ScrollView>
-    </View>
-  );
+    </View>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   container: {
     marginTop: spacing.md,
-    gap: spacing.xs,
+    gap: spacing.xs
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: spacing.md
   },
   title: {
     ...typography.label,
-    color: palette.textSecondary,
+    color: palette.textSecondary
   },
   clearAll: {
     ...typography.caption,
-    color: palette.accent,
+    color: palette.accent
   },
   chips: {
     paddingHorizontal: spacing.md,
-    gap: spacing.xs,
+    gap: spacing.xs
   },
   chip: {
     flexDirection: 'row',
@@ -102,16 +72,15 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
     backgroundColor: palette.surface,
     borderWidth: 1,
-    borderColor: palette.border,
+    borderColor: palette.border
   },
   chipText: {
     ...typography.caption,
-    color: palette.textPrimary,
+    color: palette.textPrimary
   },
   chipRemove: {
     ...typography.caption,
-    color: palette.textMuted,
-  },
+    color: palette.textMuted
+  }
 });
-
 export default RecentSearches;

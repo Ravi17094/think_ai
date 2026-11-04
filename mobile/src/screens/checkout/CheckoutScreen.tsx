@@ -27,11 +27,13 @@ import {
 } from '@/components/checkout';
 import { useCheckout, type CheckoutFormSnapshot } from '@/hooks/useCheckout';
 import type { ScreenProps } from '@/navigation/types';
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import {radii, spacing, typography} from '@/theme/tokens';
 import { formatINR } from '@/utils/pricing';
 import type { CardDetails, PaymentConfirmation } from '@/types/community';
 import type { PaymentDetails } from '@/features/payments/types';
 import { failureReasonFromCode } from '@/features/payments/failure';
+import type { Palette } from '@/theme/tokens';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 const EMPTY_CARD: CardDetails = { number: '', expiry: '', cvv: '', name: '' };
 
@@ -50,6 +52,7 @@ function snapshotFromRoute(
  * retry attempts inline.
  */
 export function CheckoutScreen({ navigation, route }: ScreenProps<'Checkout'>) {
+  const styles = useThemedStyles(createStyles);
   const initialForm = snapshotFromRoute(route.params?.formValues);
   const {
     plans,
@@ -343,7 +346,7 @@ export function CheckoutScreen({ navigation, route }: ScreenProps<'Checkout'>) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: palette.background,

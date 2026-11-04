@@ -157,12 +157,19 @@ export function createInstructorFactory(seed = 1) {
 
 export function createLessonFactory(seed = 1) {
   const random = createSeededRandom(seed);
-  return (moduleIndex: number, lessonIndex: number): Lesson => ({
-    id: `les-${moduleIndex}-${lessonIndex}`,
-    title: `${pick(random, LESSON_TITLES)} ${lessonIndex + 1}`,
-    type: pick(random, LESSON_TYPES),
-    durationMinutes: intBetween(random, 5, 45),
-  });
+  return (moduleIndex: number, lessonIndex: number): Lesson => {
+    const id = `les-${moduleIndex}-${lessonIndex}`;
+    const title = `${pick(random, LESSON_TITLES)} ${lessonIndex + 1}`;
+    const type = pick(random, LESSON_TYPES);
+    return {
+      id,
+      title,
+      type,
+      durationMinutes: intBetween(random, 5, 45),
+      description: `In this ${type} lesson you will work through ${title.toLowerCase()} with a runnable example and a short recap.`,
+      videoUrl: `https://videos.thinkzai.dev/mock/${id}.mp4`,
+    };
+  };
 }
 
 export function createModuleFactory(seed = 1) {
@@ -220,6 +227,12 @@ export function createCourseFactory(seed = 1, idPrefix = 'course') {
       instructor: createInstructor(index),
       modules,
       tags: [...seedEntry.tags],
+      learningObjectives: [
+        `Build production-ready ${seedEntry.tags[0] ?? 'engineering'} features from scratch.`,
+        `Apply ${seedEntry.level}-level patterns to a realistic capstone project.`,
+        'Debug and test confidently using the same workflow professional teams use.',
+        'Ship a portfolio-ready project you can keep extending.',
+      ],
     };
 
     return { ...base, ...overrides, modules: overrides.modules ?? base.modules };
@@ -256,6 +269,15 @@ export function createEnrollmentFactory(seed = 1) {
       overrides.completedLessons ??
       Math.round((totalLessons * progressPercent) / 100);
 
+    // Seeded completion list keeps the player + My Learning resume flow
+    // deterministic: completed lessons are always the first N in the course.
+    const lessonIds = course.modules.flatMap((module) =>
+      module.lessons.map((lesson) => lesson.id)
+    );
+    const completedLessonIds =
+      overrides.completedLessonIds ??
+      lessonIds.slice(0, Math.max(0, Math.min(completedLessons, lessonIds.length)));
+
     const daysAgo = intBetween(random, 0, 21);
     const lastAccessedAt = new Date(
       Date.UTC(2026, 0, 1 + daysAgo, 9, 30)
@@ -271,6 +293,7 @@ export function createEnrollmentFactory(seed = 1) {
       completedLessons,
       totalLessons,
       lastAccessedAt,
+      completedLessonIds,
       ...overrides,
       course: { ...course, ...(overrides.course ?? {}) },
     };

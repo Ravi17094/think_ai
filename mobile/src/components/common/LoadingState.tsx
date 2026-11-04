@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { radii, spacing, typography } from '@/theme/tokens';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 export interface LoadingStateProps {
   /** Number of shimmer placeholders to render. */
@@ -15,6 +17,7 @@ export function LoadingState({
   label = 'Loading…',
   testID = 'loading-state',
 }: LoadingStateProps) {
+  const styles = useThemedStyles(createStyles);
   const shimmer = useRef(new Animated.Value(0.4)).current;
 
   useEffect(() => {
@@ -48,7 +51,8 @@ export function LoadingState({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) =>
+  StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',

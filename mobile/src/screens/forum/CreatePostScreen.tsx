@@ -19,7 +19,10 @@ import { TagMultiSelect } from '@/components/forum/TagMultiSelect';
 import { TITLE_MIN_LENGTH } from '@/components/forum/CreatePostModal';
 import { useCreateThread } from '@/hooks/useCreateThread';
 import type { ScreenProps } from '@/navigation/types';
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import {radii, spacing, typography} from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { useThemedStyles } from '@/theme/useThemedStyles';
+import { useTheme } from '@/theme/ThemeProvider';
 
 /**
  * Page 7 — Create Post (`/forum/new`).
@@ -28,6 +31,8 @@ import { palette, radii, spacing, typography } from '@/theme/tokens';
  * preview modal and a confirmation dialog before the discussion is created.
  */
 export function CreatePostScreen({ navigation }: ScreenProps<'CreatePost'>) {
+  const styles = useThemedStyles(createStyles);
+  const { palette } = useTheme();
   const {
     categories,
     availableTags,
@@ -249,7 +254,7 @@ export function CreatePostScreen({ navigation }: ScreenProps<'CreatePost'>) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: palette.background,

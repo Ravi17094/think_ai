@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 
-import { palette, radii } from '@/theme/tokens';
+import { radii } from '@/theme/tokens';
+import { useTheme } from '@/theme/ThemeProvider';
 
 export interface ProgressBarProps {
   /** Clamped to 0–100 internally. */
@@ -29,13 +30,16 @@ function clampPercent(value: number): number {
 export function ProgressBar({
   progress,
   height = 8,
-  trackColor = palette.surfaceMuted,
-  fillColor = palette.brand,
+  trackColor,
+  fillColor,
   animated = true,
   durationMs = 600,
   testID = 'progress-bar',
   accessibilityLabel,
 }: ProgressBarProps) {
+  const { palette } = useTheme();
+  const resolvedTrackColor = trackColor ?? palette.surfaceMuted;
+  const resolvedFillColor = fillColor ?? palette.brand;
   const target = clampPercent(progress);
   const width = useRef(new Animated.Value(target)).current;
 
@@ -62,7 +66,7 @@ export function ProgressBar({
       accessibilityValue={{ now: Math.round(target), min: 0, max: 100 }}
       style={[
         styles.track,
-        { height, borderRadius: height / 2, backgroundColor: trackColor },
+        { height, borderRadius: height / 2, backgroundColor: resolvedTrackColor },
       ]}
       testID={testID}>
       <Animated.View
@@ -70,7 +74,7 @@ export function ProgressBar({
         style={[
           styles.fill,
           {
-            backgroundColor: fillColor,
+            backgroundColor: resolvedFillColor,
             borderRadius: height / 2,
             width: width.interpolate({
               inputRange: [0, 100],

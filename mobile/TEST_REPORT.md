@@ -302,3 +302,103 @@ paths, API argument contracts (`communityClient.test.ts`), and the pure units
   over HTTP.
 - **Notifications API** — no endpoint for community notification fan-out yet,
   so Pages 6–7 create posts/replies without pushing notifications.
+
+---
+
+# Learner experience refresh (Udemy-inspired IA)
+
+Owner: Manjunath
+Branch: `manjunath-mobile-features`
+Date: 2026-11-02
+
+## Scope
+
+A learner-first refresh of the existing mobile surfaces. The Thinkz AI brand,
+auth gate, routes, deep links and `LearningApiClient` seam are unchanged; the
+work adds an inspiration/continuation hierarchy and the missing learning flows
+on top of the existing data layer. No Udemy assets, trademarks or SDKs are used.
+
+| Surface | What changed |
+| --- | --- |
+| Learner Dashboard | Discovery header, enrollment stat, category shortcuts, featured rail, continue-learning shelf, recommended rail, shared loading/error/empty states. |
+| My Learning | New `/learner/my-learning` route with stats, search, status/category filters, resume cards, refresh and an actionable empty state. |
+| My Courses | Category + sort chips and category-aware deep links, all filtered client-side so the existing `searchCourses` contract stays unchanged. |
+| Course Detail | Learning objectives, persisted progress, enrollment/re-enroll states, resume CTA, lesson-aware curriculum and search shortcut. |
+| Video Player | Full curriculum, previous/next navigation, mark-complete mutations with progress recalculation, certificate and assessment entry points. |
+| Global Search | Popular-search suggestions and category shortcuts on the idle state; the existing 300 ms debounce, recents and per-type cache are preserved. |
+| Shared components | `SectionHeader`, `CategoryChips`, `SortChips`, `CourseRail`, richer `CourseCard`/`CourseGrid`, and lesson-aware `ModuleAccordion`. |
+
+## Functionality
+
+- `LearningApiClient` gained `enrollCourse` and `updateLessonProgress`; the
+  deterministic mock implements both and keeps timestamps fixed (`MOCK_NOW`).
+- `useEnrollments` now exposes enrollment lookup plus both mutations, updating
+  the shared list optimistically only after the API resolves.
+- Course categories are derived from course tags in `src/utils/course.ts`, so
+  no backend schema change is required.
+- The catalogue category/sort controls filter locally; `searchCourses` is still
+  called with only `{ query, status }`.
+- Existing test IDs and the 400 ms enroll transition are preserved.
+
+## Accessibility and responsive checks
+
+- Every new interactive control has a role and accessible label; decorative
+  glyphs are hidden from screen readers.
+- Category/sort chips, section actions, player controls and curriculum rows
+  expose 44 px minimum targets (or an equivalent 64 px play control).
+- `CourseGrid` was asserted at **375 px** and **390 px**: two columns with
+  181.5 px / 189 px card widths, consistent gutters and expanded `hitSlop`.
+- `CourseRail` keeps a 248 px card so the next card peeks in at both widths.
+- `ModuleAccordion` announces completion, and the player announces play/pause,
+  previous/next, selected lesson and busy states.
+
+## Verified
+
+| Check | Command | Result |
+| --- | --- | --- |
+| TypeScript | `npm run typecheck` | passed, 0 errors |
+| Lint | `npm run lint` | passed, 0 errors, 0 warnings |
+| Tests | `npx jest --silent` | **498 passed, 0 failed** across 49 suites |
+| Accessibility/responsive suites | `npx jest src/tests/a11y --silent` | 42 passed, 0 failed |
+| Android release bundle | `npx expo export --platform android` | bundled 866 modules (2.3 MB Hermes bundle), no resolution errors |
+
+### Changed/new test coverage
+
+| Suite | Tests |
+| --- | --- |
+| `tests/dashboard/LearnerDashboardScreen.test.tsx` | 17 |
+| `tests/myLearning/MyLearningScreen.test.tsx` | 12 |
+| `tests/myCourses/MyCoursesScreen.test.tsx` | 16 |
+| `tests/course/CourseDetailScreen.test.tsx` | 19 |
+| `tests/course/ModuleAccordion.test.tsx` | 9 |
+| `tests/learning/VideoPlayerScreen.test.tsx` | 11 |
+| `tests/search/GlobalSearchScreen.test.tsx` | 21 |
+| `tests/a11y/learnerA11y.test.tsx` | 6 |
+| `tests/a11y/learnerResponsive.test.tsx` | 6 |
+
+### Completion status
+
+| Area | Status |
+| --- | --- |
+| UI implementation | Complete for the assigned learner screens and shared components. |
+| Functionality | Complete against the existing `LearningApiClient` and deterministic mock; no backend contract changes beyond the two additive methods. |
+| Automated testing | Complete: unit, screen, accessibility and responsive assertions pass. |
+| On-device visual verification | Not run: no Android SDK/emulator or iOS simulator is available on this machine. The 375/390 px checks above are component-level layout assertions, not a device screenshot pass. |
+
+Known follow-up: when the Android toolchain is available, repeat the 375 px and
+390 px pass on an emulator/device and capture screenshots for the screenshot
+artifact set. This does not block the module handover.
+
+## Appearance controls and app-wide theme pass — 2026-11-02
+
+- Dashboard now has a compact, right-aligned Appearance segmented control with Light and Dark options.
+- Profile exposes an expandable Appearance row; selecting it reveals the same Light/Dark choices and selected state. Theme selection persists through the existing `ThemeProvider` preference.
+- Updated screen and shared component styles to use the active palette, including learner, course, search, forum, moderation, checkout, auth, learning and onboarding surfaces. The status bar switches foreground style with the selected theme.
+
+| Check | Command | Result |
+| --- | --- | --- |
+| TypeScript | `npm run typecheck` | Passed, 0 errors |
+| Lint | `npm run lint` | Passed, 0 warnings |
+| Jest | `npm test -- --runInBand --silent` | **506 passed, 0 failed** across 54 suites |
+| Appearance screen coverage | Profile + dashboard suites | Passed; Profile expands the setting and Home switches both modes |
+| Android export | `npx expo export --platform android` | Passed; bundled 877 modules, emitted a 2.37 MB Hermes bundle to `dist/` |

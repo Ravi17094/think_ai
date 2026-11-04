@@ -1,15 +1,15 @@
+import { useTheme } from "@/theme/ThemeProvider";
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { StyleSheet, Text, TextInput, View } from 'react-native';
-
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import { radii, spacing, typography } from '@/theme/tokens';
 import type { CardDetails } from '@/types/community';
-
 export interface CardFormErrors {
   number?: string;
   expiry?: string;
   cvv?: string;
   name?: string;
 }
-
 export interface CardFormProps {
   value: CardDetails;
   onChange: (next: CardDetails) => void;
@@ -39,7 +39,6 @@ export function luhnCheck(digits: string): boolean {
   }
   return sum % 10 === 0;
 }
-
 export function validateCardNumber(value: string): boolean {
   const digits = value.replace(/\D/g, '');
   return digits.length >= 13 && digits.length <= 19 && luhnCheck(digits);
@@ -59,7 +58,6 @@ export function formatExpiry(value: string): string {
   }
   return `${digits.slice(0, 2)}/${digits.slice(2)}`;
 }
-
 export function validateExpiry(value: string, now: Date = new Date()): boolean {
   const match = /^(\d{2})\/(\d{2})$/.exec(value);
   if (!match) {
@@ -74,7 +72,6 @@ export function validateExpiry(value: string, now: Date = new Date()): boolean {
   const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
   return endOfMonth > startOfCurrentMonth;
 }
-
 export function validateCvv(value: string): boolean {
   return /^\d{3,4}$/.test(value);
 }
@@ -96,7 +93,6 @@ export function validateCard(card: CardDetails): CardFormErrors {
   }
   return errors;
 }
-
 const FIELDS: {
   key: keyof CardDetails;
   label: string;
@@ -104,40 +100,35 @@ const FIELDS: {
   keyboard: 'number-pad' | 'default';
   maxLength: number;
   errorKey: keyof CardFormErrors;
-}[] = [
-  {
-    key: 'number',
-    label: 'Card number',
-    placeholder: '4242 4242 4242 4242',
-    keyboard: 'number-pad',
-    maxLength: 23,
-    errorKey: 'number',
-  },
-  {
-    key: 'expiry',
-    label: 'Expiry',
-    placeholder: 'MM/YY',
-    keyboard: 'number-pad',
-    maxLength: 5,
-    errorKey: 'expiry',
-  },
-  {
-    key: 'cvv',
-    label: 'CVV',
-    placeholder: '123',
-    keyboard: 'number-pad',
-    maxLength: 4,
-    errorKey: 'cvv',
-  },
-  {
-    key: 'name',
-    label: 'Name on card',
-    placeholder: 'Ada Lovelace',
-    keyboard: 'default',
-    maxLength: 60,
-    errorKey: 'name',
-  },
-];
+}[] = [{
+  key: 'number',
+  label: 'Card number',
+  placeholder: '4242 4242 4242 4242',
+  keyboard: 'number-pad',
+  maxLength: 23,
+  errorKey: 'number'
+}, {
+  key: 'expiry',
+  label: 'Expiry',
+  placeholder: 'MM/YY',
+  keyboard: 'number-pad',
+  maxLength: 5,
+  errorKey: 'expiry'
+}, {
+  key: 'cvv',
+  label: 'CVV',
+  placeholder: '123',
+  keyboard: 'number-pad',
+  maxLength: 4,
+  errorKey: 'cvv'
+}, {
+  key: 'name',
+  label: 'Name on card',
+  placeholder: 'Ada Lovelace',
+  keyboard: 'default',
+  maxLength: 60,
+  errorKey: 'name'
+}];
 
 /**
  * Controlled card form with inline formatting and per-field validation
@@ -148,139 +139,95 @@ export function CardForm({
   onChange,
   errorMessage = null,
   showErrors = false,
-  testID = 'card-form',
+  testID = 'card-form'
 }: CardFormProps) {
+  const {
+    palette
+  } = useTheme();
+  const styles = useThemedStyles(createStyles);
   const errors = validateCard(value);
   const fieldErrorsVisible = showErrors || value.number !== '' || value.expiry !== '';
-
   const update = (key: keyof CardDetails, raw: string) => {
     if (key === 'number') {
-      onChange({ ...value, number: formatCardNumber(raw) });
+      onChange({
+        ...value,
+        number: formatCardNumber(raw)
+      });
     } else if (key === 'expiry') {
-      onChange({ ...value, expiry: formatExpiry(raw) });
+      onChange({
+        ...value,
+        expiry: formatExpiry(raw)
+      });
     } else if (key === 'cvv') {
-      onChange({ ...value, cvv: raw.replace(/\D/g, '').slice(0, 4) });
+      onChange({
+        ...value,
+        cvv: raw.replace(/\D/g, '').slice(0, 4)
+      });
     } else {
-      onChange({ ...value, [key]: raw });
+      onChange({
+        ...value,
+        [key]: raw
+      });
     }
   };
-
-  return (
-    <View style={styles.container} testID={testID}>
+  return <View style={styles.container} testID={testID}>
       <View style={[styles.field, styles.fieldWide]}>
         <Text style={styles.label}>{FIELDS[0]?.label}</Text>
-        <TextInput
-          accessibilityLabel="Card number"
-          keyboardType="number-pad"
-          maxLength={FIELDS[0]?.maxLength}
-          onChangeText={(text) => update('number', text)}
-          placeholder={FIELDS[0]?.placeholder}
-          placeholderTextColor={palette.textMuted}
-          style={styles.input}
-          testID={`${testID}-number`}
-          value={value.number}
-        />
-        {fieldErrorsVisible && errors.number ? (
-          <Text style={styles.fieldError} testID={`${testID}-number-error`}>
+        <TextInput accessibilityLabel="Card number" keyboardType="number-pad" maxLength={FIELDS[0]?.maxLength} onChangeText={text => update('number', text)} placeholder={FIELDS[0]?.placeholder} placeholderTextColor={palette.textMuted} style={styles.input} testID={`${testID}-number`} value={value.number} />
+        {fieldErrorsVisible && errors.number ? <Text style={styles.fieldError} testID={`${testID}-number-error`}>
             {errors.number}
-          </Text>
-        ) : null}
+          </Text> : null}
       </View>
 
       <View style={styles.row}>
         <View style={styles.field}>
           <Text style={styles.label}>Expiry</Text>
-          <TextInput
-            accessibilityLabel="Card expiry"
-            keyboardType="number-pad"
-            maxLength={5}
-            onChangeText={(text) => update('expiry', text)}
-            placeholder="MM/YY"
-            placeholderTextColor={palette.textMuted}
-            style={styles.input}
-            testID={`${testID}-expiry`}
-            value={value.expiry}
-          />
-          {fieldErrorsVisible && errors.expiry ? (
-            <Text style={styles.fieldError} testID={`${testID}-expiry-error`}>
+          <TextInput accessibilityLabel="Card expiry" keyboardType="number-pad" maxLength={5} onChangeText={text => update('expiry', text)} placeholder="MM/YY" placeholderTextColor={palette.textMuted} style={styles.input} testID={`${testID}-expiry`} value={value.expiry} />
+          {fieldErrorsVisible && errors.expiry ? <Text style={styles.fieldError} testID={`${testID}-expiry-error`}>
               {errors.expiry}
-            </Text>
-          ) : null}
+            </Text> : null}
         </View>
 
         <View style={styles.field}>
           <Text style={styles.label}>CVV</Text>
-          <TextInput
-            accessibilityLabel="Card CVV"
-            keyboardType="number-pad"
-            maxLength={4}
-            onChangeText={(text) => update('cvv', text)}
-            placeholder="123"
-            placeholderTextColor={palette.textMuted}
-            secureTextEntry
-            style={styles.input}
-            testID={`${testID}-cvv`}
-            value={value.cvv}
-          />
-          {fieldErrorsVisible && errors.cvv ? (
-            <Text style={styles.fieldError} testID={`${testID}-cvv-error`}>
+          <TextInput accessibilityLabel="Card CVV" keyboardType="number-pad" maxLength={4} onChangeText={text => update('cvv', text)} placeholder="123" placeholderTextColor={palette.textMuted} secureTextEntry style={styles.input} testID={`${testID}-cvv`} value={value.cvv} />
+          {fieldErrorsVisible && errors.cvv ? <Text style={styles.fieldError} testID={`${testID}-cvv-error`}>
               {errors.cvv}
-            </Text>
-          ) : null}
+            </Text> : null}
         </View>
       </View>
 
       <View style={styles.field}>
         <Text style={styles.label}>Name on card</Text>
-        <TextInput
-          accessibilityLabel="Name on card"
-          autoCapitalize="words"
-          keyboardType="default"
-          maxLength={60}
-          onChangeText={(text) => update('name', text)}
-          placeholder="Name as printed"
-          placeholderTextColor={palette.textMuted}
-          style={styles.input}
-          testID={`${testID}-name`}
-          value={value.name}
-        />
-        {fieldErrorsVisible && errors.name ? (
-          <Text style={styles.fieldError} testID={`${testID}-name-error`}>
+        <TextInput accessibilityLabel="Name on card" autoCapitalize="words" keyboardType="default" maxLength={60} onChangeText={text => update('name', text)} placeholder="Name as printed" placeholderTextColor={palette.textMuted} style={styles.input} testID={`${testID}-name`} value={value.name} />
+        {fieldErrorsVisible && errors.name ? <Text style={styles.fieldError} testID={`${testID}-name-error`}>
             {errors.name}
-          </Text>
-        ) : null}
+          </Text> : null}
       </View>
 
-      {errorMessage ? (
-        <Text
-          accessibilityLiveRegion="assertive"
-          style={styles.error}
-          testID={`${testID}-error`}>
+      {errorMessage ? <Text accessibilityLiveRegion="assertive" style={styles.error} testID={`${testID}-error`}>
           {errorMessage}
-        </Text>
-      ) : null}
-    </View>
-  );
+        </Text> : null}
+    </View>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   container: {
-    gap: spacing.sm,
+    gap: spacing.sm
   },
   row: {
     flexDirection: 'row',
-    gap: spacing.sm,
+    gap: spacing.sm
   },
   field: {
     flex: 1,
-    gap: spacing.xxs,
+    gap: spacing.xxs
   },
   fieldWide: {
-    flex: undefined,
+    flex: undefined
   },
   label: {
     ...typography.label,
-    color: palette.textSecondary,
+    color: palette.textSecondary
   },
   input: {
     ...typography.body,
@@ -291,11 +238,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     minHeight: 44,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    paddingVertical: spacing.xs
   },
   fieldError: {
     ...typography.caption,
-    color: palette.warning,
+    color: palette.warning
   },
   error: {
     ...typography.label,
@@ -304,8 +251,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.sm,
     borderWidth: 1,
     color: palette.danger,
-    padding: spacing.sm,
-  },
+    padding: spacing.sm
+  }
 });
-
 export default CardForm;

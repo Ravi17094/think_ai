@@ -6,7 +6,9 @@ import { BookmarkList } from '@/components/forum/BookmarkList';
 import { SyncIndicator } from '@/components/forum/SyncIndicator';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import type { ScreenProps } from '@/navigation/types';
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import {radii, spacing, typography} from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 /**
  * Page 8 — Bookmarks (`/forum/bookmarks`).
@@ -15,6 +17,7 @@ import { palette, radii, spacing, typography } from '@/theme/tokens';
  * session-aware reload whenever the signed-in user changes.
  */
 export function BookmarksScreen({ navigation }: ScreenProps<'Bookmarks'>) {
+  const styles = useThemedStyles(createStyles);
   const {
     bookmarks,
     syncedAt,
@@ -93,7 +96,7 @@ export function BookmarksScreen({ navigation }: ScreenProps<'Bookmarks'>) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: palette.background,

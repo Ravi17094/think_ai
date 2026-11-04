@@ -1,20 +1,22 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { StyleSheet, View } from 'react-native';
-
 import { Skeleton } from '@/components/common';
-import { palette, radii, spacing } from '@/theme/tokens';
+import { radii, spacing } from '@/theme/tokens';
 
 /** Queue-row skeletons matching the flag table layout (header lives in the table). */
 export function ModerationSkeleton({
   rows = 3,
-  testID = 'moderation-skeleton',
+  testID = 'moderation-skeleton'
 }: {
   rows?: number;
   testID?: string;
 }) {
-  return (
-    <View testID={testID}>
-      {Array.from({ length: rows }, (_, index) => (
-        <View key={index} style={styles.row}>
+  const styles = useThemedStyles(createStyles);
+  return <View testID={testID}>
+      {Array.from({
+      length: rows
+    }, (_, index) => <View key={index} style={styles.row}>
           <View style={styles.rowMain}>
             <View style={styles.contentLines}>
               <Skeleton height={12} width="30%" />
@@ -31,13 +33,10 @@ export function ModerationSkeleton({
             <Skeleton height={32} width={74} radius={999} />
             <Skeleton height={32} width={64} radius={999} />
           </View>
-        </View>
-      ))}
-    </View>
-  );
+        </View>)}
+    </View>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   row: {
     backgroundColor: palette.surface,
     borderColor: palette.border,
@@ -46,22 +45,21 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginHorizontal: spacing.md,
     marginTop: spacing.sm,
-    padding: spacing.sm,
+    padding: spacing.sm
   },
   rowMain: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: spacing.sm,
+    gap: spacing.sm
   },
   contentLines: {
     flex: 1,
-    gap: spacing.xs,
+    gap: spacing.xs
   },
   actions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.xs,
-  },
+    gap: spacing.xs
+  }
 });
-
 export default ModerationSkeleton;

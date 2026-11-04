@@ -9,7 +9,7 @@ import { PreviewModal } from '@/components/moderation/PreviewModal';
 import { UserPanel } from '@/components/moderation/UserPanel';
 import { useModeration, type ModerationTab } from '@/hooks/useModeration';
 import type { ScreenProps } from '@/navigation/types';
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import {radii, spacing, typography} from '@/theme/tokens';
 import { formatRelativeTime } from '@/utils/datetime';
 import type {
   ContentTarget,
@@ -17,6 +17,8 @@ import type {
   ModerationUser,
   UserPostSummary,
 } from '@/types/community';
+import type { Palette } from '@/theme/tokens';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 const TABS: { key: ModerationTab; label: string }[] = [
   { key: 'queue', label: 'Queue' },
@@ -42,6 +44,7 @@ interface PreviewState {
  * confirm dialogs for the destructive operations.
  */
 export function ModerationScreen(_props: ScreenProps<'Moderation'>) {
+  const styles = useThemedStyles(createStyles);
   const {
     tab,
     setTab,
@@ -246,7 +249,7 @@ export function ModerationScreen(_props: ScreenProps<'Moderation'>) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: palette.background,

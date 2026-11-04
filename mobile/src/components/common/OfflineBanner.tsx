@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { radii, spacing, typography } from '@/theme/tokens';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 export interface OfflineBannerProps {
   /** Defaults to `true`; render the banner only while offline. */
@@ -20,6 +22,7 @@ export function OfflineBanner({
   message = 'You are offline — showing saved content.',
   testID = 'offline-banner',
 }: OfflineBannerProps) {
+  const styles = useThemedStyles(createStyles);
   if (!visible) {
     return null;
   }
@@ -39,7 +42,8 @@ export function OfflineBanner({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) =>
+  StyleSheet.create({
   banner: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -59,7 +63,7 @@ const styles = StyleSheet.create({
   label: {
     ...typography.label,
     // High-contrast text for the amber surface (WCAG AA at this size).
-    color: '#FDE68A',
+    color: palette.warning,
     flexShrink: 1,
   },
 });

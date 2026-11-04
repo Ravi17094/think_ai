@@ -1,19 +1,20 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { StyleSheet, View } from 'react-native';
-
 import { Skeleton } from '@/components/common';
-import { palette, radii, spacing } from '@/theme/tokens';
+import { radii, spacing } from '@/theme/tokens';
 
 /**
  * Field skeletons for the create-post form while categories and the tag
  * taxonomy load — mirrors title / category / editor / tag rows.
  */
 export function CreatePostSkeleton({
-  testID = 'create-post-skeleton',
+  testID = 'create-post-skeleton'
 }: {
   testID?: string;
 }) {
-  return (
-    <View style={styles.form} testID={testID}>
+  const styles = useThemedStyles(createStyles);
+  return <View style={styles.form} testID={testID}>
       <Skeleton height={12} width="30%" testID={`${testID}-title-label`} />
       <Skeleton height={44} width="100%" radius={12} testID={`${testID}-title-field`} />
 
@@ -29,23 +30,20 @@ export function CreatePostSkeleton({
         <Skeleton height={28} width={58} radius={999} />
         <Skeleton height={28} width={64} radius={999} />
       </View>
-    </View>
-  );
+    </View>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   form: {
     backgroundColor: palette.surface,
     borderColor: palette.border,
     borderRadius: radii.lg,
     borderWidth: 1,
     gap: spacing.sm,
-    padding: spacing.md,
+    padding: spacing.md
   },
   tagRow: {
     flexDirection: 'row',
-    gap: spacing.xs,
-  },
+    gap: spacing.xs
+  }
 });
-
 export default CreatePostSkeleton;

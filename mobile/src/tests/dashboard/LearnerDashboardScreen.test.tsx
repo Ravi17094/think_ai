@@ -23,6 +23,16 @@ async function pullToRefresh() {
 }
 
 describe('LearnerDashboardScreen', () => {
+  it('places the compact theme selector in the Dashboard header action area', () => {
+    const { navigation } = renderScreen(LearnerDashboardScreen, { name: 'LearnerDashboard' });
+    const options = navigation.setOptions.mock.calls.map(([value]) => value);
+    const headerOptions = options.find((value) => typeof value.headerRight === 'function');
+    expect(headerOptions).toBeDefined();
+    const panel = headerOptions!.headerRight!();
+    expect(panel).toMatchObject({ props: { compact: true, testID: 'dashboard-appearance-toggle' } });
+    expect(screen.queryByTestId('dashboard-appearance-toggle')).toBeNull();
+  });
+
   it('shows a loading skeleton before enrollments arrive', async () => {
     const { client } = buildClient();
     renderScreen(LearnerDashboardScreen, { client, name: 'LearnerDashboard' });
@@ -148,5 +158,111 @@ describe('LearnerDashboardScreen', () => {
       expect(screen.getByTestId('course-card-percent')).toHaveTextContent('55%')
     );
     expect(screen.getByTestId('course-card-progress').props.accessibilityValue.now).toBe(55);
+  });
+
+  it('renders the discovery sections with category shortcuts', async () => {
+    const { client } = buildClient({ enrollmentCount: 3 });
+    renderScreen(LearnerDashboardScreen, { client, name: 'LearnerDashboard' });
+
+    await waitFor(() => expect(screen.getByTestId('dashboard-course-list')).toBeTruthy());
+
+    expect(screen.getByTestId('dashboard-categories')).toBeTruthy();
+    expect(screen.getByTestId('dashboard-category-chips')).toBeTruthy();
+    expect(screen.getByTestId('dashboard-featured')).toBeTruthy();
+    expect(screen.getByTestId('dashboard-recommended')).toBeTruthy();
+    expect(screen.getByText('Browse by category')).toBeTruthy();
+    expect(screen.getByText('Featured courses')).toBeTruthy();
+    expect(screen.getByText('Recommended for you')).toBeTruthy();
+  });
+
+  it('opens My Courses pre-filtered by the chosen category', async () => {
+    const { client } = buildClient({ enrollmentCount: 3 });
+    const navigation = createMockNavigation();
+    renderScreen(LearnerDashboardScreen, {
+      client,
+      name: 'LearnerDashboard',
+      navigation,
+    });
+
+    await waitFor(() => expect(screen.getByTestId('dashboard-categories')).toBeTruthy());
+    fireEvent.press(screen.getByTestId('category-chip-mobile'));
+
+    expect(navigation.navigate).toHaveBeenCalledWith('MyCourses', {
+      category: 'mobile',
+    });
+  });
+
+  it('opens course detail from a featured rail card', async () => {
+    const { client } = buildClient({ enrollmentCount: 3 });
+    const navigation = createMockNavigation();
+    renderScreen(LearnerDashboardScreen, {
+      client,
+      name: 'LearnerDashboard',
+      navigation,
+    });
+
+    await waitFor(() => expect(screen.getByTestId('dashboard-featured')).toBeTruthy());
+    const cards = screen.getAllByTestId(/^dashboard-featured-rail-card-/);
+    expect(cards.length).toBeGreaterThan(0);
+
+    const courseId = cards[0]!.props.testID.replace(
+      'dashboard-featured-rail-card-',
+      ''
+    );
+    fireEvent.press(cards[0]!);
+
+    expect(navigation.navigate).toHaveBeenCalledWith('CourseDetail', { courseId });
+  });
+
+  it('opens My Learning from the continue-learning action', async () => {
+    const { client } = buildClient({ enrollmentCount: 3 });
+    const navigation = createMockNavigation();
+    renderScreen(LearnerDashboardScreen, {
+      client,
+      name: 'LearnerDashboard',
+      navigation,
+    });
+
+    await waitFor(() => expect(screen.getByTestId('dashboard-continue')).toBeTruthy());
+    fireEvent.press(screen.getByTestId('dashboard-continue-header-action'));
+
+    expect(navigation.navigate).toHaveBeenCalledWith('MyLearning');
+  });
+
+  it('opens global search when the dashboard search is submitted', async () => {
+    const { client } = buildClient({ enrollmentCount: 3 });
+    const navigation = createMockNavigation();
+    renderScreen(LearnerDashboardScreen, {
+      client,
+      name: 'LearnerDashboard',
+      navigation,
+    });
+
+    await waitFor(() => expect(screen.getByTestId('dashboard-search')).toBeTruthy());
+    fireEvent(screen.getByTestId('dashboard-search-input'), 'submitEditing');
+
+    expect(navigation.navigate).toHaveBeenCalledWith('GlobalSearch');
+  });
+
+  it('keeps discovery visible for a learner with no enrollments', async () => {
+    const { client } = buildClient({ enrollmentCount: 0 });
+    renderScreen(LearnerDashboardScreen, { client, name: 'LearnerDashboard' });
+
+    await waitFor(() =>
+      expect(screen.getByTestId('dashboard-empty-state')).toBeTruthy()
+    );
+
+    expect(screen.getByTestId('dashboard-featured')).toBeTruthy();
+    expect(screen.getByTestId('dashboard-categories')).toBeTruthy();
+    expect(screen.queryByTestId('dashboard-continue')).toBeNull();
+  });
+
+  it('labels each continue-learning card with its resume action', async () => {
+    const { client } = buildClient({ enrollmentCount: 2 });
+    renderScreen(LearnerDashboardScreen, { client, name: 'LearnerDashboard' });
+
+    await waitFor(() => expect(screen.getByTestId('dashboard-course-list')).toBeTruthy());
+
+    expect(screen.getAllByTestId('course-card-action').length).toBeGreaterThan(0);
   });
 });

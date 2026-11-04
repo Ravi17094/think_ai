@@ -1,26 +1,21 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { Image, StyleSheet, Text, View } from 'react-native';
-
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import { radii, spacing, typography } from '@/theme/tokens';
 import type { Instructor } from '@/types';
-
 export interface InstructorCardProps {
   instructor: Instructor;
   testID?: string;
 }
-
 export function InstructorCard({
   instructor,
-  testID = 'instructor-card',
+  testID = 'instructor-card'
 }: InstructorCardProps) {
-  return (
-    <View style={styles.card} testID={testID}>
-      <Image
-        accessibilityIgnoresInvertColors
-        accessibilityLabel={instructor.name}
-        source={{ uri: instructor.avatarUrl }}
-        style={styles.avatar}
-        testID={`${testID}-avatar`}
-      />
+  const styles = useThemedStyles(createStyles);
+  return <View style={styles.card} testID={testID}>
+      <Image accessibilityIgnoresInvertColors accessibilityLabel={instructor.name} source={{
+      uri: instructor.avatarUrl
+    }} style={styles.avatar} testID={`${testID}-avatar`} />
       <View style={styles.body}>
         <Text style={styles.name} testID={`${testID}-name`}>
           {instructor.name}
@@ -30,11 +25,9 @@ export function InstructorCard({
           {instructor.bio}
         </Text>
       </View>
-    </View>
-  );
+    </View>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   card: {
     flexDirection: 'row',
     gap: spacing.md,
@@ -42,31 +35,30 @@ const styles = StyleSheet.create({
     borderRadius: radii.lg,
     backgroundColor: palette.surface,
     borderWidth: 1,
-    borderColor: palette.border,
+    borderColor: palette.border
   },
   avatar: {
     width: 56,
     height: 56,
     borderRadius: radii.pill,
-    backgroundColor: palette.surfaceMuted,
+    backgroundColor: palette.surfaceMuted
   },
   body: {
     flex: 1,
-    gap: spacing.xxs,
+    gap: spacing.xxs
   },
   name: {
     ...typography.subtitle,
-    color: palette.textPrimary,
+    color: palette.textPrimary
   },
   title: {
     ...typography.caption,
-    color: palette.accent,
+    color: palette.accent
   },
   bio: {
     ...typography.caption,
     color: palette.textSecondary,
-    marginTop: spacing.xxs,
-  },
+    marginTop: spacing.xxs
+  }
 });
-
 export default InstructorCard;

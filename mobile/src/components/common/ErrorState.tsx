@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { radii, spacing, typography } from '@/theme/tokens';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 export interface ErrorStateProps {
   message: string;
@@ -15,6 +17,7 @@ export function ErrorState({
   retryLabel = 'Try again',
   testID = 'error-state',
 }: ErrorStateProps) {
+  const styles = useThemedStyles(createStyles);
   return (
     <View
       accessibilityLiveRegion="assertive"
@@ -38,7 +41,8 @@ export function ErrorState({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) =>
+  StyleSheet.create({
   container: {
     alignItems: 'center',
     padding: spacing.lg,

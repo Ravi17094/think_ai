@@ -1,6 +1,9 @@
 import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { radii, spacing, typography } from '@/theme/tokens';
+import { useTheme } from '@/theme/ThemeProvider';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 export interface ConfirmDialogProps {
   visible: boolean;
@@ -33,6 +36,8 @@ export function ConfirmDialog({
   onCancel,
   testID = 'confirm-dialog',
 }: ConfirmDialogProps) {
+  const { palette } = useTheme();
+  const styles = useThemedStyles(createStyles);
   return (
     <Modal
       animationType="fade"
@@ -110,7 +115,8 @@ export function ConfirmDialog({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) =>
+  StyleSheet.create({
   backdrop: {
     flex: 1,
     alignItems: 'center',

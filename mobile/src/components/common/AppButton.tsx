@@ -7,7 +7,10 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { radii, spacing, typography } from '@/theme/tokens';
+import { useTheme } from '@/theme/ThemeProvider';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 export type AppButtonVariant = 'primary' | 'secondary' | 'danger';
 
@@ -34,6 +37,8 @@ export function AppButton({
   style,
   testID,
 }: AppButtonProps) {
+  const { palette } = useTheme();
+  const styles = useThemedStyles(createStyles);
   const isBlocked = loading || disabled;
   const label = loading && loadingLabel ? loadingLabel : title;
 
@@ -72,7 +77,8 @@ export function AppButton({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) =>
+  StyleSheet.create({
   base: {
     flexDirection: 'row',
     alignItems: 'center',

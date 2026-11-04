@@ -1,11 +1,16 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { hitSlop, palette, radii, spacing, typography } from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { hitSlop, radii, spacing, typography } from '@/theme/tokens';
+import { useTheme } from '@/theme/ThemeProvider';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 export interface SearchBarProps {
   value: string;
   onChangeText: (next: string) => void;
   onClear?: () => void;
+  /** Fired when the keyboard search key is pressed. */
+  onSubmit?: () => void;
   placeholder?: string;
   /** True while a debounced request is in flight. */
   isSearching?: boolean;
@@ -16,10 +21,13 @@ export function SearchBar({
   value,
   onChangeText,
   onClear,
+  onSubmit,
   placeholder = 'Search courses…',
   isSearching = false,
   testID = 'search-bar',
 }: SearchBarProps) {
+  const { palette } = useTheme();
+  const styles = useThemedStyles(createStyles);
   const showClear = value.length > 0;
 
   const handleClear = () => {
@@ -43,6 +51,7 @@ export function SearchBar({
         autoCapitalize="none"
         autoCorrect={false}
         onChangeText={onChangeText}
+        onSubmitEditing={onSubmit}
         placeholder={placeholder}
         placeholderTextColor={palette.textMuted}
         returnKeyType="search"
@@ -73,7 +82,8 @@ export function SearchBar({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) =>
+  StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',

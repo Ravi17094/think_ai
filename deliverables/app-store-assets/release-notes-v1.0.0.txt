@@ -1,0 +1,20 @@
+Version 1.0.0 Release Notes
+
+New Features:
+- Complete e-learning platform with course catalog and enrollment
+- Interactive video player with progress tracking
+- Community forum with discussions, replies, and moderation
+- Secure checkout and payment processing
+- User profiles with role-based access (Learner, Instructor, TA, Admin)
+- Onboarding flow for new users
+- Push notifications for course updates and community activity
+- Offline support for key features
+- Comprehensive accessibility support
+
+Improvements:
+- Optimized forum performance for smooth scrolling with large thread lists
+- Enhanced UI/UX with modern design
+- Improved search functionality
+
+Bug Fixes:
+- Various stability and performance improvements

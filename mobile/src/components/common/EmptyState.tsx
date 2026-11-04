@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { radii, spacing, typography } from '@/theme/tokens';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 export interface EmptyStateProps {
   icon?: string;
@@ -19,6 +21,7 @@ export function EmptyState({
   onAction,
   testID = 'empty-state',
 }: EmptyStateProps) {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.container} testID={testID}>
       <View style={styles.iconCircle} testID={`${testID}-icon`}>
@@ -39,7 +42,8 @@ export function EmptyState({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) =>
+  StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',

@@ -1,7 +1,8 @@
+import { useTheme } from "@/theme/ThemeProvider";
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
-
-import { palette, radii, spacing, typography } from '@/theme/tokens';
-
+import { radii, spacing, typography } from '@/theme/tokens';
 export interface SolvedToggleProps {
   solved: boolean;
   /** Only the thread author gets the interactive toggle. */
@@ -20,41 +21,30 @@ export function SolvedToggle({
   canManage,
   isUpdating = false,
   onToggle,
-  testID = 'solved-toggle',
+  testID = 'solved-toggle'
 }: SolvedToggleProps) {
+  const {
+    palette
+  } = useTheme();
+  const styles = useThemedStyles(createStyles);
   if (!canManage) {
-    return solved ? (
-      <Text style={styles.badge} testID={`${testID}-badge`}>
+    return solved ? <Text style={styles.badge} testID={`${testID}-badge`}>
         ✓ Solved
-      </Text>
-    ) : null;
+      </Text> : null;
   }
-
-  return (
-    <Pressable
-      accessibilityLabel={solved ? 'Mark thread as unsolved' : 'Mark thread as solved'}
-      accessibilityRole="button"
-      accessibilityState={{ selected: solved, busy: isUpdating, disabled: isUpdating }}
-      disabled={isUpdating}
-      onPress={() => onToggle?.(!solved)}
-      style={({ pressed }) => [
-        styles.badge,
-        solved ? styles.solvedActive : styles.solvedInactive,
-        pressed && styles.pressed,
-      ]}
-      testID={testID}>
-      {isUpdating ? (
-        <ActivityIndicator color={palette.success} size="small" />
-      ) : (
-        <Text style={[styles.label, solved ? styles.labelActive : styles.labelInactive]}>
+  return <Pressable accessibilityLabel={solved ? 'Mark thread as unsolved' : 'Mark thread as solved'} accessibilityRole="button" accessibilityState={{
+    selected: solved,
+    busy: isUpdating,
+    disabled: isUpdating
+  }} disabled={isUpdating} onPress={() => onToggle?.(!solved)} style={({
+    pressed
+  }) => [styles.badge, solved ? styles.solvedActive : styles.solvedInactive, pressed && styles.pressed]} testID={testID}>
+      {isUpdating ? <ActivityIndicator color={palette.success} size="small" /> : <Text style={[styles.label, solved ? styles.labelActive : styles.labelInactive]}>
           {solved ? '✓ Solved — tap to reopen' : 'Mark as solved'}
-        </Text>
-      )}
-    </Pressable>
-  );
+        </Text>}
+    </Pressable>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   badge: {
     alignItems: 'center',
     backgroundColor: palette.surfaceMuted,
@@ -65,27 +55,26 @@ const styles = StyleSheet.create({
     gap: spacing.xxs,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xxs,
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-start'
   },
   solvedActive: {
-    backgroundColor: 'rgba(52, 211, 153, 0.14)',
+    backgroundColor: 'rgba(52, 211, 153, 0.14)'
   },
   solvedInactive: {
-    borderColor: palette.borderStrong,
+    borderColor: palette.borderStrong
   },
   pressed: {
-    opacity: 0.75,
+    opacity: 0.75
   },
   label: {
     ...typography.caption,
-    fontWeight: '700',
+    fontWeight: '700'
   },
   labelActive: {
-    color: palette.success,
+    color: palette.success
   },
   labelInactive: {
-    color: palette.textSecondary,
-  },
+    color: palette.textSecondary
+  }
 });
-
 export default SolvedToggle;

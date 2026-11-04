@@ -1,37 +1,31 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { ImageBackground, StyleSheet, Text, View } from 'react-native';
-
-import { palette, spacing, typography } from '@/theme/tokens';
+import { spacing, typography } from '@/theme/tokens';
 import type { Course } from '@/types';
-
 export interface HeroBannerProps {
   course: Course;
   height?: number;
   testID?: string;
 }
-
 export function HeroBanner({
   course,
   height = 220,
-  testID = 'hero-banner',
+  testID = 'hero-banner'
 }: HeroBannerProps) {
+  const styles = useThemedStyles(createStyles);
   const hours = Math.round(course.durationMinutes / 60);
-
-  return (
-    <ImageBackground
-      accessibilityIgnoresInvertColors
-      imageStyle={styles.image}
-      source={{ uri: course.thumbnailUrl }}
-      style={[styles.container, { height }]}
-      testID={`${testID}-image`}>
+  return <ImageBackground accessibilityIgnoresInvertColors imageStyle={styles.image} source={{
+    uri: course.thumbnailUrl
+  }} style={[styles.container, {
+    height
+  }]} testID={`${testID}-image`}>
       <View style={styles.scrim} />
       <View style={styles.content} testID={testID}>
         <Text style={styles.level} testID={`${testID}-level`}>
           {course.level.toUpperCase()}
         </Text>
-        <Text
-          accessibilityRole="header"
-          style={styles.title}
-          testID={`${testID}-title`}>
+        <Text accessibilityRole="header" style={styles.title} testID={`${testID}-title`}>
           {course.title}
         </Text>
         <Text style={styles.subtitle} testID={`${testID}-subtitle`}>
@@ -47,49 +41,46 @@ export function HeroBanner({
           </Text>
         </View>
       </View>
-    </ImageBackground>
-  );
+    </ImageBackground>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   container: {
     width: '100%',
     justifyContent: 'flex-end',
-    backgroundColor: palette.surfaceMuted,
+    backgroundColor: palette.surfaceMuted
   },
   image: {
-    resizeMode: 'cover',
+    resizeMode: 'cover'
   },
   scrim: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(11, 16, 32, 0.72)',
+    backgroundColor: 'rgba(11, 16, 32, 0.72)'
   },
   content: {
     padding: spacing.md,
-    gap: spacing.xxs,
+    gap: spacing.xxs
   },
   level: {
     ...typography.caption,
     color: palette.accent,
-    letterSpacing: 1,
+    letterSpacing: 1
   },
   title: {
     ...typography.title,
-    color: palette.textPrimary,
+    color: palette.textPrimary
   },
   subtitle: {
     ...typography.body,
-    color: palette.textSecondary,
+    color: palette.textSecondary
   },
   metaRow: {
     flexDirection: 'row',
     gap: spacing.md,
-    marginTop: spacing.xs,
+    marginTop: spacing.xs
   },
   meta: {
     ...typography.caption,
-    color: palette.textMuted,
-  },
+    color: palette.textMuted
+  }
 });
-
 export default HeroBanner;

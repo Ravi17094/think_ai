@@ -1,19 +1,20 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { StyleSheet, View } from 'react-native';
-
 import { Skeleton } from '@/components/common';
-import { palette, radii, spacing } from '@/theme/tokens';
+import { radii, spacing } from '@/theme/tokens';
 
 /**
  * Checkout skeleton — mirrors the plan cards, payment form and order summary
  * so the page has no empty flash while plans load.
  */
 export function CheckoutSkeleton({
-  testID = 'checkout-skeleton',
+  testID = 'checkout-skeleton'
 }: {
   testID?: string;
 }) {
-  return (
-    <View style={styles.container} testID={testID}>
+  const styles = useThemedStyles(createStyles);
+  return <View style={styles.container} testID={testID}>
       <View style={styles.card}>
         <Skeleton height={16} width="55%" testID={`${testID}-plan-title`} />
         <Skeleton height={12} width="80%" />
@@ -40,13 +41,11 @@ export function CheckoutSkeleton({
         <Skeleton height={14} width="70%" />
         <Skeleton height={18} width="44%" />
       </View>
-    </View>
-  );
+    </View>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   container: {
-    gap: spacing.sm,
+    gap: spacing.sm
   },
   card: {
     backgroundColor: palette.surface,
@@ -54,12 +53,11 @@ const styles = StyleSheet.create({
     borderRadius: radii.lg,
     borderWidth: 1,
     gap: spacing.sm,
-    padding: spacing.md,
+    padding: spacing.md
   },
   row: {
     flexDirection: 'row',
-    gap: spacing.sm,
-  },
+    gap: spacing.sm
+  }
 });
-
 export default CheckoutSkeleton;

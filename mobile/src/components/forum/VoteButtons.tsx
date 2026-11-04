@@ -1,8 +1,8 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-
-import { palette, hitSlop, spacing, typography } from '@/theme/tokens';
+import { hitSlop, spacing, typography } from '@/theme/tokens';
 import type { VoteDirection } from '@/types/community';
-
 export interface VoteButtonsProps {
   score: number;
   userVote: VoteDirection;
@@ -22,55 +22,37 @@ export function VoteButtons({
   onVote,
   disabled = false,
   orientation = 'vertical',
-  testID = 'vote-buttons',
+  testID = 'vote-buttons'
 }: VoteButtonsProps) {
+  const styles = useThemedStyles(createStyles);
   const press = (direction: VoteDirection) => () => {
     if (!disabled) {
       onVote(direction);
     }
   };
-
   const upSelected = userVote === 'up';
   const downSelected = userVote === 'down';
-
-  return (
-    <View
-      accessibilityRole="summary"
-      style={[styles.row, orientation === 'vertical' && styles.column]}
-      testID={testID}>
-      <Pressable
-        accessibilityLabel={upSelected ? 'Remove upvote' : 'Upvote'}
-        accessibilityRole="button"
-        accessibilityState={{ disabled, selected: upSelected }}
-        hitSlop={hitSlop}
-        onPress={press('up')}
-        style={styles.button}
-        testID={`${testID}-up`}>
+  return <View accessibilityRole="summary" style={[styles.row, orientation === 'vertical' && styles.column]} testID={testID}>
+      <Pressable accessibilityLabel={upSelected ? 'Remove upvote' : 'Upvote'} accessibilityRole="button" accessibilityState={{
+      disabled,
+      selected: upSelected
+    }} hitSlop={hitSlop} onPress={press('up')} style={styles.button} testID={`${testID}-up`}>
         <Text style={[styles.arrow, upSelected && styles.upSelected]}>▲</Text>
       </Pressable>
 
-      <Text
-        accessibilityLabel={`Score ${score}`}
-        style={[styles.score, upSelected && styles.upSelected, downSelected && styles.downSelected]}
-        testID={`${testID}-score`}>
+      <Text accessibilityLabel={`Score ${score}`} style={[styles.score, upSelected && styles.upSelected, downSelected && styles.downSelected]} testID={`${testID}-score`}>
         {score}
       </Text>
 
-      <Pressable
-        accessibilityLabel={downSelected ? 'Remove downvote' : 'Downvote'}
-        accessibilityRole="button"
-        accessibilityState={{ disabled, selected: downSelected }}
-        hitSlop={hitSlop}
-        onPress={press('down')}
-        style={styles.button}
-        testID={`${testID}-down`}>
+      <Pressable accessibilityLabel={downSelected ? 'Remove downvote' : 'Downvote'} accessibilityRole="button" accessibilityState={{
+      disabled,
+      selected: downSelected
+    }} hitSlop={hitSlop} onPress={press('down')} style={styles.button} testID={`${testID}-down`}>
         <Text style={[styles.arrow, downSelected && styles.downSelected]}>▼</Text>
       </Pressable>
-    </View>
-  );
+    </View>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   row: {
     alignItems: 'center',
     backgroundColor: palette.surfaceMuted,
@@ -79,35 +61,34 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: spacing.xs,
     paddingVertical: spacing.xxs,
-    gap: spacing.xxs,
+    gap: spacing.xxs
   },
   column: {
-    flexDirection: 'column',
+    flexDirection: 'column'
   },
   button: {
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 32,
-    minWidth: 32,
+    minWidth: 32
   },
   arrow: {
     ...typography.label,
     color: palette.textSecondary,
-    fontSize: 14,
+    fontSize: 14
   },
   score: {
     ...typography.label,
     color: palette.textPrimary,
     fontWeight: '700',
     minWidth: 24,
-    textAlign: 'center',
+    textAlign: 'center'
   },
   upSelected: {
-    color: palette.success,
+    color: palette.success
   },
   downSelected: {
-    color: palette.danger,
-  },
+    color: palette.danger
+  }
 });
-
 export default VoteButtons;

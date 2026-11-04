@@ -11,10 +11,13 @@ import { TagFilter } from '@/components/forum/TagFilter';
 import { ThreadList } from '@/components/forum/ThreadList';
 import { useForumThreads } from '@/hooks/useForumThreads';
 import type { ScreenProps } from '@/navigation/types';
-import { palette, spacing } from '@/theme/tokens';
+import {spacing} from '@/theme/tokens';
 import type { CreateThreadInput } from '@/types';
+import type { Palette } from '@/theme/tokens';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 export function ForumHomeScreen({ navigation }: ScreenProps<'ForumHome'>) {
+  const styles = useThemedStyles(createStyles);
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [composerError, setComposerError] = useState<string | null>(null);
@@ -122,7 +125,7 @@ export function ForumHomeScreen({ navigation }: ScreenProps<'ForumHome'>) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: palette.background,

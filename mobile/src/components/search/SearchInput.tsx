@@ -1,7 +1,8 @@
+import { useTheme } from "@/theme/ThemeProvider";
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-
-import { hitSlop, palette, radii, spacing, typography } from '@/theme/tokens';
-
+import { hitSlop, radii, spacing, typography } from '@/theme/tokens';
 export interface SearchInputProps {
   value: string;
   onChangeText: (next: string) => void;
@@ -12,7 +13,6 @@ export interface SearchInputProps {
   autoFocus?: boolean;
   testID?: string;
 }
-
 export function SearchInput({
   value,
   onChangeText,
@@ -21,8 +21,12 @@ export function SearchInput({
   placeholder = 'Search courses, lessons, forum and assessments…',
   isBusy = false,
   autoFocus = false,
-  testID = 'search-input',
+  testID = 'search-input'
 }: SearchInputProps) {
+  const {
+    palette
+  } = useTheme();
+  const styles = useThemedStyles(createStyles);
   const handleClear = () => {
     if (onClear) {
       onClear();
@@ -30,53 +34,20 @@ export function SearchInput({
     }
     onChangeText('');
   };
-
-  return (
-    <View style={styles.container} testID={testID}>
-      <Text
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-        style={styles.leadingIcon}>
+  return <View style={styles.container} testID={testID}>
+      <Text accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={styles.leadingIcon}>
         🔍
       </Text>
-      <TextInput
-        accessibilityLabel={placeholder}
-        autoCapitalize="none"
-        autoCorrect={false}
-        autoFocus={autoFocus}
-        onChangeText={onChangeText}
-        onSubmitEditing={() => onSubmit?.(value)}
-        placeholder={placeholder}
-        placeholderTextColor={palette.textMuted}
-        returnKeyType="search"
-        style={styles.input}
-        testID={`${testID}-field`}
-        value={value}
-      />
-      {value.length > 0 ? (
-        <Pressable
-          accessibilityLabel="Clear search"
-          accessibilityRole="button"
-          hitSlop={hitSlop}
-          onPress={handleClear}
-          testID={`${testID}-clear`}>
+      <TextInput accessibilityLabel={placeholder} autoCapitalize="none" autoCorrect={false} autoFocus={autoFocus} onChangeText={onChangeText} onSubmitEditing={() => onSubmit?.(value)} placeholder={placeholder} placeholderTextColor={palette.textMuted} returnKeyType="search" style={styles.input} testID={`${testID}-field`} value={value} />
+      {value.length > 0 ? <Pressable accessibilityLabel="Clear search" accessibilityRole="button" hitSlop={hitSlop} onPress={handleClear} testID={`${testID}-clear`}>
           <Text style={styles.clear}>✕</Text>
-        </Pressable>
-      ) : null}
-      {isBusy ? (
-        <Text
-          accessibilityLabel="Searching"
-          accessibilityLiveRegion="polite"
-          style={styles.busy}
-          testID={`${testID}-busy`}>
+        </Pressable> : null}
+      {isBusy ? <Text accessibilityLabel="Searching" accessibilityLiveRegion="polite" style={styles.busy} testID={`${testID}-busy`}>
           …
-        </Text>
-      ) : null}
-    </View>
-  );
+        </Text> : null}
+    </View>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -87,27 +58,26 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
     backgroundColor: palette.surface,
     borderWidth: 1,
-    borderColor: palette.border,
+    borderColor: palette.border
   },
   leadingIcon: {
-    fontSize: 14,
+    fontSize: 14
   },
   input: {
     flex: 1,
     ...typography.body,
     color: palette.textPrimary,
-    paddingVertical: spacing.xs,
+    paddingVertical: spacing.xs
   },
   clear: {
     ...typography.label,
     color: palette.textSecondary,
-    paddingHorizontal: spacing.xxs,
+    paddingHorizontal: spacing.xxs
   },
   busy: {
     ...typography.body,
     color: palette.textMuted,
-    paddingHorizontal: spacing.xxs,
-  },
+    paddingHorizontal: spacing.xxs
+  }
 });
-
 export default SearchInput;

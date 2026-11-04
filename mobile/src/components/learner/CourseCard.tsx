@@ -1,12 +1,17 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ProgressBar } from '@/components/common';
-import { hitSlop, palette, radii, spacing, typography } from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { hitSlop, radii, spacing, typography } from '@/theme/tokens';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 import type { Enrollment } from '@/types';
+import { formatRating } from '@/utils/course';
 
 export interface CourseCardProps {
   enrollment: Enrollment;
   onPress?: (enrollment: Enrollment) => void;
+  /** Visible call to action under the progress bar. */
+  actionLabel?: string;
   testID?: string;
 }
 
@@ -25,8 +30,10 @@ function statusLabel(enrollment: Enrollment): string {
 export function CourseCard({
   enrollment,
   onPress,
+  actionLabel,
   testID = 'course-card',
 }: CourseCardProps) {
+  const styles = useThemedStyles(createStyles);
   const { course } = enrollment;
   const progress = enrollment.progressPercent;
 
@@ -62,6 +69,14 @@ export function CourseCard({
         <Text numberOfLines={1} style={styles.subtitle}>
           {course.subtitle}
         </Text>
+        <View style={styles.metaRow}>
+          <Text numberOfLines={1} style={styles.instructor} testID={`${testID}-instructor`}>
+            {course.instructor.name}
+          </Text>
+          <Text style={styles.rating} testID={`${testID}-rating`}>
+            ★ {formatRating(course.rating)}
+          </Text>
+        </View>
 
         <View style={styles.progressRow}>
           <Text style={styles.progressPercent} testID={`${testID}-percent`}>
@@ -77,12 +92,18 @@ export function CourseCard({
           progress={progress}
           testID={`${testID}-progress`}
         />
+        {actionLabel ? (
+          <Text style={styles.actionLabel} testID={`${testID}-action`}>
+            {actionLabel}
+          </Text>
+        ) : null}
       </View>
     </Pressable>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) =>
+  StyleSheet.create({
   card: {
     borderRadius: radii.lg,
     backgroundColor: palette.surface,
@@ -110,7 +131,7 @@ const styles = StyleSheet.create({
   },
   statusBadgeText: {
     ...typography.caption,
-    color: palette.textPrimary,
+    color: '#F1F3F9',
   },
   body: {
     padding: spacing.md,
@@ -123,6 +144,21 @@ const styles = StyleSheet.create({
   subtitle: {
     ...typography.caption,
     color: palette.textMuted,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  instructor: {
+    ...typography.caption,
+    color: palette.textSecondary,
+    flexShrink: 1,
+  },
+  rating: {
+    ...typography.caption,
+    color: palette.warning,
   },
   progressRow: {
     flexDirection: 'row',
@@ -139,6 +175,12 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: palette.textSecondary,
     flexShrink: 1,
+  },
+  actionLabel: {
+    ...typography.caption,
+    color: palette.accent,
+    fontWeight: '700',
+    marginTop: spacing.xxs,
   },
 });
 

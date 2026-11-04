@@ -3,7 +3,9 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { ScreenProps } from '@/navigation/types';
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import {radii, spacing, typography} from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 const OPTIONS = [
   'Encapsulation',
@@ -16,6 +18,7 @@ export function AssessmentScreen({
   navigation,
   route,
 }: ScreenProps<'Assessment'>) {
+  const styles = useThemedStyles(createStyles);
   const [selected, setSelected] = useState<number | null>(null);
   const correctIndex = useMemo(() => 0, []);
 
@@ -67,7 +70,7 @@ export function AssessmentScreen({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: palette.background,

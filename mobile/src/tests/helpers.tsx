@@ -3,6 +3,12 @@ import { act, render, type RenderOptions } from '@testing-library/react-native';
 import type { LearningApiClient } from '@/api/client';
 import { ApiClientProvider } from '@/hooks/useApiClient';
 import type { RootStackParamList } from '@/navigation/types';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+import { ThemeProvider } from '@/theme/ThemeProvider';
+import type { ThemeMode } from '@/theme/tokens';
+
+const TEST_SAFE_AREA_METRICS = { frame: { x: 0, y: 0, width: 375, height: 800 }, insets: { top: 0, right: 0, bottom: 0, left: 0 } };
 
 type RouteName = keyof RootStackParamList;
 
@@ -35,6 +41,7 @@ export interface RenderWithProvidersOptions extends Omit<RenderOptions, 'wrapper
   client?: LearningApiClient;
   navigation?: MockNavigation;
   route?: Partial<{ params: Record<string, unknown> }> & { name?: RouteName };
+  themeMode?: ThemeMode;
 }
 
 /**
@@ -43,10 +50,14 @@ export interface RenderWithProvidersOptions extends Omit<RenderOptions, 'wrapper
  */
 export function renderWithProviders(
   ui: React.ReactElement,
-  { client, ...options }: RenderWithProvidersOptions = {}
+  { client, themeMode, ...options }: RenderWithProvidersOptions = {}
 ) {
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <ApiClientProvider client={client}>{children}</ApiClientProvider>
+    <SafeAreaProvider initialMetrics={TEST_SAFE_AREA_METRICS}>
+    <ThemeProvider initialMode={themeMode}>
+      <ApiClientProvider client={client}>{children}</ApiClientProvider>
+    </ThemeProvider>
+    </SafeAreaProvider>
   );
 
   return render(ui, { wrapper: Wrapper, ...options });
@@ -64,6 +75,7 @@ export function renderScreen<Name extends RouteName>(
     client?: LearningApiClient;
     navigation?: MockNavigation;
     params?: RootStackParamList[Name];
+    themeMode?: ThemeMode;
   }
 ) {
   const navigation = options.navigation ?? createMockNavigation();
@@ -72,7 +84,7 @@ export function renderScreen<Name extends RouteName>(
       navigation={navigation}
       route={{ key: `${options.name}-route`, name: options.name, params: options.params }}
     />,
-    { client: options.client }
+    { client: options.client, themeMode: options.themeMode }
   );
 
   return { ...result, navigation };

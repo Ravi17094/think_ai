@@ -20,6 +20,7 @@ import type {
   GlobalSearchResponse,
   SearchResult,
   SearchResultType,
+  UpdateLessonProgressInput,
 } from '@/types';
 import type { LearningApiClient } from './client';
 import { createCommunityClient } from './communityClient';
@@ -45,6 +46,9 @@ const TAG_POOL = [
 ] as const;
 
 const ALL_TAGS: string[] = [...TAG_POOL];
+
+/** Fixed "now" so mock mutations stay deterministic in snapshots and tests. */
+const MOCK_NOW = '2026-02-10T09:30:00.000Z';
 
 /**
  * Searchable keywords per result type. Titles alone would leave whole tabs
@@ -219,6 +223,100 @@ export function createMockApiClient(
         throw new Error(`Course "${courseId}" was not found.`);
       }
       return course;
+    },
+
+    async enrollCourse(courseId: string): Promise<Enrollment> {
+      await guard();
+
+      const existing = allEnrollments.find((e) => e.courseId === courseId);
+      if (existing) {
+        return existing;
+      }
+
+      const courseIndex = allCourses.findIndex((c) => c.id === courseId);
+      const course = allCourses[courseIndex];
+      if (!course) {
+        throw new Error(`Course "${courseId}" was not found.`);
+      }
+
+      // Replace rather than mutate: screens may still hold the pre-enrollment
+      // course object and must not flip to the enrolled state before the
+      // screen's own transition has finished.
+      const enrolledCourse: Course = { ...course, isEnrolled: true };
+      allCourses[courseIndex] = enrolledCourse;
+
+      const totalLessons = enrolledCourse.modules.reduce(
+        (sum, module) => sum + module.lessons.length,
+        0
+      );
+      const enrollment: Enrollment = {
+        id: `enr-new-${allEnrollments.length + 1}`,
+        userId: 'user-1',
+        courseId: enrolledCourse.id,
+        course: enrolledCourse,
+        batchName: 'Batch 26-A',
+        status: 'not-started',
+        progressPercent: 0,
+        completedLessons: 0,
+        totalLessons,
+        completedLessonIds: [],
+        // Fixed timestamp keeps mock responses deterministic across runs.
+        lastAccessedAt: MOCK_NOW,
+      };
+      allEnrollments.push(enrollment);
+      return enrollment;
+    },
+
+    async updateLessonProgress(
+      input: UpdateLessonProgressInput
+    ): Promise<Enrollment> {
+      await guard();
+
+      const index = allEnrollments.findIndex(
+        (e) => e.courseId === input.courseId
+      );
+      const enrollment = allEnrollments[index];
+      if (!enrollment) {
+        throw new Error(
+          `No enrollment found for course "${input.courseId}".`
+        );
+      }
+
+      const lessonIds = enrollment.course.modules.flatMap((module) =>
+        module.lessons.map((lesson) => lesson.id)
+      );
+      const completed = new Set(enrollment.completedLessonIds ?? []);
+      if (input.completed) {
+        completed.add(input.lessonId);
+      } else {
+        completed.delete(input.lessonId);
+      }
+
+      const completedLessonIds = lessonIds.filter((id) => completed.has(id));
+      const completedLessons = completedLessonIds.length;
+      const totalLessons = lessonIds.length || enrollment.totalLessons;
+      const progressPercent =
+        totalLessons > 0
+          ? Math.round((completedLessons / totalLessons) * 100)
+          : 0;
+      const status: EnrollmentStatus =
+        progressPercent >= 100
+          ? 'completed'
+          : progressPercent > 0
+            ? 'in-progress'
+            : 'not-started';
+
+      const updated: Enrollment = {
+        ...enrollment,
+        status,
+        progressPercent,
+        completedLessons,
+        totalLessons,
+        completedLessonIds,
+        lastAccessedAt: MOCK_NOW,
+      };
+      allEnrollments[index] = updated;
+      return updated;
     },
 
     async fetchAllTags(): Promise<string[]> {

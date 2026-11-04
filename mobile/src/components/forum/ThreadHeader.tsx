@@ -1,13 +1,13 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { StyleSheet, Text, View } from 'react-native';
-
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import { radii, spacing, typography } from '@/theme/tokens';
 import { formatRelativeTime } from '@/utils/datetime';
 import type { ForumCategory } from '@/types';
 import type { ThreadDetail, VoteDirection } from '@/types/community';
 import { MentionText } from './MentionText';
 import { SolvedToggle } from './SolvedToggle';
 import { VoteButtons } from './VoteButtons';
-
 export interface ThreadHeaderProps {
   thread: ThreadDetail;
   categories?: ForumCategory[];
@@ -31,31 +31,21 @@ export function ThreadHeader({
   onToggleSolved,
   isVoting = false,
   isUpdatingSolved = false,
-  testID = 'thread-header',
+  testID = 'thread-header'
 }: ThreadHeaderProps) {
-  const category = categories.find((item) => item.id === thread.categoryId);
-
-  return (
-    <View style={styles.card} testID={testID}>
+  const styles = useThemedStyles(createStyles);
+  const category = categories.find(item => item.id === thread.categoryId);
+  return <View style={styles.card} testID={testID}>
       <View style={styles.badgeRow}>
-        {category ? (
-          <Text style={[styles.category, { color: category.color }]}>
+        {category ? <Text style={[styles.category, {
+        color: category.color
+      }]}>
             {category.name}
-          </Text>
-        ) : null}
-        <SolvedToggle
-          canManage={isAuthor}
-          isUpdating={isUpdatingSolved}
-          onToggle={onToggleSolved}
-          solved={thread.solved}
-          testID={`${testID}-solved`}
-        />
+          </Text> : null}
+        <SolvedToggle canManage={isAuthor} isUpdating={isUpdatingSolved} onToggle={onToggleSolved} solved={thread.solved} testID={`${testID}-solved`} />
       </View>
 
-      <Text
-        accessibilityRole="header"
-        style={styles.title}
-        testID={`${testID}-title`}>
+      <Text accessibilityRole="header" style={styles.title} testID={`${testID}-title`}>
         {thread.title}
       </Text>
 
@@ -66,78 +56,57 @@ export function ThreadHeader({
         <View style={styles.authorMeta}>
           <Text style={styles.authorName} testID={`${testID}-author`}>
             {thread.author.name}
-            {thread.author.username ? (
-              <Text style={styles.handle}> @{thread.author.username}</Text>
-            ) : null}
+            {thread.author.username ? <Text style={styles.handle}> @{thread.author.username}</Text> : null}
           </Text>
           <Text style={styles.timestamp} testID={`${testID}-timestamp`}>
             {formatRelativeTime(thread.createdAt)} · {thread.views} views ·{' '}
             {thread.replyCount} replies
           </Text>
         </View>
-        <VoteButtons
-          disabled={isVoting}
-          onVote={onVote}
-          orientation="horizontal"
-          score={thread.score}
-          testID={`${testID}-votes`}
-          userVote={userVote}
-        />
+        <VoteButtons disabled={isVoting} onVote={onVote} orientation="horizontal" score={thread.score} testID={`${testID}-votes`} userVote={userVote} />
       </View>
 
       <MentionText text={thread.body} testID={`${testID}-body`} />
 
-      {thread.tags.length > 0 ? (
-        <View style={styles.tagRow} testID={`${testID}-tags`}>
-          {thread.tags.map((tag) => (
-            <View key={tag} style={styles.tag}>
+      {thread.tags.length > 0 ? <View style={styles.tagRow} testID={`${testID}-tags`}>
+          {thread.tags.map(tag => <View key={tag} style={styles.tag}>
               <Text style={styles.tagText}>{tag}</Text>
-            </View>
-          ))}
-        </View>
-      ) : null}
-    </View>
-  );
+            </View>)}
+        </View> : null}
+    </View>;
 }
-
 function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('');
+  return name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]?.toUpperCase() ?? '').join('');
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   card: {
     backgroundColor: palette.surface,
     borderColor: palette.border,
     borderRadius: radii.lg,
     borderWidth: 1,
     padding: spacing.md,
-    gap: spacing.sm,
+    gap: spacing.sm
   },
   badgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.xs,
-    flexWrap: 'wrap',
+    flexWrap: 'wrap'
   },
   category: {
     ...typography.caption,
     fontWeight: '700',
-    textTransform: 'uppercase',
+    textTransform: 'uppercase'
   },
   title: {
     ...typography.title,
-    color: palette.textPrimary,
+    color: palette.textPrimary
   },
   authorRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.sm
   },
   avatar: {
     alignItems: 'center',
@@ -145,32 +114,32 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
     height: 36,
     justifyContent: 'center',
-    width: 36,
+    width: 36
   },
   avatarInitials: {
     ...typography.label,
     color: palette.textInverse,
-    fontWeight: '700',
+    fontWeight: '700'
   },
   authorMeta: {
-    flex: 1,
+    flex: 1
   },
   authorName: {
     ...typography.label,
-    color: palette.textPrimary,
+    color: palette.textPrimary
   },
   handle: {
     color: palette.textSecondary,
-    fontWeight: '400',
+    fontWeight: '400'
   },
   timestamp: {
     ...typography.caption,
-    color: palette.textMuted,
+    color: palette.textMuted
   },
   tagRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.xs,
+    gap: spacing.xs
   },
   tag: {
     backgroundColor: palette.surfaceMuted,
@@ -178,12 +147,11 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
     borderWidth: 1,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xxs,
+    paddingVertical: spacing.xxs
   },
   tagText: {
     ...typography.caption,
-    color: palette.textSecondary,
-  },
+    color: palette.textSecondary
+  }
 });
-
 export default ThreadHeader;

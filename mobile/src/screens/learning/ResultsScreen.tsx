@@ -2,9 +2,12 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { ScreenProps } from '@/navigation/types';
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import {radii, spacing, typography} from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 export function ResultsScreen({ navigation, route }: ScreenProps<'Results'>) {
+  const styles = useThemedStyles(createStyles);
   const { score, passed, assessmentId } = route.params;
 
   return (
@@ -43,7 +46,7 @@ export function ResultsScreen({ navigation, route }: ScreenProps<'Results'>) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: palette.background,

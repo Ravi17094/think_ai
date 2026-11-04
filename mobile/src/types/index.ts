@@ -11,6 +11,9 @@ export interface Lesson {
   title: string;
   type: LessonType;
   durationMinutes: number;
+  /** Optional because catalogue payloads supplied by older backends omit it. */
+  description?: string;
+  videoUrl?: string;
 }
 
 export interface CourseModule {
@@ -43,7 +46,30 @@ export interface Course {
   instructor: Instructor;
   modules: CourseModule[];
   tags: string[];
+  /** Learning outcomes rendered by the course detail screen. */
+  learningObjectives?: string[];
 }
+
+/** Stable category ids used by dashboard chips and course filtering. */
+export type CourseCategoryId =
+  | 'mobile'
+  | 'web'
+  | 'data'
+  | 'testing'
+  | 'performance';
+
+export interface CourseCategory {
+  id: CourseCategoryId;
+  label: string;
+  icon: string;
+  tags: string[];
+}
+
+export type CourseSortOption =
+  | 'recommended'
+  | 'highest-rated'
+  | 'shortest'
+  | 'title';
 
 export type EnrollmentStatus = 'not-started' | 'in-progress' | 'completed';
 
@@ -58,6 +84,14 @@ export interface Enrollment {
   completedLessons: number;
   totalLessons: number;
   lastAccessedAt: string;
+  /** Lesson ids the learner has completed; used by the player and My Learning. */
+  completedLessonIds?: string[];
+}
+
+export interface UpdateLessonProgressInput {
+  courseId: string;
+  lessonId: string;
+  completed: boolean;
 }
 
 export type CourseStatusFilter = 'all' | 'in-progress' | 'completed';

@@ -1,12 +1,12 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import type { ReactElement } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
-
 import { EmptyState, ErrorState } from '@/components/common';
-import { palette, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 import type { BookmarkRecord } from '@/types/community';
 import { BookmarkRow } from './BookmarkRow';
 import { BookmarksSkeleton } from './BookmarksSkeleton';
-
 export interface BookmarkListProps {
   bookmarks: BookmarkRecord[];
   isLoading?: boolean;
@@ -35,54 +35,20 @@ export function BookmarkList({
   onOpen,
   onRemove,
   listHeader,
-  testID = 'bookmark-list',
+  testID = 'bookmark-list'
 }: BookmarkListProps) {
-  return (
-    <FlatList
-      contentContainerStyle={styles.content}
-      data={bookmarks}
-      keyExtractor={(item) => item.id}
-      ListEmptyComponent={
-        hasError ? (
-          <ErrorState
-            message={errorMessage ?? 'Unable to load bookmarks.'}
-            onRetry={onRetry}
-          />
-        ) : isLoading ? (
-          <BookmarksSkeleton testID={`${testID}-skeleton`} />
-        ) : (
-          <EmptyState
-            icon="🔖"
-            message="Bookmark a thread and it will show up here for quick access."
-            testID={`${testID}-empty`}
-            title="No bookmarks yet"
-          />
-        )
-      }
-      ListHeaderComponent={listHeader ?? undefined}
-      onRefresh={onRefresh}
-      refreshing={isRefreshing}
-      testID={testID}
-      renderItem={({ item, index }) => (
-        <BookmarkRow
-          isRemoving={isRemovingId === item.discussionId}
-          onOpen={onOpen}
-          onRemove={onRemove}
-          record={item}
-          testID={`${testID}-row-${index}`}
-        />
-      )}
-    />
-  );
+  const styles = useThemedStyles(createStyles);
+  return <FlatList contentContainerStyle={styles.content} data={bookmarks} keyExtractor={item => item.id} ListEmptyComponent={hasError ? <ErrorState message={errorMessage ?? 'Unable to load bookmarks.'} onRetry={onRetry} /> : isLoading ? <BookmarksSkeleton testID={`${testID}-skeleton`} /> : <EmptyState icon="🔖" message="Bookmark a thread and it will show up here for quick access." testID={`${testID}-empty`} title="No bookmarks yet" />} ListHeaderComponent={listHeader ?? undefined} onRefresh={onRefresh} refreshing={isRefreshing} testID={testID} renderItem={({
+    item,
+    index
+  }) => <BookmarkRow isRemoving={isRemovingId === item.discussionId} onOpen={onOpen} onRemove={onRemove} record={item} testID={`${testID}-row-${index}`} />} />;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   content: {
     flexGrow: 1,
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.xl,
-    backgroundColor: palette.background,
-  },
+    backgroundColor: palette.background
+  }
 });
-
 export default BookmarkList;

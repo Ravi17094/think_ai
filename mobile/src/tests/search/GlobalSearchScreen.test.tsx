@@ -316,4 +316,37 @@ describe('GlobalSearchScreen', () => {
 
     expect(navigation.navigate).toHaveBeenCalledWith('ForumHome');
   });
+
+  it('starts a search from a popular suggestion', async () => {
+    const { client, searchGlobal } = buildClient();
+    renderScreen(GlobalSearchScreen, { client, name: 'GlobalSearch' });
+    await flushAllPendingWork();
+
+    expect(screen.getByTestId('global-search-popular')).toBeTruthy();
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('global-search-popular-react-native'));
+    });
+    expect(screen.getByTestId('search-input-field').props.value).toBe('react native');
+
+    await act(async () => {
+      jest.advanceTimersByTime(SEARCH_DEBOUNCE_MS);
+    });
+    await flushAllPendingWork();
+
+    expect(searchGlobal).toHaveBeenCalledWith('react native', 'course');
+  });
+
+  it('opens the catalogue filtered by a category shortcut', async () => {
+    const { client } = buildClient();
+    const navigation = createMockNavigation();
+    renderScreen(GlobalSearchScreen, { client, name: 'GlobalSearch', navigation });
+    await flushAllPendingWork();
+
+    expect(screen.getByTestId('global-search-category-section')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('category-chip-web'));
+
+    expect(navigation.navigate).toHaveBeenCalledWith('MyCourses', {
+      category: 'web',
+    });
+  });
 });

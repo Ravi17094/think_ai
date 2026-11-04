@@ -9,7 +9,7 @@
  * this file and `src/theme/index.ts`.
  */
 
-export const palette = {
+const darkPalette = {
   background: '#0B1020',
   surface: '#141A2E',
   surfaceElevated: '#1B2239',
@@ -33,6 +33,54 @@ export const palette = {
 
   overlay: 'rgba(11, 16, 32, 0.72)',
 } as const;
+
+/**
+ * Light theme mirror of the dark palette. Contrast pairs were chosen to keep
+ * body text at or above WCAG AA on the matching surface:
+ *   textPrimary/#FFFFFF  16.1:1
+ *   textSecondary/#FFFFFF 10.3:1
+ *   textMuted/#FFFFFF      4.8:1
+ *   brand/#FFFFFF          5.9:1
+ */
+const lightPalette = {
+  background: '#F5F6FB',
+  surface: '#FFFFFF',
+  surfaceElevated: '#FFFFFF',
+  surfaceMuted: '#EDEFF6',
+  border: '#D9DEEA',
+  borderStrong: '#BCC4D6',
+
+  brand: '#6D28D9',
+  brandAlt: '#4338CA',
+  accent: '#0E7490',
+
+  success: '#047857',
+  warning: '#B45309',
+  danger: '#B91C1C',
+  info: '#1D4ED8',
+
+  textPrimary: '#111827',
+  textSecondary: '#374151',
+  textMuted: '#6B7280',
+  textInverse: '#FFFFFF',
+
+  overlay: 'rgba(17, 24, 39, 0.55)',
+} as const;
+
+export type Palette = {
+  [Key in keyof typeof darkPalette]: string;
+};
+
+export type ThemeMode = 'light' | 'dark';
+
+/** Backwards-compatible export: screens that have not adopted `useTheme` keep
+ *  the original dark look. */
+export const palette: Palette = darkPalette;
+
+export const palettes: Record<ThemeMode, Palette> = {
+  dark: darkPalette,
+  light: lightPalette,
+};
 
 export const spacing = {
   xxs: 4,

@@ -1,8 +1,8 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { StyleSheet, Text, View } from 'react-native';
-
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import { radii, spacing, typography } from '@/theme/tokens';
 import { formatRelativeTime } from '@/utils/datetime';
-
 export interface SyncIndicatorProps {
   /** `syncedAt` stamp from `GET /api/bookmarks`. */
   syncedAt: string | null;
@@ -14,31 +14,19 @@ export interface SyncIndicatorProps {
 export function SyncIndicator({
   syncedAt,
   isSyncing = false,
-  testID = 'sync-indicator',
+  testID = 'sync-indicator'
 }: SyncIndicatorProps) {
-  return (
-    <View style={styles.chip} testID={testID}>
-      <Text
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-        style={styles.icon}>
+  const styles = useThemedStyles(createStyles);
+  return <View style={styles.chip} testID={testID}>
+      <Text accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={styles.icon}>
         {isSyncing ? '⟳' : '↻'}
       </Text>
-      <Text
-        accessibilityLiveRegion="polite"
-        style={styles.label}
-        testID={`${testID}-label`}>
-        {isSyncing
-          ? 'Syncing…'
-          : syncedAt
-            ? `Synced ${formatRelativeTime(syncedAt)}`
-            : 'Not synced yet'}
+      <Text accessibilityLiveRegion="polite" style={styles.label} testID={`${testID}-label`}>
+        {isSyncing ? 'Syncing…' : syncedAt ? `Synced ${formatRelativeTime(syncedAt)}` : 'Not synced yet'}
       </Text>
-    </View>
-  );
+    </View>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -48,16 +36,15 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
     borderWidth: 1,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xxs,
+    paddingVertical: spacing.xxs
   },
   icon: {
     ...typography.caption,
-    color: palette.accent,
+    color: palette.accent
   },
   label: {
     ...typography.caption,
-    color: palette.textSecondary,
-  },
+    color: palette.textSecondary
+  }
 });
-
 export default SyncIndicator;

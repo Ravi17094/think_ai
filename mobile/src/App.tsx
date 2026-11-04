@@ -50,7 +50,10 @@ import { ForumHomeScreen } from "@/screens/forum/ForumHomeScreen";
 import { ForumThreadDetailScreen } from "@/screens/forum/ForumThreadDetailScreen";
 import { ModerationScreen } from "@/screens/forum/ModerationScreen";
 import { LearnerDashboardScreen } from "@/screens/learner/LearnerDashboardScreen";
+import { MyLearningScreen } from "@/screens/learner/MyLearningScreen";
 import { MyCoursesScreen } from "@/screens/learner/MyCoursesScreen";
+import { ProfileScreen } from "@/screens/learner/ProfileScreen";
+import { WishlistScreen } from "@/screens/learner/WishlistScreen";
 import { GlobalSearchScreen } from "@/screens/search/GlobalSearchScreen";
 import { palette } from "@/theme/tokens";
 
@@ -65,6 +68,9 @@ import { LiveStudioScreen } from "@/screens/staff/LiveStudioScreen";
 import { subscribeToNotificationDeepLinks } from "@/features/notifications/pushRegistration";
 
 const StaffToolsRoute = withErrorBoundary(StaffToolsScreen, "staff-tools");
+const MyLearningRoute = withErrorBoundary(MyLearningScreen, "my-learning");
+const WishlistRoute = withErrorBoundary(WishlistScreen, "wishlist");
+const ProfileRoute = withErrorBoundary(ProfileScreen, "profile");
 const AttendanceRegisterRoute = withErrorBoundary(AttendanceRegisterScreen, "attendance-register");
 const AttendanceReportRoute = withErrorBoundary(AttendanceReportScreen, "attendance-report");
 const GradingQueueRoute = withErrorBoundary(GradingQueueScreen, "grading-queue");
@@ -216,6 +222,21 @@ export function RootNavigator() {
           name="Account"
           component={ProtectedAccount}
           options={{ title: "My account" }}
+        />
+        <Stack.Screen
+          name="MyLearning"
+          component={MyLearningRoute}
+          options={{ title: "My Learning" }}
+        />
+        <Stack.Screen
+          name="Wishlist"
+          component={WishlistRoute}
+          options={{ title: "Wishlist" }}
+        />
+        <Stack.Screen
+          name="Profile"
+          component={ProfileRoute}
+          options={{ title: "Profile" }}
         />
         <Stack.Screen
           name="LmsHome"

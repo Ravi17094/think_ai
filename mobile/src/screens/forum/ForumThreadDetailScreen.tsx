@@ -11,7 +11,9 @@ import { useReplyVotes } from '@/hooks/useReplyVotes';
 import { useSession } from '@/hooks/useSession';
 import { useThreadDetail } from '@/hooks/useThreadDetail';
 import type { ScreenProps } from '@/navigation/types';
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import {radii, spacing, typography} from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 /**
  * Page 6 — Forum Thread Detail (`/forum/threads/:id`).
@@ -21,6 +23,7 @@ import { palette, radii, spacing, typography } from '@/theme/tokens';
  * initial fetch.
  */
 export function ForumThreadDetailScreen({ route }: ScreenProps<'ForumThread'>) {
+  const styles = useThemedStyles(createStyles);
   const { threadId } = route.params;
   const session = useSession();
   const {
@@ -184,7 +187,7 @@ export function ForumThreadDetailScreen({ route }: ScreenProps<'ForumThread'>) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: palette.background,

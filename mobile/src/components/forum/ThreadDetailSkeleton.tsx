@@ -1,8 +1,8 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { StyleSheet, View } from 'react-native';
-
 import { Skeleton } from '@/components/common';
-import { palette, radii, spacing } from '@/theme/tokens';
-
+import { radii, spacing } from '@/theme/tokens';
 export interface ThreadDetailSkeletonProps {
   /** Number of reply rows to shimmer. */
   replyRows?: number;
@@ -15,10 +15,10 @@ export interface ThreadDetailSkeletonProps {
  */
 export function ThreadDetailSkeleton({
   replyRows = 3,
-  testID = 'thread-detail-skeleton',
+  testID = 'thread-detail-skeleton'
 }: ThreadDetailSkeletonProps) {
-  return (
-    <View testID={testID}>
+  const styles = useThemedStyles(createStyles);
+  return <View testID={testID}>
       <View style={styles.card}>
         <Skeleton height={10} width="24%" testID={`${testID}-category`} />
         <Skeleton height={24} width="85%" radius={12} testID={`${testID}-title`} />
@@ -38,21 +38,19 @@ export function ThreadDetailSkeleton({
         </View>
       </View>
 
-      {Array.from({ length: replyRows }, (_, index) => (
-        <View key={index} style={styles.reply}>
+      {Array.from({
+      length: replyRows
+    }, (_, index) => <View key={index} style={styles.reply}>
           <View style={styles.authorRow}>
             <Skeleton height={28} width={28} radius={999} />
             <Skeleton height={12} width="35%" />
           </View>
           <Skeleton height={12} width="92%" />
           <Skeleton height={12} width={index % 2 === 0 ? '70%' : '84%'} />
-        </View>
-      ))}
-    </View>
-  );
+        </View>)}
+    </View>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   card: {
     backgroundColor: palette.surface,
     borderColor: palette.border,
@@ -60,20 +58,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: spacing.md,
     gap: spacing.sm,
-    marginTop: spacing.md,
+    marginTop: spacing.md
   },
   authorRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.sm
   },
   authorLines: {
     flex: 1,
-    gap: spacing.xs,
+    gap: spacing.xs
   },
   tagRow: {
     flexDirection: 'row',
-    gap: spacing.xs,
+    gap: spacing.xs
   },
   reply: {
     backgroundColor: palette.surface,
@@ -82,8 +80,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: spacing.sm,
     gap: spacing.xs,
-    marginTop: spacing.sm,
-  },
+    marginTop: spacing.sm
+  }
 });
-
 export default ThreadDetailSkeleton;

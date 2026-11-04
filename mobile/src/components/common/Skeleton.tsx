@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 
-import { palette, radii } from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { radii } from '@/theme/tokens';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 export interface SkeletonProps {
   /** Fixed width, or a percentage string such as `'70%'`. Defaults to `'100%'`. */
@@ -24,6 +26,7 @@ export function Skeleton({
   style,
   testID = 'skeleton',
 }: SkeletonProps) {
+  const styles = useThemedStyles(createStyles);
   const shimmer = useRef(new Animated.Value(0.35)).current;
 
   useEffect(() => {
@@ -58,7 +61,8 @@ export function Skeleton({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) =>
+  StyleSheet.create({
   block: {
     backgroundColor: palette.surfaceMuted,
   },

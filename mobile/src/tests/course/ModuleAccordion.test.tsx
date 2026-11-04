@@ -112,4 +112,29 @@ describe('ModuleAccordion', () => {
       screen.getByTestId('module-accordion-header-1').props.accessibilityState
     ).toEqual({ expanded: true });
   });
+
+  it('marks completed lessons and reports the pressed lesson', () => {
+    const onSelectLesson = jest.fn();
+    const module = modules[0]!;
+    const done = module.lessons[0]!;
+    const pending = module.lessons[1]!;
+
+    render(
+      <ModuleAccordion
+        completedLessonIds={[done.id]}
+        modules={modules}
+        onSelectLesson={onSelectLesson}
+      />
+    );
+
+    fireEvent.press(screen.getByTestId('module-accordion-header-0'));
+
+    const completedRow = screen.getByTestId('module-accordion-lesson-0-0');
+    expect(completedRow.props.accessibilityLabel).toBe(
+      `${done.title}, ${done.durationMinutes} minutes, completed`
+    );
+
+    fireEvent.press(screen.getByTestId('module-accordion-lesson-0-1'));
+    expect(onSelectLesson).toHaveBeenCalledWith(pending, module);
+  });
 });

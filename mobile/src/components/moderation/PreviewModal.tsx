@@ -1,8 +1,8 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-
-import { palette, radii, spacing, typography } from '@/theme/tokens';
+import { radii, spacing, typography } from '@/theme/tokens';
 import { MentionText } from '@/components/forum/MentionText';
-
 export interface PreviewModalProps {
   visible: boolean;
   title: string;
@@ -20,64 +20,50 @@ export function PreviewModal({
   body,
   meta,
   onClose,
-  testID = 'preview-modal',
+  testID = 'preview-modal'
 }: PreviewModalProps) {
-  return (
-    <Modal
-      animationType="slide"
-      onRequestClose={onClose}
-      transparent
-      visible={visible}>
+  const styles = useThemedStyles(createStyles);
+  return <Modal animationType="slide" onRequestClose={onClose} transparent visible={visible}>
       <View style={styles.backdrop} testID={`${testID}-backdrop`}>
         <View style={styles.sheet} testID={testID}>
           <View style={styles.header}>
             <Text style={styles.headerTitle}>Preview</Text>
-            <Pressable
-              accessibilityLabel="Close preview"
-              accessibilityRole="button"
-              onPress={onClose}
-              testID={`${testID}-close`}>
+            <Pressable accessibilityLabel="Close preview" accessibilityRole="button" onPress={onClose} testID={`${testID}-close`}>
               <Text style={styles.close}>✕</Text>
             </Pressable>
           </View>
 
           <ScrollView contentContainerStyle={styles.body} testID={`${testID}-content`}>
-            {meta ? (
-              <Text style={styles.meta} testID={`${testID}-meta`}>
+            {meta ? <Text style={styles.meta} testID={`${testID}-meta`}>
                 {meta}
-              </Text>
-            ) : null}
+              </Text> : null}
             <Text style={styles.title} testID={`${testID}-title`}>
               {title}
             </Text>
             <MentionText text={body} testID={`${testID}-body`} />
           </ScrollView>
 
-          <Pressable
-            accessibilityRole="button"
-            onPress={onClose}
-            style={({ pressed }) => [styles.doneButton, pressed && styles.pressed]}
-            testID={`${testID}-done`}>
+          <Pressable accessibilityRole="button" onPress={onClose} style={({
+          pressed
+        }) => [styles.doneButton, pressed && styles.pressed]} testID={`${testID}-done`}>
             <Text style={styles.doneLabel}>Done</Text>
           </Pressable>
         </View>
       </View>
-    </Modal>
-  );
+    </Modal>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   backdrop: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: palette.overlay,
+    backgroundColor: palette.overlay
   },
   sheet: {
     maxHeight: '85%',
     backgroundColor: palette.surfaceElevated,
     borderTopLeftRadius: radii.xl,
     borderTopRightRadius: radii.xl,
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.lg
   },
   header: {
     flexDirection: 'row',
@@ -85,30 +71,30 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: spacing.md,
     borderBottomColor: palette.border,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth
   },
   headerTitle: {
     ...typography.subtitle,
-    color: palette.textPrimary,
+    color: palette.textPrimary
   },
   close: {
     ...typography.subtitle,
     color: palette.textSecondary,
-    paddingHorizontal: spacing.xs,
+    paddingHorizontal: spacing.xs
   },
   body: {
     gap: spacing.sm,
-    padding: spacing.md,
+    padding: spacing.md
   },
   meta: {
     ...typography.caption,
     color: palette.accent,
     textTransform: 'uppercase',
-    fontWeight: '700',
+    fontWeight: '700'
   },
   title: {
     ...typography.subtitle,
-    color: palette.textPrimary,
+    color: palette.textPrimary
   },
   doneButton: {
     alignItems: 'center',
@@ -116,16 +102,15 @@ const styles = StyleSheet.create({
     backgroundColor: palette.brand,
     borderRadius: radii.pill,
     marginHorizontal: spacing.md,
-    minHeight: 44,
+    minHeight: 44
   },
   doneLabel: {
     ...typography.label,
     color: palette.textInverse,
-    fontWeight: '700',
+    fontWeight: '700'
   },
   pressed: {
-    opacity: 0.85,
-  },
+    opacity: 0.85
+  }
 });
-
 export default PreviewModal;

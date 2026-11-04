@@ -9,6 +9,7 @@ import type {
   ForumThreadQuery,
   GlobalSearchResponse,
   SearchResultType,
+  UpdateLessonProgressInput,
 } from '@/types';
 import type {
   BookmarkPage,
@@ -54,6 +55,10 @@ export interface LearningApiClient {
 
   // Page 3 — Course Detail
   fetchCourse(courseId: string): Promise<Course>;
+  /** Enrolls the signed-in learner, or returns the existing enrollment. */
+  enrollCourse(courseId: string): Promise<Enrollment>;
+  /** Marks a lesson complete/incomplete and returns the updated enrollment. */
+  updateLessonProgress(input: UpdateLessonProgressInput): Promise<Enrollment>;
 
   // Page 4 — Global Search
   fetchAllTags(): Promise<string[]>;

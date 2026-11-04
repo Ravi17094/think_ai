@@ -1,52 +1,42 @@
+import { useThemedStyles } from "@/theme/useThemedStyles";
+import type { Palette } from "@/theme/tokens";
 import { Linking, StyleSheet, Text, View } from 'react-native';
-
-import { palette, spacing, typography } from '@/theme/tokens';
+import { spacing, typography } from '@/theme/tokens';
 import { parseMarkdown, type InlineToken } from '@/utils/markdown';
-
 export interface MarkdownPreviewProps {
   value: string;
   testID?: string;
 }
-
-function InlineText({ tokens }: { tokens: InlineToken[] }) {
-  return (
-    <Text>
+function InlineText({
+  tokens
+}: {
+  tokens: InlineToken[];
+}) {
+  const styles = useThemedStyles(createStyles);
+  return <Text>
       {tokens.map((token, index) => {
-        switch (token.type) {
-          case 'bold':
-            return (
-              <Text key={index} style={styles.bold}>
+      switch (token.type) {
+        case 'bold':
+          return <Text key={index} style={styles.bold}>
                 {token.value}
-              </Text>
-            );
-          case 'italic':
-            return (
-              <Text key={index} style={styles.italic}>
+              </Text>;
+        case 'italic':
+          return <Text key={index} style={styles.italic}>
                 {token.value}
-              </Text>
-            );
-          case 'code':
-            return (
-              <Text key={index} style={styles.code}>
+              </Text>;
+        case 'code':
+          return <Text key={index} style={styles.code}>
                 {token.value}
-              </Text>
-            );
-          case 'link':
-            return (
-              <Text
-                key={index}
-                accessibilityRole="link"
-                onPress={() => void Linking.openURL(token.href)}
-                style={styles.link}>
+              </Text>;
+        case 'link':
+          return <Text key={index} accessibilityRole="link" onPress={() => void Linking.openURL(token.href)} style={styles.link}>
                 {token.value}
-              </Text>
-            );
-          default:
-            return <Text key={index}>{token.value}</Text>;
-        }
-      })}
-    </Text>
-  );
+              </Text>;
+        default:
+          return <Text key={index}>{token.value}</Text>;
+      }
+    })}
+    </Text>;
 }
 
 /**
@@ -54,95 +44,81 @@ function InlineText({ tokens }: { tokens: InlineToken[] }) {
  * contract as the web editor's escaped renderer: unknown syntax shows as
  * plain text and can never throw.
  */
-export function MarkdownPreview({ value, testID = 'markdown-preview' }: MarkdownPreviewProps) {
+export function MarkdownPreview({
+  value,
+  testID = 'markdown-preview'
+}: MarkdownPreviewProps) {
+  const styles = useThemedStyles(createStyles);
   const blocks = parseMarkdown(value);
-
   if (blocks.length === 0) {
-    return (
-      <Text style={styles.empty} testID={`${testID}-empty`}>
+    return <Text style={styles.empty} testID={`${testID}-empty`}>
         Nothing to preview yet.
-      </Text>
-    );
+      </Text>;
   }
-
-  return (
-    <View testID={testID}>
+  return <View testID={testID}>
       {blocks.map((block, index) => {
-        if (block.type === 'bullet') {
-          return (
-            <View key={index} style={styles.bulletRow}>
+      if (block.type === 'bullet') {
+        return <View key={index} style={styles.bulletRow}>
               <Text style={styles.bulletMark}>•</Text>
               <View style={styles.bulletBody}>
                 <InlineText tokens={block.tokens} />
               </View>
-            </View>
-          );
-        }
-
-        return (
-          <View key={index} style={styles.block}>
-            <Text
-              style={[
-                styles.paragraph,
-                block.type === 'heading' && styles.heading,
-                block.level !== undefined && block.level <= 2 && styles.heading,
-              ]}>
+            </View>;
+      }
+      return <View key={index} style={styles.block}>
+            <Text style={[styles.paragraph, block.type === 'heading' && styles.heading, block.level !== undefined && block.level <= 2 && styles.heading]}>
               <InlineText tokens={block.tokens} />
             </Text>
-          </View>
-        );
-      })}
-    </View>
-  );
+          </View>;
+    })}
+    </View>;
 }
-
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) => StyleSheet.create({
   block: {
-    marginBottom: spacing.xs,
+    marginBottom: spacing.xs
   },
   paragraph: {
     ...typography.body,
-    color: palette.textPrimary,
+    color: palette.textPrimary
   },
   heading: {
     ...typography.subtitle,
     color: palette.textPrimary,
-    marginTop: spacing.xs,
+    marginTop: spacing.xs
   },
   bulletRow: {
     flexDirection: 'row',
-    marginBottom: spacing.xxs,
+    marginBottom: spacing.xxs
   },
   bulletMark: {
     ...typography.body,
     color: palette.textSecondary,
-    marginRight: spacing.xs,
+    marginRight: spacing.xs
   },
   bulletBody: {
-    flex: 1,
+    flex: 1
   },
   bold: {
-    fontWeight: '700',
+    fontWeight: '700'
   },
   italic: {
-    fontStyle: 'italic',
+    fontStyle: 'italic'
   },
   code: {
     ...typography.mono,
     backgroundColor: palette.surfaceMuted,
     color: palette.accent,
     borderRadius: 4,
-    paddingHorizontal: spacing.xxs,
+    paddingHorizontal: spacing.xxs
   },
   link: {
     color: palette.info,
-    textDecorationLine: 'underline',
+    textDecorationLine: 'underline'
   },
   empty: {
     ...typography.body,
     color: palette.textMuted,
-    fontStyle: 'italic',
-  },
+    fontStyle: 'italic'
+  }
 });
-
 export default MarkdownPreview;

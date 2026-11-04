@@ -1,6 +1,9 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
-import { palette, spacing, typography } from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { spacing, typography } from '@/theme/tokens';
+import { useTheme } from '@/theme/ThemeProvider';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 
 export interface ScreenHeaderProps {
   title: string;
@@ -15,6 +18,7 @@ export function ScreenHeader({
   right,
   testID = 'screen-header',
 }: ScreenHeaderProps) {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.header} testID={testID}>
       <View style={styles.headerText}>
@@ -39,6 +43,8 @@ export function InlineSpinner({
   label = 'Loading more…',
   testID = 'inline-spinner',
 }: InlineSpinnerProps) {
+  const { palette } = useTheme();
+  const styles = useThemedStyles(createStyles);
   return (
     <View
       accessibilityLabel={label}
@@ -52,7 +58,8 @@ export function InlineSpinner({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) =>
+  StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',

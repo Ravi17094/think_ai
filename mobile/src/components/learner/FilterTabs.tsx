@@ -1,6 +1,8 @@
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 
-import { hitSlop, palette, radii, spacing, typography } from '@/theme/tokens';
+import type { Palette } from '@/theme/tokens';
+import { hitSlop, radii, spacing, typography } from '@/theme/tokens';
+import { useThemedStyles } from '@/theme/useThemedStyles';
 import type { CourseStatusFilter } from '@/types';
 
 export const COURSE_STATUS_FILTERS: readonly {
@@ -26,6 +28,7 @@ export function FilterTabs({
   counts,
   testID = 'filter-tabs',
 }: FilterTabsProps) {
+  const styles = useThemedStyles(createStyles);
   return (
     <ScrollView
       contentContainerStyle={styles.content}
@@ -57,7 +60,8 @@ export function FilterTabs({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (palette: Palette) =>
+  StyleSheet.create({
   content: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
