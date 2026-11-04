@@ -6,7 +6,9 @@
     "orientation": "portrait",
     "scheme": "thinkzai",
     "userInterfaceStyle": "light",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.thinkzai.mobile"
@@ -20,6 +22,10 @@
     "web": {
       "bundler": "metro"
     },
-    "plugins": ["expo-notifications", "./plugins/withPatanDownloads"]
+    "plugins": [
+      "expo-notifications",
+      "./plugins/withPatanDownloads",
+      "expo-video"
+    ]
   }
 }

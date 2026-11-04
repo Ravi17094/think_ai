@@ -1,13 +1,10 @@
 require("dotenv").config();
 
-const express = require("express");
-const app = express();
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+const http = require("http");
+const { Server } = require("socket.io");
+// Use the configured Express app (routes, middleware, CORS and health check)
+// and expose it through exactly one HTTP server.
+const app = require("./app");
 const { startWorker } =
     require("./services/notificationQueueService");
 

@@ -77,7 +77,7 @@ function createJitsiToken(req, res) {
         aud: "jitsi", iss: appId, sub: domain, room,
         context: { user: { id: String(req.user.id), name: req.user.name || "Participant" } },
     }, secret, { expiresIn: "10m" });
-    return res.status(200).json({ success: true, data: { room, token, expiresInSeconds: 600 } });
+    return res.status(200).json({ success: true, data: { domain, room, token, expiresInSeconds: 600 } });
 }
 
 function getMessages(req, res) {

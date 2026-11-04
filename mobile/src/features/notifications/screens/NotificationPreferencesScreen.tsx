@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { palette, spacing, typography } from '@/theme/tokens';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 import { useNotificationPreferences } from '../hooks/useNotificationPreferences';
@@ -59,9 +61,10 @@ export function NotificationPreferencesScreen() {
 
   const groups: EventGroup[] = ['replies', 'mentions', 'sessions', 'payments'];
   return (
-    <ScrollView
+    <SafeAreaView edges={['left', 'right', 'bottom']} style={styles.safe}><ScrollView
       contentContainerStyle={styles.container}
       testID="notification-preferences-screen">
+      <View style={styles.header}><Text style={styles.eyebrow}>NOTIFICATIONS</Text><Text style={styles.title}>Stay in the loop</Text><Text style={styles.subtitle}>Choose how you want to receive updates from Thinkz.ai.</Text></View>
       {loading ? (
         <View accessibilityLiveRegion="polite" style={styles.loading}>
           <ActivityIndicator
@@ -101,27 +104,39 @@ export function NotificationPreferencesScreen() {
         onDiscard={discard}
         onCancel={cancel}
       />
-    </ScrollView>
+    </ScrollView></SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: palette.background },
   container: {
-    padding: 16,
-    gap: 12,
+    padding: spacing.lg,
+    paddingTop: 116,
+    paddingBottom: spacing.xxl,
+    gap: spacing.md,
   },
+  header: { gap: spacing.xs, marginBottom: spacing.xs },
+  eyebrow: { ...typography.caption, color: palette.accent, fontWeight: '800', letterSpacing: 1.1 },
+  title: { ...typography.display, color: palette.textPrimary },
+  subtitle: { ...typography.body, color: palette.textSecondary },
   loading: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.xs,
+    backgroundColor: palette.surfaceMuted,
+    borderColor: palette.border,
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: spacing.sm,
   },
   error: {
-    color: '#F87171',
-    fontSize: 13,
+    color: palette.danger,
+    ...typography.caption,
   },
   toast: {
-    color: '#34D399',
-    fontSize: 13,
+    color: palette.success,
+    ...typography.caption,
     fontWeight: '600',
   },
 });

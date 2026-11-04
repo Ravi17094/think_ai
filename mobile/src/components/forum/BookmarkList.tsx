@@ -59,7 +59,7 @@ export function BookmarkList({
           />
         )
       }
-      ListHeaderComponent={listHeader ?? null}
+      ListHeaderComponent={listHeader ?? undefined}
       onRefresh={onRefresh}
       refreshing={isRefreshing}
       testID={testID}

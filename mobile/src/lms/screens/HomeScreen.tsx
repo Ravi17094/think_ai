@@ -1,92 +1,36 @@
-import { useCallback, useEffect } from "react";
-import { Text, View } from "react-native";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
-import { AppButton } from "@/components/common/AppButton";
-import { signOut } from "@/api/session";
 import type { ScreenProps } from "@/navigation/types";
+import { palette } from "@/theme/tokens";
 import { lmsApi } from "../api";
 import { useLms } from "../LmsProvider";
 import { useLmsResource } from "../useLmsResource";
-import { Card, LoadState, Screen, styles } from "../ui";
+import { LoadState, Screen } from "../ui";
+
+const categories = ["✨ All courses", "📱 Mobile", "💻 Web", "🧠 Data & AI"];
+const nav = [["⌂", "Home"], ["▶", "My learning"], ["⌕", "Explore"], ["♡", "Wishlist"], ["♙", "Profile"]] as const;
+
 export function LmsHomeScreen({ navigation }: ScreenProps<"LmsHome">) {
-  const { session, sync } = useLms();
-  const focused = useIsFocused();
-  const fetcher = useCallback(() => lmsApi.enrollments(), [session.token]);
-  const resource = useLmsResource(fetcher);
-  useEffect(() => {
-    if (focused && session.token) void resource.refresh();
-  }, [focused, session.token]);
-  return (
-    <Screen title="Learning workspace">
-      <View style={styles.row}>
-        <AppButton
-          title="My profile"
-          variant="secondary"
-          onPress={() => navigation.navigate("LearnerProfile")}
-        />
-        <AppButton
-          title="Playground"
-          variant="secondary"
-          onPress={() => navigation.navigate("CodePlayground")}
-        />
-        <AppButton
-          title="Downloads"
-          variant="secondary"
-          onPress={() => navigation.navigate("Downloads")}
-        />
-        <AppButton
-          title="Teaching tools"
-          variant="secondary"
-          onPress={() => navigation.navigate("StaffTools")}
-        />
-      </View>
-      <LoadState {...resource} retry={resource.refresh} />
-      {resource.data?.length === 0 ? (
-        <Card>
-          <Text style={styles.text}>
-            No enrollments yet. Your payment or enrollment administrator can
-            enroll you in a course.
-          </Text>
-        </Card>
-      ) : null}
-      {resource.data?.map((row) => (
-        <Card key={row.id}>
-          <Text style={styles.heading}>{row.batch.course.title}</Text>
-          <Text style={styles.muted}>
-            {row.summary.completedLessons}/{row.summary.totalLessons} lessons ·{" "}
-            {row.summary.percentage.toFixed(1)}% complete
-          </Text>
-          <Text style={styles.badge}>
-            {row.courseAccess
-              ? row.enrollmentStatus
-              : "Awaiting enrollment unlock"}
-          </Text>
-          <AppButton
-            title="Continue learning"
-            disabled={!row.courseAccess}
-            onPress={() =>
-              navigation.navigate("CoursePlayer", {
-                courseId: row.batch.course.id,
-              })
-            }
-          />
-        </Card>
-      ))}
-      <AppButton
-        title="Sync progress"
-        onPress={() => void sync()}
-        variant="secondary"
-      />
-      <AppButton
-        title="Community dashboard"
-        variant="secondary"
-        onPress={() => navigation.navigate("LearnerDashboard")}
-      />
-      <AppButton
-        title="Sign out"
-        variant="secondary"
-        onPress={() => void signOut()}
-      />
-    </Screen>
-  );
+  const { session, account } = useLms(); const focused = useIsFocused(); const [category, setCategory] = useState(0);
+  const resource = useLmsResource(useCallback(() => lmsApi.enrollments(), [session.token]));
+  useEffect(() => { if (focused && session.token) void resource.refresh(); }, [focused, session.token]);
+  const rows = resource.data || []; const completed = useMemo(() => rows.filter(x => x.summary.percentage >= 100).length, [rows]);
+  const hasTeachingTools = ["ta", "instructor", "admin", "superadmin"].includes(account?.role.toLowerCase() ?? "");
+  const go = (label: string) => { const routes: Record<string, string> = { "My learning": "MyCourses", Explore: "GlobalSearch", Wishlist: "Bookmarks", Profile: "LearnerProfile" }; if (routes[label]) navigation.navigate(routes[label] as never); };
+  return <Screen title="Dashboard">
+    <View style={s.welcomeRow}><View><Text style={s.welcome}>Welcome back</Text><Text style={s.subtle}>{completed} completed · {Math.max(rows.length-completed, 0)} in progress</Text></View><View style={s.countCard}><Text style={s.countLabel}>Enrolled</Text><Text style={s.count}>{rows.length}</Text></View></View>
+    {hasTeachingTools ? <Pressable onPress={() => navigation.navigate("StaffTools")} style={s.teachingTools} accessibilityRole="button"><View><Text style={s.toolsKicker}>TA & INSTRUCTOR WORKSPACE</Text><Text style={s.toolsTitle}>Teaching tools</Text><Text style={s.toolsDetail}>Live Studio, attendance, grading, controls and permissions</Text></View><Text style={s.toolsArrow}>›</Text></Pressable> : null}
+    <Pressable onPress={() => navigation.navigate("GlobalSearch")} style={s.search}><Text style={s.searchIcon}>⌕</Text><TextInput editable={false} pointerEvents="none" placeholder="Search courses, lessons and forum…" placeholderTextColor={palette.textMuted} style={s.searchText} /></Pressable>
+    <View style={s.sectionRow}><View><Text style={s.sectionTitle}>Browse by category</Text><Text style={s.subtle}>Find the track that fits your goal</Text></View><Pressable onPress={() => navigation.navigate("MyCourses")}><Text style={s.link}>All courses</Text></Pressable></View>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.categoryList}>{categories.map((item,i) => <Pressable key={item} onPress={() => setCategory(i)} style={[s.category, category===i && s.categoryActive]}><Text style={[s.categoryText, category===i && s.categoryTextActive]}>{item}</Text></Pressable>)}</ScrollView>
+    <View style={s.sectionRow}><View><Text style={s.sectionTitle}>Featured courses</Text><Text style={s.subtle}>Hand-picked by the Thinkz AI team</Text></View><Pressable onPress={() => navigation.navigate("MyCourses")}><Text style={s.link}>See all</Text></Pressable></View>
+    <LoadState {...resource} retry={resource.refresh} />
+    {rows.length === 0 ? <View style={s.empty}><Text style={s.emptyTitle}>Your learning starts here</Text><Text style={s.subtle}>You have no active enrollments yet.</Text></View> : null}
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.courseList}>{rows.map((row,index) => <Pressable key={row.id} onPress={() => navigation.navigate("CoursePlayer", { courseId: row.batch.course.id })} style={s.courseCard}><View style={[s.artwork,{backgroundColor:index%2?"#26204A":"#24344D"}]}><Text style={s.artIcon}>{index%2?"⌘":"◈"}</Text><Text style={s.tag}>{index%2?"Mobile Development":"Web Development"}</Text></View><View style={s.courseInfo}><Text numberOfLines={2} style={s.courseTitle}>{row.batch.course.title}</Text><Text numberOfLines={1} style={s.subtle}>{row.batch.course.description || "Thinkz AI learning path"}</Text><View style={s.courseFooter}><Text style={s.rating}>★ 4.9</Text><Text style={s.subtle}>{row.summary.percentage.toFixed(0)}% complete</Text></View></View></Pressable>)}</ScrollView>
+    <View style={s.bottomNav}>{nav.map(([icon,label]) => <Pressable key={label} onPress={() => go(label)} style={s.navItem}><Text style={[s.navIcon,label==="Home"&&s.active]}>{icon}</Text><Text style={[s.navLabel,label==="Home"&&s.active]}>{label}</Text></Pressable>)}</View>
+  </Screen>;
 }
+const s = StyleSheet.create({
+ welcomeRow:{flexDirection:"row",justifyContent:"space-between",alignItems:"center",marginTop:8},welcome:{color:palette.textPrimary,fontSize:30,fontWeight:"800",letterSpacing:-.7},subtle:{color:palette.textSecondary,fontSize:15,lineHeight:22},countCard:{minWidth:104,padding:14,alignItems:"center",borderRadius:24,backgroundColor:palette.surface,borderWidth:1,borderColor:palette.borderStrong},countLabel:{color:palette.textSecondary,fontSize:13},count:{color:palette.textPrimary,fontSize:32,fontWeight:"800"},teachingTools:{marginTop:20,padding:18,borderRadius:20,flexDirection:"row",alignItems:"center",justifyContent:"space-between",backgroundColor:"#201645",borderWidth:1,borderColor:palette.brand},toolsKicker:{color:palette.accent,fontSize:11,fontWeight:"800",letterSpacing:1},toolsTitle:{color:palette.textPrimary,fontSize:21,fontWeight:"800",marginTop:4},toolsDetail:{color:palette.textSecondary,fontSize:13,lineHeight:19,marginTop:4,maxWidth:255},toolsArrow:{color:palette.textPrimary,fontSize:34,fontWeight:"300"},search:{flexDirection:"row",alignItems:"center",height:76,paddingHorizontal:22,borderRadius:40,backgroundColor:palette.surface,borderWidth:1,borderColor:palette.borderStrong,marginTop:24},searchIcon:{fontSize:28,color:palette.accent,marginRight:12},searchText:{flex:1,color:palette.textPrimary,fontSize:16},sectionRow:{flexDirection:"row",alignItems:"flex-end",justifyContent:"space-between",marginTop:34},sectionTitle:{color:palette.textPrimary,fontSize:25,fontWeight:"800",letterSpacing:-.4},link:{color:palette.accent,fontSize:16,fontWeight:"700"},categoryList:{gap:12,paddingTop:20},category:{paddingHorizontal:20,height:54,justifyContent:"center",borderRadius:28,borderWidth:1,borderColor:palette.borderStrong,backgroundColor:palette.surface},categoryActive:{borderColor:palette.brand,backgroundColor:"#261746"},categoryText:{color:palette.textSecondary,fontSize:16,fontWeight:"700"},categoryTextActive:{color:palette.textPrimary},courseList:{gap:16,paddingTop:20},courseCard:{width:270,borderRadius:26,overflow:"hidden",backgroundColor:palette.surface,borderWidth:1,borderColor:palette.borderStrong},artwork:{height:170,padding:15,justifyContent:"space-between"},artIcon:{fontSize:54,color:palette.accent},tag:{alignSelf:"flex-start",backgroundColor:"rgba(11,16,32,.72)",color:palette.textPrimary,borderRadius:16,paddingHorizontal:12,paddingVertical:7,overflow:"hidden",fontWeight:"700"},courseInfo:{padding:17,gap:7},courseTitle:{color:palette.textPrimary,fontSize:18,fontWeight:"800",minHeight:44},courseFooter:{flexDirection:"row",justifyContent:"space-between",marginTop:8},rating:{color:"#FBBF24",fontWeight:"800"},empty:{padding:22,marginTop:16,borderRadius:20,backgroundColor:palette.surface,borderWidth:1,borderColor:palette.border},emptyTitle:{color:palette.textPrimary,fontSize:18,fontWeight:"700",marginBottom:6},bottomNav:{marginTop:28,marginHorizontal:-20,marginBottom:-48,paddingTop:14,paddingBottom:18,flexDirection:"row",justifyContent:"space-around",backgroundColor:palette.surface,borderTopWidth:1,borderColor:palette.border},navItem:{alignItems:"center",gap:4,minWidth:54},navIcon:{color:palette.textSecondary,fontSize:23},navLabel:{color:palette.textSecondary,fontSize:11,fontWeight:"600"},active:{color:palette.brand}
+});

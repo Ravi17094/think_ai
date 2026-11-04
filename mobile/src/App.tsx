@@ -8,8 +8,6 @@ import { CertificateScreen as CompanyCertificateScreen } from "@/screens/learnin
 import { ResultsScreen } from "@/screens/learning/ResultsScreen";
 import { VideoPlayerScreen } from "@/screens/learning/VideoPlayerScreen";
 import { useEffect, useMemo, type ComponentType } from "react";
-import { Pressable, Text, View } from "react-native";
-import { signOut } from "@/api/session";
 import { AccessGate } from "@/lms/AccessGate";
 import { isAdministrator, type AccessAudience } from "@/lms/access";
 import {
@@ -196,53 +194,18 @@ export function RootNavigator() {
         initialRouteName={
           !session.token ? "SignIn" : admin ? "AdminHome" : "LmsHome"
         }
-        screenOptions={({ navigation }) => ({
-          headerRight: session.token
-            ? () => (
-                <View style={{ flexDirection: "row", gap: 4 }}>
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Open my workspace"
-                    style={{
-                      padding: 8,
-                      minHeight: 44,
-                      justifyContent: "center",
-                    }}
-                    onPress={() =>
-                      admin
-                        ? navigation.navigate("AdminHome")
-                        : navigation.navigate("LmsHome")
-                    }
-                  >
-                    <Text style={{ color: palette.textPrimary }}>Home</Text>
-                  </Pressable>
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Sign out"
-                    style={{
-                      padding: 8,
-                      minHeight: 44,
-                      justifyContent: "center",
-                    }}
-                    onPress={() => void signOut()}
-                  >
-                    <Text style={{ color: palette.textSecondary }}>
-                      Sign out
-                    </Text>
-                  </Pressable>
-                </View>
-              )
-            : undefined,
+        screenOptions={{
           headerStyle: { backgroundColor: palette.surface },
           headerTintColor: palette.textPrimary,
-          headerTitleStyle: { fontWeight: "700" },
+          headerTitleStyle: { fontWeight: "800", fontSize: 22 },
+          headerShadowVisible: false,
           contentStyle: { backgroundColor: palette.background },
-        })}
+        }}
       >
         <Stack.Screen
           name="SignIn"
           component={SignInScreen}
-          options={{ title: "Sign in" }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="AdminHome"
@@ -257,7 +220,7 @@ export function RootNavigator() {
         <Stack.Screen
           name="LmsHome"
           component={ProtectedLmsHome}
-          options={{ title: "My learning" }}
+          options={{ title: "Dashboard" }}
         />
         <Stack.Screen
           name="CoursePlayer"
@@ -366,7 +329,7 @@ export function RootNavigator() {
         <Stack.Screen component={GradingQueueRoute} name="GradingQueue" options={{ title: 'Grading queue' }} />
         <Stack.Screen component={InstructorControlsRoute} name="InstructorControls" options={{ title: 'Instructor controls' }} />
         <Stack.Screen component={RbacMatrixRoute} name="RbacMatrix" options={{ title: 'Role permissions' }} />
-        <Stack.Screen name="Login" component={SignInScreen} options={{ title: "Sign in" }} />
+        <Stack.Screen name="Login" component={SignInScreen} options={{ headerShown: false }} />
         <Stack.Screen name="PaymentSuccess" component={ProtectedPaymentSuccess} options={{ title: "Payment Successful" }} />
         <Stack.Screen name="PaymentFailed" component={ProtectedPaymentFailed} options={{ title: "Payment Failed" }} />
         <Stack.Screen name="NotificationPreferences" component={ProtectedNotificationPreferences} options={{ title: "Notification Preferences" }} />

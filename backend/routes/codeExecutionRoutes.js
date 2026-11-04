@@ -15,12 +15,11 @@ const {
     validateCodeExecution
 } = require("../validations/codeExecutionValidation");
 
-const { practiceRun } = require("../controllers/codeExecutionController");
 const { authenticateToken, authorizeRoles } = require("../middleware/lmsLegacyAccess");
 const { requireOwnedCodeAttempt, redactLearnerAnswers } = require("../middleware/lmsLegacyOwnership");
 const { internalCallbackAuth } = require("../middleware/internalCallbackAuth");
 const learnerOnly = [authenticateToken, authorizeRoles("Learner")];
-router.post("/practice-run", ...learnerOnly, practiceRun);
+router.post("/practice-run", ...learnerOnly, executeCode);
 
 
 // ----------------------------------------------------
@@ -81,6 +80,14 @@ router.post("/practice-run", ...learnerOnly, practiceRun);
  */
 router.post(
     "/execute",
+    ...learnerOnly,
+    requireOwnedCodeAttempt({ publicTestCase: true }),
+    redactLearnerAnswers,
+    validateCodeExecution,
+    executeCode
+);
+
+router.post(
     "/run",
     ...learnerOnly,
     requireOwnedCodeAttempt({ publicTestCase: true }),
@@ -174,7 +181,7 @@ router.post(
     ...learnerOnly,
     requireOwnedCodeAttempt(),
     redactLearnerAnswers,
-    submitCode
+    executeCode
 );
 
 

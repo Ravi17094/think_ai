@@ -9,7 +9,7 @@
 export const FORUM_API_BASE_URL =
   import.meta.env.VITE_FORUM_API_URL ||
   import.meta.env.VITE_API_BASE_URL ||
-  "/api";
+  "http://localhost:5000/api";
 
 const CURRENT_USER_KEY = "thinkz_forum_user_id";
 

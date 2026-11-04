@@ -48,9 +48,9 @@ export function ThreadListOptimized({
             testID="forum-thread-list-loading-more">
             Loading...
           </Text>
-        ) : null
+        ) : undefined
       }
-      ListEmptyComponent={!loading ? <Text style={styles.empty}>No threads</Text> : null}
+      ListEmptyComponent={!loading ? <Text style={styles.empty}>No threads</Text> : undefined}
       contentContainerStyle={styles.content}
       testID="forum-thread-list-optimized"
     />

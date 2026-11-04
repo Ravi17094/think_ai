@@ -2,7 +2,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Video, type AVPlaybackStatus } from "expo-av";
 import { lmsApi, LmsApiError } from "@/lms/api";
 import { downloadLesson, localVideo } from "@/lms/downloads";
 import { useLms } from "@/lms/LmsProvider";
@@ -40,7 +39,6 @@ export function useCoursePlayer(courseId: number, requestedLessonId?: number) {
   const [uri, setUri] = useState<string | null>(null),
     [message, setMessage] = useState(""),
     [download, setDownload] = useState<number | null>(null);
-  const video = useRef<Video>(null);
   const lastSaved = useRef(0);
   const position = useRef(0);
   const restoredPosition = useRef(0);
@@ -147,22 +145,19 @@ export function useCoursePlayer(courseId: number, requestedLessonId?: number) {
         void saveOnLeave.current(position.current).catch(() => undefined);
     };
   }, [lesson?.id, resource.data?.enrollmentId, session.userId]);
-  function playback(status: AVPlaybackStatus) {
-    if (!status.isLoaded) {
-      if (status.error) setMessage(status.error);
-      return;
-    }
-    position.current = status.positionMillis / 1000;
+  /** Record progress from the `expo-video` player without depending on the legacy expo-av status object. */
+  function playback(positionSeconds: number, didJustFinish = false, isPlaying = false) {
+    position.current = positionSeconds;
     if (
-      status.didJustFinish ||
+      didJustFinish ||
       Math.abs(position.current - lastSaved.current) >= 15 ||
-      (!status.isPlaying &&
+      (!isPlaying &&
         position.current > 0 &&
         position.current !== lastSaved.current)
     ) {
       lastSaved.current = position.current;
       void saveProgress(
-        status.didJustFinish && lesson
+        didJustFinish && lesson
           ? lesson.durationSeconds
           : position.current,
       )
@@ -193,6 +188,6 @@ export function useCoursePlayer(courseId: number, requestedLessonId?: number) {
       (hasCompletedLesson(l, localWatched[l.id] ?? 0) &&
         l.durationSeconds > 0),
   ).length;
-  return { resource, lesson, lessons, uri, message, download, video,
+  return { resource, lesson, lessons, uri, message, download,
     initialPosition, completed, online, playback, downloadCurrent, setSelected };
 }

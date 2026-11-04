@@ -4,7 +4,7 @@ import {
   StyleSheet,
   Text,
   View,
-  ViewToken,
+  type ListViewToken,
 } from 'react-native';
 
 import { EmptyState, ErrorState, InlineSpinner } from '@/components/common';
@@ -25,7 +25,7 @@ export interface ThreadListProps {
   onRefresh?: () => void;
   onSelectThread?: (thread: ForumThread) => void;
   /** 0–1. The next page is requested once this fraction of the list is visible. */
-  onViewableItemsChanged?: (info: { viewableItems: ViewToken[] }) => void;
+  onViewableItemsChanged?: (info: { viewableItems: ListViewToken[] }) => void;
   emptyTitle?: string;
   emptyMessage?: string;
   testID?: string;
@@ -128,7 +128,7 @@ export function ThreadList({
       ListEmptyComponent={
         hasError ? (
           <ErrorState message={errorMessage ?? 'Unable to load threads.'} />
-        ) : isLoading ? null : (
+        ) : isLoading ? undefined : (
           <EmptyState
             icon="💬"
             message={emptyMessage}

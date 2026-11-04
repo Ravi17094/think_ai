@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const prisma = new PrismaClient();
 
@@ -74,19 +75,44 @@ exports.login = async (req, res) => {
             return res.status(401).json({ error: "Invalid credentials." });
         }
 
-        // Optional: If you use JWT authentication, you would sign a token here.
-        // For now, returning success and basic user details.
         const { password: _, ...userWithoutPassword } = user;
+        const secret = process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET;
+
+        if (!secret) {
+            console.error("Login error: JWT secret is not configured.");
+            return res.status(503).json({ error: "Authentication is not configured." });
+        }
+
+        // The mobile LMS authenticates subsequent requests with this token.
+        // Keep the identity claim numeric because the LMS authorization middleware
+        // verifies it against the User table.
+        const token = jwt.sign(
+            { id: user.id, email: user.email, role: user.role },
+            secret,
+            { expiresIn: "7d" }
+        );
 
         return res.status(200).json({
+            success: true,
             message: "Login successful!",
-            user: userWithoutPassword
+            user: userWithoutPassword,
+            token
         });
 
     } catch (error) {
         console.error("Login error:", error);
         return res.status(500).json({ error: "Internal server error occurred." });
     }
+};
+
+// Returns the authenticated identity attached by requireRole.  Keeping this
+// controller explicit prevents Express from receiving an undefined handler
+// when `/api/auth/me` is registered.
+exports.getCurrentUser = (req, res) => {
+    return res.status(200).json({
+        success: true,
+        user: req.user
+    });
 };
 
 // Export both controllers so they can be hooked up in your routes folder

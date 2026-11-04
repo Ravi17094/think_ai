@@ -10,7 +10,11 @@ const {
     updateEnrollment,
     deleteEnrollment
 } = require("../controllers/enrollmentController");
-const { createSession, getSessionById, updateSession, deleteSession } = require("../controllers/sessionController");
+const {
+    validateEnrollmentCreate,
+    validateEnrollmentUpdate,
+    validateEnrollmentId
+} = require("../validations/enrollmentValidation");
 /**
  * @swagger
  * tags:
@@ -84,7 +88,6 @@ router.get("/:id", getEnrollmentById);
  *       201:
  *         description: Enrollment created successfully
  */
-router.post("/", createEnrollment);
 router.post(
     "/",
     authenticateToken,
@@ -232,11 +235,6 @@ router.put(
  *       404:
  *         description: Enrollment not found
  */
-router.delete("/:id", deleteEnrollment);
-router.post("/sessions", createSession);
-router.get("/sessions/:id", getSessionById);
-router.put("/sessions/:id", updateSession);
-router.delete("/sessions/:id", deleteSession);
 router.delete(
     "/:id",
     authenticateToken,

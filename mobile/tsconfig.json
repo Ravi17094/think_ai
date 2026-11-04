@@ -27,6 +27,7 @@
   "exclude": [
     "node_modules",
     "dist",
-    ".expo"
+    ".expo",
+    "frontend/mobile-app"
   ]
 }

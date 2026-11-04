@@ -1,4 +1,5 @@
-import { Modal, StyleSheet, Text, Button, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { palette, radii, spacing, typography } from '@/theme/tokens';
 
 export function UnsavedWarningModal({
   visible,
@@ -19,10 +20,10 @@ export function UnsavedWarningModal({
           <Text accessibilityRole="header" style={styles.title}>
             Unsaved changes
           </Text>
-          <Text>You have unsaved changes. Discard them?</Text>
+          <Text style={styles.description}>You have unsaved changes. Discard them?</Text>
           <View style={styles.actions}>
-            <Button title="Cancel" onPress={onCancel} testID="unsaved-cancel" />
-            <Button title="Discard" color="red" onPress={onDiscard} testID="unsaved-discard" />
+            <Pressable style={[styles.action, styles.cancel]} onPress={onCancel} testID="unsaved-cancel"><Text style={styles.cancelText}>Cancel</Text></Pressable>
+            <Pressable style={[styles.action, styles.discard]} onPress={onDiscard} testID="unsaved-discard"><Text style={styles.discardText}>Discard</Text></Pressable>
           </View>
         </View>
       </View>
@@ -33,24 +34,32 @@ export function UnsavedWarningModal({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: palette.overlay,
     justifyContent: 'center',
     alignItems: 'center',
   },
   card: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
+    backgroundColor: palette.surface,
+    borderColor: palette.borderStrong,
+    borderWidth: 1,
+    padding: spacing.lg,
+    borderRadius: radii.xl,
     width: '80%',
-    gap: 12,
+    gap: spacing.sm,
   },
   title: {
-    fontSize: 16,
-    fontWeight: '700',
+    ...typography.subtitle,
+    color: palette.textPrimary,
   },
   actions: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    gap: 8,
+    gap: spacing.sm,
   },
+  description: { ...typography.body, color: palette.textSecondary },
+  action: { minHeight: 44, paddingHorizontal: spacing.md, borderRadius: radii.md, justifyContent: 'center', alignItems: 'center' },
+  cancel: { borderColor: palette.borderStrong, borderWidth: 1 },
+  discard: { backgroundColor: palette.danger },
+  cancelText: { ...typography.label, color: palette.textPrimary },
+  discardText: { ...typography.label, color: palette.textInverse },
 });

@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
     backgroundColor: palette.background,
   },
   content: {
+    paddingTop: 116,
     paddingBottom: spacing.xxl,
   },
   section: {

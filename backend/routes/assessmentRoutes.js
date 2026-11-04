@@ -6,7 +6,17 @@ const {
     createAssessment,
     getAssessmentById,
     submitAssessment,
-    getAssessmentAnalytics
+    getAssessmentAnalytics,
+    startAssessment,
+    createCodingQuestion,
+    getCodingQuestions,
+    getCodingQuestionById,
+    updateCodingQuestion,
+    deleteCodingQuestion,
+    createCodingTestCase,
+    getCodingTestCases,
+    updateCodingTestCase,
+    deleteCodingTestCase
 } = require("../controllers/assessmentController");
 
 const {
@@ -340,12 +350,6 @@ router.post(
  *       500:
  *         description: Internal server error
  */
-router.get(
-    "/:id/submissions",
-    ...adminOnly,
-    validateAssessmentId,
-    getAssessmentSubmissions
-);
 
 /**
  * @swagger
@@ -440,10 +444,6 @@ router.post(
 // GENERAL ASSESSMENT CRUD & STATUS ROUTES
 // ============================================================
 
-router.get("/", ...adminOnly, getAllAssessments);
-router.put("/:id", ...adminOnly, validateAssessmentId, updateAssessment);
-router.delete("/:id", ...adminOnly, validateAssessmentId, deleteAssessment);
-router.get("/enrollment/:enrollmentId/status", ...learnerOnly, requireOwnedEnrollment, redactLearnerAnswers, getEnrollmentAssessmentStatus);
 
 // ============================================================
 // ADMIN - CREATE CODING QUESTION

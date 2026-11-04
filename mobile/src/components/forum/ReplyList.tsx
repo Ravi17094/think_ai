@@ -93,8 +93,8 @@ export function ReplyList({
           />
         )
       }
-      ListFooterComponent={listFooter ?? null}
-      ListHeaderComponent={listHeader ?? null}
+      ListFooterComponent={listFooter ?? undefined}
+      ListHeaderComponent={listHeader ?? undefined}
       onRefresh={onRefresh}
       refreshing={isRefreshing}
       testID={testID}

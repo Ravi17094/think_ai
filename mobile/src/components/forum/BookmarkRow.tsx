@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   removeBackdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'flex-start',
     justifyContent: 'center',
     paddingLeft: spacing.md,

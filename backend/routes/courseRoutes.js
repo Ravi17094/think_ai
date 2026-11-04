@@ -12,6 +12,10 @@ const {
     deleteCourse,
     getCourseBatches
 } = require("../controllers/courseController");
+const {
+    validateCourseId,
+    validateCourseUpdate
+} = require("../validations/courseValidation");
 
 /**
  * @swagger
@@ -144,7 +148,6 @@ router.post("/", createCourse);
  *       200:
  *         description: Course updated successfully
  */
-router.put("/:id", updateCourse);
 router.put(
     "/:id",
     authenticateToken,
@@ -174,7 +177,6 @@ router.put(
  *       404:
  *         description: Course not found
  */
-router.delete("/:id", deleteCourse);
 router.delete(
     "/:id",
     authenticateToken,

@@ -8,6 +8,17 @@ const mockSync = jest.fn(async () => {});
 let mockVersions = {};
 let mockOnline = true;
 let mockPlayback: (status: any) => void;
+let mockTimeUpdate: ((event: { currentTime: number }) => void) | undefined;
+let mockPlayToEnd: (() => void) | undefined;
+const mockVideoPlayer = {
+  playing: false,
+  pause: jest.fn(),
+  addListener: jest.fn((event: string, listener: (payload?: { currentTime: number }) => void) => {
+    if (event === "timeUpdate") mockTimeUpdate = listener;
+    if (event === "playToEnd") mockPlayToEnd = listener as () => void;
+    return { remove: jest.fn() };
+  }),
+};
 jest.mock("@/lms/LmsProvider", () => ({ useLms: () => ({
   session: { userId: "1", token: "token" }, ready: true, online: mockOnline,
   sync: mockSync, syncStatus: "", versions: mockVersions, account: { role: "Learner" },
@@ -15,14 +26,16 @@ jest.mock("@/lms/LmsProvider", () => ({ useLms: () => ({
 jest.mock("@/lms/api", () => ({ lmsApi: { player: jest.fn(), note: jest.fn(), saveNote: jest.fn() },
   LmsApiError: class extends Error { status = 0; } }));
 jest.mock("@/lms/downloads", () => ({ downloadLesson: jest.fn(), localVideo: async (user: string, lesson: any) => `${user}/${lesson.id}.mp4` }));
-jest.mock("expo-av", () => {
+jest.mock("expo-video", () => {
   const React = require("react");
   const { View } = require("react-native");
-  return { ResizeMode: { CONTAIN: "contain" }, Video: React.forwardRef((props: any, ref: any) => {
-    mockPlayback = props.onPlaybackStatusUpdate;
-    React.useImperativeHandle(ref, () => ({ pauseAsync: async () => {} }));
-    return React.createElement(View, { testID: "lesson-video", ...props });
-  }) };
+  return {
+    useVideoPlayer: (_source: unknown, setup: (player: typeof mockVideoPlayer) => void) => {
+      setup(mockVideoPlayer);
+      return mockVideoPlayer;
+    },
+    VideoView: (props: Record<string, unknown>) => React.createElement(View, { testID: "lesson-video", ...props }),
+  };
 });
 const navigation = { navigate: jest.fn() };
 const player = { enrollmentId: 2, course: { id: 4, title: "Current course", description: "", modules: [{ id: 5, title: "Module", order: 0,
@@ -32,14 +45,27 @@ const player = { enrollmentId: 2, course: { id: 4, title: "Current course", desc
 const view = () => <CoursePlayerScreen {...({ route: { params: { courseId: 4 } }, navigation } as any)} />;
 beforeEach(async () => {
   await AsyncStorage.clear(); jest.clearAllMocks(); mockOnline = true; mockVersions = {};
+  mockVideoPlayer.playing = false;
+  mockTimeUpdate = undefined;
+  mockPlayToEnd = undefined;
+  mockPlayback = (status) => {
+    mockVideoPlayer.playing = Boolean(status.isPlaying);
+    if (status.didJustFinish) mockPlayToEnd?.();
+    else mockTimeUpdate?.({ currentTime: status.positionMillis / 1000 });
+  };
   (lmsApi.player as jest.Mock).mockResolvedValue(player);
   (lmsApi.note as jest.Mock).mockResolvedValue({ text: "" });
 });
 test("video completion updates the visible progress bar and persists the watched position", async () => {
   const screen = render(view());
   await waitFor(() => expect(screen.getByTestId("lesson-video")).toBeTruthy());
+  await waitFor(() => expect(mockPlayToEnd).toEqual(expect.any(Function)));
   expect(screen.getByLabelText("Course completion").props.accessibilityValue.now).toBe(0);
-  await act(async () => { mockPlayback({ isLoaded: true, positionMillis: 100000, didJustFinish: true, isPlaying: false }); });
+  await act(async () => {
+    mockPlayback({ isLoaded: true, positionMillis: 100000, didJustFinish: true, isPlaying: false });
+    await Promise.resolve();
+    await Promise.resolve();
+  });
   await waitFor(() => expect(screen.getByText("1/2 lessons completed")).toBeTruthy());
   expect(screen.getByLabelText("Course completion").props.accessibilityValue.now).toBe(50);
   expect(JSON.parse((await AsyncStorage.getItem(storageKey("1", "position:1")))!)).toBe(100);
@@ -50,6 +76,7 @@ test("offline completion stays queued and lesson selection highlights the next l
   mockOnline = false;
   const screen = render(view());
   await waitFor(() => expect(screen.getByTestId("lesson-video")).toBeTruthy());
+  await waitFor(() => expect(mockPlayToEnd).toEqual(expect.any(Function)));
   await act(async () => { mockPlayback({ isLoaded: true, positionMillis: 100000, didJustFinish: true, isPlaying: false }); });
   await waitFor(() => expect(screen.getByText("1/2 lessons completed")).toBeTruthy());
   expect(mockSync).not.toHaveBeenCalled();
@@ -61,6 +88,7 @@ test("offline completion stays queued and lesson selection highlights the next l
 test("a sync response does not enqueue another save and backgrounding uses the latest version", async () => {
   const screen = render(view());
   await waitFor(() => expect(screen.getByTestId("lesson-video")).toBeTruthy());
+  await waitFor(() => expect(mockTimeUpdate).toEqual(expect.any(Function)));
   await act(async () => { mockPlayback({ isLoaded: true, positionMillis: 15000, isPlaying: true }); });
   await acknowledgeProgress("1", await loadQueue("1"));
   expect(await loadQueue("1")).toEqual([]);
@@ -77,6 +105,7 @@ test("switching lessons and unmounting still saves each lesson's unsaved positio
   mockOnline = false;
   const screen = render(view());
   await waitFor(() => expect(screen.getByTestId("lesson-video")).toBeTruthy());
+  await waitFor(() => expect(mockTimeUpdate).toEqual(expect.any(Function)));
   await act(async () => { mockPlayback({ isLoaded: true, positionMillis: 7000, isPlaying: true }); });
   expect(await loadQueue("1")).toEqual([]);
   fireEvent.press(screen.getByText("Second"));

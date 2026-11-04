@@ -1,5 +1,5 @@
 import { useCertificate } from "@/hooks/useCertificate";
-import { useRef, useState } from "react";
+import { useRef, useState, type ComponentRef } from "react";
 import { Platform, Text, View } from "react-native";
 import { captureRef } from "react-native-view-shot";
 import { AppButton } from "@/components/common/AppButton";
@@ -15,7 +15,7 @@ import { Card, LoadState, Message, Screen, styles } from "../ui";
 export function CertificateScreen({ route }: ScreenProps<"LmsCertificate">) {
   const resource = useCertificate(route.params.certificateId);
   const cert = resource.data;
-  const preview = useRef<View>(null);
+  const preview = useRef<ComponentRef<typeof View>>(null);
   const [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false);
   async function action(fn: () => Promise<unknown>) {

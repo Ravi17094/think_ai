@@ -5,6 +5,7 @@ export type StudioPoll = { id: number; question: string; status: string; totalVo
 export type StudioAttendee = { userId: string; name: string; online: boolean; muted: boolean; cameraOn: boolean; raisedHand: boolean };
 export type StudioSession = { id: string; title: string; status: string; attendees: StudioAttendee[]; polls: StudioPoll[]; messages: StudioMessage[] };
 export type BreakoutRoom = { id: number; name: string; status: string; members: Array<{ userId: string; userName: string }> };
+export type JitsiJoinDetails = { domain: string; room: string; token: string; expiresInSeconds: number };
 
 export const joinLiveSession = (id: string) => apiData<StudioSession>(`/studio/sessions/${encodeURIComponent(id)}/join`, { method: 'POST' });
 export const getLiveMessages = (id: string) => apiData<StudioMessage[]>(`/studio/sessions/${encodeURIComponent(id)}/messages`);
@@ -15,3 +16,4 @@ export const joinBreakoutRoom = (id: number) => apiData<BreakoutRoom>(`/studio/b
 export const leaveBreakoutRoom = (id: number) => apiData<BreakoutRoom>(`/studio/breakouts/${id}/leave`, { method: 'POST' });
 export const voteLivePoll = (pollId: number, optionId: number) => apiData<StudioPoll>(`/studio/polls/${pollId}/vote`, { method: 'POST', body: { optionId } });
 export const createLivePoll = (sessionId: string, question: string, options: string[]) => apiData<StudioPoll>(`/studio/sessions/${encodeURIComponent(sessionId)}/polls`, { method: 'POST', body: { question, options } });
+export const getJitsiJoinDetails = (sessionId: string) => apiData<JitsiJoinDetails>(`/studio/sessions/${encodeURIComponent(sessionId)}/jitsi-token`, { method: 'POST' });

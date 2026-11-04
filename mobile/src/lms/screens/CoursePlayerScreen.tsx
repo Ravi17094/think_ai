@@ -130,7 +130,7 @@ export function CoursePlayerScreen({
   });
   useEffect(() => {
     const timeUpdate = player.addListener("timeUpdate", (event) =>
-      playback(event.currentTime),
+      playback(event.currentTime, false, player.playing),
     );
     const completed = player.addListener("playToEnd", () =>
       playback(lesson?.durationSeconds ?? 0, true),

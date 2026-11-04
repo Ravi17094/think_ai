@@ -1,7 +1,12 @@
 import axios from 'axios'
 
+const configuredApiBaseUrl = import.meta.env.VITE_COURSE_API_BASE_URL || import.meta.env.VITE_API_BASE_URL
+const apiBaseUrl = configuredApiBaseUrl?.startsWith('http')
+  ? configuredApiBaseUrl
+  : 'http://localhost:5000/api'
+
 const courseApiClient = axios.create({
-  baseURL: import.meta.env.VITE_COURSE_API_BASE_URL, 
+  baseURL: apiBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },

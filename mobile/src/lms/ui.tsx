@@ -1,4 +1,5 @@
-import { useState, type PropsWithChildren } from "react";
+import { useCallback, useContext, useEffect, useRef, useState, type PropsWithChildren } from "react";
+import { NavigationContext } from "@react-navigation/native";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -17,7 +18,8 @@ import { useLms } from "./LmsProvider";
 import { isAdministrator } from "./access";
 export const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: palette.background },
-  content: { padding: 20, gap: 16, paddingBottom: 48 },
+  // Keep initial content clear of the development host's floating header.
+  content: { padding: 20, paddingTop: 116, gap: 16, paddingBottom: 48 },
   card: {
     padding: 18,
     gap: 12,
@@ -52,6 +54,14 @@ export const styles = StyleSheet.create({
     backgroundColor: palette.surfaceMuted,
     color: palette.accent,
   },
+  loginShell: { flex: 1, justifyContent: "center", paddingTop: 44, gap: 14 },
+  loginBrand: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 22 },
+  loginMark: { color: palette.textPrimary, backgroundColor: palette.brand, paddingHorizontal: 10, paddingVertical: 7, borderRadius: 10, fontSize: 17, fontWeight: "800" },
+  loginBrandText: { color: palette.textPrimary, fontSize: 21, fontWeight: "800", letterSpacing: 0.4 },
+  loginTitle: { color: palette.textPrimary, fontSize: 34, lineHeight: 40, fontWeight: "800" },
+  loginSubtitle: { color: palette.textSecondary, fontSize: 16, lineHeight: 24, marginBottom: 16 },
+  loginCard: { padding: 20, gap: 14, borderRadius: 24, backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.borderStrong },
+  loginCardTitle: { color: palette.textPrimary, fontSize: 18, fontWeight: "700", marginBottom: 4 },
 });
 export function Field({
   label,
@@ -102,8 +112,12 @@ export function LoginForm() {
     }
   }
   return (
-    <View style={styles.card}>
-      <Text style={styles.heading}>Sign in to your account</Text>
+    <View style={styles.loginShell}>
+      <View style={styles.loginBrand}><Text style={styles.loginMark}>tz</Text><Text style={styles.loginBrandText}>Thinkz.ai</Text></View>
+      <Text style={styles.loginTitle}>Welcome back</Text>
+      <Text style={styles.loginSubtitle}>Sign in to continue your learning journey.</Text>
+      <View style={styles.loginCard}>
+      <Text style={styles.loginCardTitle}>Your learning, in one place</Text>
       <Field
         label="Email"
         autoCapitalize="none"
@@ -124,15 +138,40 @@ export function LoginForm() {
         loading={busy}
         disabled={!email || !password}
       />
+      </View>
     </View>
   );
 }
 export function Screen({
-  title,
+  title: _title,
   children,
 }: PropsWithChildren<{ title: string }>) {
-  const { session, ready, online, syncStatus, account } = useLms();
+  const { session, ready, online, account } = useLms();
   const admin = isAdministrator(account?.role);
+  // React Native's installed ScrollView declaration is a function component,
+  // so use the small imperative surface this screen needs rather than its
+  // component type as the ref type.
+  const scrollRef = useRef<{ scrollTo: (options: { y: number; animated: boolean }) => void } | null>(null);
+  const navigation = useContext(NavigationContext);
+  const resetScroll = useCallback(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }, []);
+  useEffect(() => {
+    const resetAfterFocus = () => {
+      const frame = requestAnimationFrame(resetScroll);
+      const delayedReset = setTimeout(resetScroll, 350);
+      return () => {
+        cancelAnimationFrame(frame);
+        clearTimeout(delayedReset);
+      };
+    };
+    const cleanInitialReset = resetAfterFocus();
+    const unsubscribe = navigation?.addListener?.("focus", resetAfterFocus);
+    return () => {
+      cleanInitialReset();
+      unsubscribe?.();
+    };
+  }, [navigation, resetScroll]);
   return (
     <SafeAreaView edges={["left", "right", "bottom"]} style={styles.screen}>
       <KeyboardAvoidingView
@@ -140,12 +179,14 @@ export function Screen({
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
+          ref={scrollRef as never}
           keyboardShouldPersistTaps="handled"
+          contentInsetAdjustmentBehavior="never"
+          onContentSizeChange={() => {
+            resetScroll();
+          }}
           contentContainerStyle={styles.content}
         >
-          <Text accessibilityRole="header" style={styles.title}>
-            {title}
-          </Text>
           {!ready ? (
             <ActivityIndicator />
           ) : !session.token ? (
@@ -161,7 +202,6 @@ export function Screen({
                   }
                 />
               ) : null}
-              {!admin ? <Message text={syncStatus} /> : null}
               {children}
             </>
           )}

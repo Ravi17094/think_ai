@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ComponentRef } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -6,8 +6,7 @@ import {
   Text,
   TextInput,
   View,
-  type NativeSyntheticEvent,
-  type TextInputSelectionChangeEventData,
+  type TextInputSelectionChangeEvent,
 } from 'react-native';
 
 import { useApiClient } from '@/hooks/useApiClient';
@@ -70,7 +69,7 @@ export function RichTextEditor({
   testID = 'rich-text-editor',
 }: RichTextEditorProps) {
   const client = useApiClient();
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<ComponentRef<typeof TextInput>>(null);
   const [selection, setSelection] = useState({ start: 0, end: 0 });
   const [isPreview, setIsPreview] = useState(false);
   const [suggestions, setSuggestions] = useState<MentionUser[]>([]);
@@ -145,7 +144,7 @@ export function RichTextEditor({
   };
 
   const handleSelectionChange = (
-    event: NativeSyntheticEvent<TextInputSelectionChangeEventData>
+    event: TextInputSelectionChangeEvent
   ) => {
     const { start, end } = event.nativeEvent.selection;
     setSelection({ start, end });

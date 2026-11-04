@@ -1,5 +1,6 @@
-const BASE = '/api/roles';
-const USE_MOCK = true;
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const BASE = `${API_BASE}/roles`;
+const USE_MOCK = false;
 
 export const ROLE_HIERARCHY = ['Admin', 'Instructor', 'TA', 'Learner',];
 

@@ -18,6 +18,7 @@ const updateEnrollment = async (id, data) => {
 
 const deleteEnrollment = async (id) => {
     return await repository.deleteEnrollment(Number(id));
+};
 
 /*
  * ----------------------------------------------------
@@ -41,42 +42,6 @@ const unlockCourseAccess = async () => {
     );
 };
 
-
-/*
- * ----------------------------------------------------
- * Delete enrollment
- * ----------------------------------------------------
- */
-
-const deleteEnrollment = async (
-    id
-) => {
-
-    const enrollmentId =
-        validateId(
-            id,
-            "Enrollment ID"
-        );
-
-
-    const enrollment =
-        await repository.getEnrollmentById(
-            enrollmentId
-        );
-
-
-    if (!enrollment) {
-
-        throw new Error(
-            "Enrollment not found"
-        );
-    }
-
-
-    return repository.deleteEnrollment(
-        enrollmentId
-    );
-};
 
 module.exports = {
     getAllEnrollments,

@@ -352,6 +352,24 @@ const getAssessmentSubmissionResult = async (
     }
 };
 
+const startAssessment = async (req, res) => {
+    try {
+        const submission = await service.startAssessment(
+            req.params.id,
+            req.body.enrollmentId
+        );
+        return res.status(200).json({ success: true, data: submission });
+    } catch (error) {
+        return res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+// The coding-question routes are mounted separately. Keep their handlers
+// defined so the API server can start even when that optional module has not
+// been implemented in this controller yet.
+const codingAdminUnavailable = (req, res) =>
+    res.status(501).json({ success: false, message: "Coding-question administration is not available yet." });
+
 module.exports = {
 
     createAssessment,
@@ -361,5 +379,15 @@ module.exports = {
     submitAssessment,
 
     getAssessmentAnalytics,
-    getAssessmentSubmissionResult
+    getAssessmentSubmissionResult,
+    startAssessment,
+    createCodingQuestion: codingAdminUnavailable,
+    getCodingQuestions: codingAdminUnavailable,
+    getCodingQuestionById: codingAdminUnavailable,
+    updateCodingQuestion: codingAdminUnavailable,
+    deleteCodingQuestion: codingAdminUnavailable,
+    createCodingTestCase: codingAdminUnavailable,
+    getCodingTestCases: codingAdminUnavailable,
+    updateCodingTestCase: codingAdminUnavailable,
+    deleteCodingTestCase: codingAdminUnavailable
 };

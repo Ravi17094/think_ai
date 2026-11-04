@@ -4,7 +4,9 @@ jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+// React Native 0.88 moved this helper from Libraries/Animated to src/private.
+// Mocking it stops native animations from running during Jest assertions.
+jest.mock('react-native/src/private/animated/NativeAnimatedHelper');
 
 /**
  * NetInfo is a native module with no Jest implementation, so it is mocked

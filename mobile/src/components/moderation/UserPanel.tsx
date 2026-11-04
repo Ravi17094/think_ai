@@ -147,7 +147,7 @@ export function UserPanel({
       data={selectedUser ? [] : users}
       keyExtractor={(item) => item.id}
       ListEmptyComponent={
-        selectedUser ? null : isLoading ? (
+        selectedUser ? undefined : isLoading ? (
           <View testID={`${testID}-skeleton`}>
             <Skeleton height={56} />
             <Skeleton height={56} />
@@ -164,7 +164,7 @@ export function UserPanel({
             testID={`${testID}-empty`}
             title="No members"
           />
-        ) : null
+        ) : undefined
       }
       ListHeaderComponent={
         <View style={styles.headerSlot}>
