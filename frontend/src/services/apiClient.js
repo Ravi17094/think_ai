@@ -25,7 +25,10 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // A failed sign-in is handled by the login form. Redirecting here reloads
+    // the form and hides the useful invalid-credential message.
+    const isAuthenticationRequest = error.config?.url?.startsWith('/auth/')
+    if (error.response?.status === 401 && !isAuthenticationRequest) {
       localStorage.removeItem('token')
       window.location.href = '/login'
     }
