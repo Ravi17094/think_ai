@@ -2,9 +2,6 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { notificationReceived, showToast } from '../../features/preferenceNotification/preferenceNotificationSlice';
 import { selectUser } from '../../features/auth/authSlice';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { notificationReceived, showToast } from '../../features/preferenceNotification/preferenceNotificationSlice';
 import { useLiveSessionNotifications } from '../../hooks/useLiveSessionNotifications';
 import { useForumSocket } from '../../hooks/useForumSocket';
 
@@ -17,7 +14,6 @@ import { useForumSocket } from '../../hooks/useForumSocket';
  *
  * Mount next to the routed pages (see LearnerLayout).
  */
-export default function LiveSessionNotificationListener() {
 function LiveSessionLifecycleListener() {
   const user = useSelector(selectUser);
 
