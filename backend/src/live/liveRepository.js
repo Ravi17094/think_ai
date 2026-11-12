@@ -31,6 +31,18 @@ function getSession(sessionId) {
     return findSessionWithRelations(sessionId);
 }
 
+function listSessions() {
+    return prisma.liveSession.findMany({
+        orderBy: [{ status: "asc" }, { scheduledAt: "asc" }, { createdAt: "desc" }],
+        include: {
+            attendees: { orderBy: { id: "asc" } },
+            messages: { orderBy: { id: "asc" } },
+            polls: { orderBy: { id: "asc" }, include: { options: { orderBy: { id: "asc" } }, votes: true } },
+            breakouts: { orderBy: { id: "asc" }, include: { members: { orderBy: { id: "asc" } } } }
+        }
+    });
+}
+
 function upsertSession(data) {
     return prisma.liveSession.upsert({
         where: { id: data.id },
@@ -247,6 +259,7 @@ function leaveBreakoutRoom(roomId, userId) {
 
 module.exports = {
     getSession,
+    listSessions,
     upsertSession,
     updateSessionStatus,
     getAttendee,

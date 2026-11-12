@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import Layout from "../components/layout/Layout";
 
@@ -25,8 +25,6 @@ import EnrollmentDetails from "../pages/enrollments/EnrollmentDetails";
 
 function AppRoutes() {
   return (
-    <BrowserRouter>
-
       <Routes>
 
         <Route path="/" element={<Layout />}>
@@ -87,8 +85,6 @@ function AppRoutes() {
 <Route path="/enrollments/:id" element={<EnrollmentDetails />} />
 
       </Routes>
-
-    </BrowserRouter>
   );
 }
 

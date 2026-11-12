@@ -10,8 +10,13 @@ import { getSession, restoreSession } from './session';
  *   - Envelope: success `{ success: true, data, ...extras }`,
  *     failure `{ success: false, message, ...extras }` with 4xx/5xx.
  */
-export const API_BASE_URL: string =
-  process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:5000/api';
+export function normalizeApiBaseUrl(value: string | undefined): string {
+  const candidate = (value ?? 'http://localhost:5000/api').trim().replace(/\/+$/, '');
+  if (!candidate) return 'http://localhost:5000/api';
+  return /\/api$/i.test(candidate) ? candidate : `${candidate}/api`;
+}
+
+export const API_BASE_URL: string = normalizeApiBaseUrl(process.env.EXPO_PUBLIC_API_URL);
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 

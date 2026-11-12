@@ -3,21 +3,29 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ApiError } from "@/api/http";
 import { getInstructorControls, saveInstructorControls, type InstructorControls } from "@/api/staffApi";
+import { listLiveSessions, type StudioSession } from "@/api/liveStudioApi";
 import { palette, radii, spacing, typography } from "@/theme/tokens";
 import { checklistItems } from "./staffStorage";
 import { StaffNotice, StaffPageHeader, StaffSection, staffStyles } from "./staffUi";
 
-const SESSION_ID = "demo-live-session";
 const initialControls: InstructorControls = { muted: false, chatDisabled: false, spotlight: false, recording: false };
 
 export function InstructorControlsScreen() {
+  const [sessions, setSessions] = useState<StudioSession[]>([]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [done, setDone] = useState<string[]>([]);
   const [controls, setControls] = useState<InstructorControls>(initialControls);
   const [notice, setNotice] = useState("Loading server-saved session preparation…");
   const [saving, setSaving] = useState(false);
   const load = async () => {
     try {
-      const value = await getInstructorControls(SESSION_ID);
+      const available = await listLiveSessions();
+      setSessions(available);
+      if (!sessionId) {
+        setNotice(available.length ? "Choose a live session to load its controls." : "No live sessions are available yet.");
+        return;
+      }
+      const value = await getInstructorControls(sessionId);
       setDone(value.checklist);
       setControls(value.controls);
       setNotice(value.updatedAt ? "Loaded the shared server copy." : "Start the shared preparation checklist.");
@@ -29,11 +37,12 @@ export function InstructorControlsScreen() {
   useEffect(() => {
     const initialLoad = setTimeout(() => void load(), 0);
     return () => clearTimeout(initialLoad);
-  }, []);
+  }, [sessionId]);
   const persist = async (nextDone: string[], nextControls: InstructorControls, label: string) => {
+    if (!sessionId) return;
     setDone(nextDone); setControls(nextControls); setSaving(true);
     try {
-      await saveInstructorControls(SESSION_ID, nextDone, nextControls);
+      await saveInstructorControls(sessionId, nextDone, nextControls);
       setNotice(`${label} saved for everyone on this session.`);
     } catch (error) {
       setNotice(error instanceof ApiError ? error.message : "Save failed. Tap the change again to retry.");
@@ -53,6 +62,13 @@ export function InstructorControlsScreen() {
       <ScrollView contentContainerStyle={staffStyles.content}>
         <StaffPageHeader eyebrow="LIVE SESSION" title="Instructor controls" description="Prepare your class and keep the live session settings synced for your teaching team." />
         <StaffNotice tone={saving ? "neutral" : "success"}>{saving ? "Saving changes to the shared session…" : notice}</StaffNotice>
+        <StaffSection title="Live session">
+          <View style={styles.sessionList}>
+            {sessions.map((item) => <Pressable key={item.id} onPress={() => setSessionId(item.id)} style={[styles.session, sessionId === item.id && styles.sessionSelected]} accessibilityRole="button" accessibilityState={{ selected: sessionId === item.id }}><Text style={styles.sessionTitle}>{item.title}</Text><Text style={styles.sessionMeta}>{item.status} · {item.id}</Text></Pressable>)}
+            {!sessions.length ? <Text style={styles.sessionMeta}>Create a session in Live Studio before configuring controls.</Text> : null}
+          </View>
+        </StaffSection>
+        {sessionId ? <>
         <View style={styles.progressCard}>
           <View><Text style={styles.progressLabel}>Session preparation</Text><Text style={styles.progressText}>{done.length} of {checklistItems.length} checks complete</Text></View>
           <Text style={styles.progressValue}>{completedPercent}%</Text>
@@ -78,6 +94,7 @@ export function InstructorControlsScreen() {
         <StaffSection title="Post-session summary">
           <View style={styles.summary}><Summary label="Attendance" value="Open the attendance register" /><Summary label="Grading" value="Open the grading queue" /><Summary label="Recording" value={controls.recording ? "Recording in progress" : "Not started"} last /></View>
         </StaffSection>
+        </> : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -91,6 +108,11 @@ function Summary({ label, value, last = false }: { label: string; value: string;
 }
 
 const styles = StyleSheet.create({
+  sessionList: { gap: spacing.sm },
+  session: { ...staffStyles.card, padding: spacing.sm, gap: spacing.xxs },
+  sessionSelected: { borderColor: palette.brand, backgroundColor: "#21164A" },
+  sessionTitle: { ...typography.label, color: palette.textPrimary },
+  sessionMeta: { ...typography.caption, color: palette.textSecondary },
   progressCard: { backgroundColor: "#21164A", borderColor: palette.brand, borderWidth: 1, borderRadius: radii.xl, padding: spacing.lg, flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: spacing.xs },
   progressLabel: { ...typography.subtitle, color: palette.textPrimary },
   progressText: { ...typography.caption, color: palette.textSecondary, marginTop: spacing.xxs },

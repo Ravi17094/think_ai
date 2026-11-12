@@ -30,6 +30,20 @@ function resolveServerUrl() {
   }
 }
 
+// Simulated events are useful for local demos, but must never be presented as
+// a real live class in a production bundle.
+function allowMockSockets() {
+  return Boolean(import.meta.env.DEV || import.meta.env.VITE_ENABLE_SOCKET_MOCKS === "true");
+}
+
+class DisconnectedStudioSocket {
+  constructor() { this.mode = "disconnected"; this.connected = false; }
+  on() {}
+  off() {}
+  emit() {}
+  disconnect() {}
+}
+
 /** In-browser mock used when no live backend is available. */
 class MockStudioSocket {
   constructor({ sessionId }) {
@@ -130,8 +144,12 @@ export function createStudioSocket({ sessionId, user }) {
       } catch {
         /* never connected */
       }
-      const mock = new MockStudioSocket({ sessionId }).connect();
-      resolve({ socket: mock, mode: "mock" });
+      if (allowMockSockets()) {
+        const mock = new MockStudioSocket({ sessionId }).connect();
+        resolve({ socket: mock, mode: "mock" });
+      } else {
+        resolve({ socket: new DisconnectedStudioSocket(), mode: "disconnected" });
+      }
     };
 
     const fallbackTimer = setTimeout(settleWithMock, 2500);

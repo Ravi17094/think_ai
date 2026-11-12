@@ -17,7 +17,7 @@ export function LmsHomeScreen({ navigation }: ScreenProps<"LmsHome">) {
   useEffect(() => { if (focused && session.token) void resource.refresh(); }, [focused, session.token]);
   const rows = resource.data || []; const completed = useMemo(() => rows.filter(x => x.summary.percentage >= 100).length, [rows]);
   const hasTeachingTools = ["ta", "instructor", "admin", "superadmin"].includes(account?.role.toLowerCase() ?? "");
-  const go = (label: string) => { const routes: Record<string, string> = { "My learning": "MyCourses", Explore: "GlobalSearch", Wishlist: "Bookmarks", Profile: "LearnerProfile" }; if (routes[label]) navigation.navigate(routes[label] as never); };
+  const go = (label: string) => { const routes: Record<string, string> = { "My learning": "MyCourses", Explore: "GlobalSearch", Wishlist: "Wishlist", Profile: "LearnerProfile" }; if (routes[label]) navigation.navigate(routes[label] as never); };
   return <Screen title="Dashboard">
     <View style={s.welcomeRow}><View><Text style={s.welcome}>Welcome back</Text><Text style={s.subtle}>{completed} completed · {Math.max(rows.length-completed, 0)} in progress</Text></View><View style={s.countCard}><Text style={s.countLabel}>Enrolled</Text><Text style={s.count}>{rows.length}</Text></View></View>
     {hasTeachingTools ? <Pressable onPress={() => navigation.navigate("StaffTools")} style={s.teachingTools} accessibilityRole="button"><View><Text style={s.toolsKicker}>TA & INSTRUCTOR WORKSPACE</Text><Text style={s.toolsTitle}>Teaching tools</Text><Text style={s.toolsDetail}>Live Studio, attendance, grading, controls and permissions</Text></View><Text style={s.toolsArrow}>›</Text></Pressable> : null}

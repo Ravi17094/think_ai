@@ -23,8 +23,31 @@ function handleError(res, error, defaultMessage) {
     if (error && error.code === "FORBIDDEN") {
         return res.status(403).json({ success: false, message: error.message });
     }
+    if (error && error.code === "NOT_FOUND") {
+        return res.status(404).json({ success: false, message: error.message });
+    }
+    if (error && error.code === "CONFLICT") {
+        return res.status(409).json({ success: false, message: error.message });
+    }
     console.error(defaultMessage, error);
     return res.status(500).json({ success: false, message: defaultMessage });
+}
+
+function listSessions(_req, res) {
+    return service.listSessions()
+        .then((sessions) => res.status(200).json({ success: true, data: sessions }))
+        .catch((error) => handleError(res, error, "Failed to load live sessions"));
+}
+
+function createSession(req, res) {
+    if (!canManageSession(req.user)) {
+        const error = new Error("Only an Instructor or Admin can create a live class");
+        error.code = "FORBIDDEN";
+        return handleError(res, error, "Failed to create session");
+    }
+    return service.createSession({ ...req.body, hostId: req.user.id })
+        .then((session) => res.status(201).json({ success: true, data: session }))
+        .catch((error) => handleError(res, error, "Failed to create session"));
 }
 
 function getSession(req, res) {
@@ -65,18 +88,26 @@ function updateSessionStatus(req, res) {
         .catch((error) => handleError(res, error, "Failed to update session status"));
 }
 
-function createJitsiToken(req, res) {
+async function createJitsiToken(req, res) {
     const secret = process.env.JITSI_JWT_SECRET;
     const appId = process.env.JITSI_APP_ID;
     const domain = process.env.JITSI_DOMAIN;
+    const issuer = process.env.JITSI_JWT_ISSUER || appId;
+    const audience = process.env.JITSI_JWT_AUDIENCE || appId;
+    const algorithm = process.env.JITSI_JWT_ALGORITHM || "HS256";
     if (!secret || !appId || !domain) {
         return res.status(503).json({ success: false, message: "Jitsi is not configured for this environment" });
     }
+    if (algorithm !== "HS256") {
+        return res.status(503).json({ success: false, message: "Only HS256 is supported for this Jitsi environment" });
+    }
+    try { await service.getSession(req.params.id); }
+    catch (error) { return handleError(res, error, "Failed to load live session"); }
     const room = `thinkz-${String(req.params.id).replace(/[^a-z0-9_-]/gi, "-")}`;
     const token = jwt.sign({
-        aud: "jitsi", iss: appId, sub: domain, room,
+        aud: audience, iss: issuer, sub: domain, room,
         context: { user: { id: String(req.user.id), name: req.user.name || "Participant" } },
-    }, secret, { expiresIn: "10m" });
+    }, secret, { expiresIn: "10m", algorithm: "HS256" });
     return res.status(200).json({ success: true, data: { domain, room, token, expiresInSeconds: 600 } });
 }
 
@@ -150,6 +181,8 @@ function leaveBreakoutRoom(req, res) {
 }
 
 module.exports = {
+    listSessions,
+    createSession,
     getSession,
     joinSession,
     updateSessionStatus,

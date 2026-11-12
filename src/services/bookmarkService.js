@@ -1,81 +1,37 @@
-const BOOKMARK_KEY = 'thinkz_bookmarks';
+/** Backend-backed forum bookmarks. Browser storage is not used. */
+const API_BASE = (import.meta.env.VITE_COMMUNITY_API_URL || '/api').replace(/\/$/, '');
 
-const delay = (ms = 150) => new Promise((r) => setTimeout(r, ms));
-
-function loadBookmarks() {
-  try {
-    const raw = localStorage.getItem(BOOKMARK_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
+async function request(path, options = {}) {
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: { Accept: 'application/json', ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...options.headers },
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || payload.success === false) throw new Error(payload.message || `Bookmark request failed (${response.status})`);
+  return payload.data;
 }
 
-function saveBookmarks(bookmarks) {
-  try {
-    localStorage.setItem(BOOKMARK_KEY, JSON.stringify(bookmarks));
-  } catch {
-    // ignore
-  }
+async function ids() {
+  return (await request('/bookmarks')).map((record) => record.discussionId);
 }
 
 export const BookmarkService = {
-  async getBookmarks() {
-    await delay(100);
-    return loadBookmarks();
-  },
-
-  async isBookmarked(postId) {
-    await delay(50);
-    return loadBookmarks().includes(postId);
-  },
-
+  getBookmarks: ids,
+  async isBookmarked(postId) { return (await ids()).includes(postId); },
   async toggleBookmark(postId) {
-    await delay(100);
-    const bookmarks = loadBookmarks();
-    const index = bookmarks.indexOf(postId);
-    let bookmarked;
-
-    if (index >= 0) {
-      bookmarks.splice(index, 1);
-      bookmarked = false;
-    } else {
-      bookmarks.push(postId);
-      bookmarked = true;
-    }
-
-    saveBookmarks(bookmarks);
-    return { postId, bookmarked };
+    if (await this.isBookmarked(postId)) return this.removeBookmark(postId);
+    return this.addBookmark(postId);
   },
-
   async addBookmark(postId) {
-    await delay(100);
-    const bookmarks = loadBookmarks();
-    if (!bookmarks.includes(postId)) {
-      bookmarks.push(postId);
-      saveBookmarks(bookmarks);
-    }
+    await request('/bookmarks', { method: 'POST', body: JSON.stringify({ discussionId: postId }) });
     return { postId, bookmarked: true };
   },
-
   async removeBookmark(postId) {
-    await delay(100);
-    const bookmarks = loadBookmarks();
-    const filtered = bookmarks.filter((id) => id !== postId);
-    saveBookmarks(filtered);
+    // Demo community identity is resolved as u1 by the backend when no token is present.
+    await request(`/bookmarks/u1/${encodeURIComponent(postId)}`, { method: 'DELETE' });
     return { postId, bookmarked: false };
   },
-
-  async getBookmarkCount() {
-    await delay(50);
-    return loadBookmarks().length;
-  },
+  async getBookmarkCount() { return (await ids()).length; },
 };
 
-export function resetBookmarks() {
-  try {
-    localStorage.removeItem(BOOKMARK_KEY);
-  } catch {
-    // ignore
-  }
-}
+export function resetBookmarks() {}

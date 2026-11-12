@@ -17,7 +17,7 @@ const tabs = [
   { label: "Home", icon: "⌂", route: "LmsHome" as const },
   { label: "My learning", icon: "▶", route: "MyCourses" as const },
   { label: "Explore", icon: "⌕", route: "GlobalSearch" as const },
-  { label: "Wishlist", icon: "♡", route: "Bookmarks" as const },
+  { label: "Wishlist", icon: "♡", route: "Wishlist" as const },
   { label: "Profile", icon: "♙", route: "LearnerProfile" as const },
 ];
 

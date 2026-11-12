@@ -3,7 +3,9 @@ const prisma = require('../config/database');
 const requireRole = require('../middleware/requireRole');
 
 const router = express.Router();
-const staffOnly = requireRole(['Instructor', 'Admin', 'TA']);
+// These actions change the state of a live class for every participant.
+// TAs may support learners, but cannot mute attendees, disable chat or record.
+const staffOnly = requireRole(['Instructor', 'Admin']);
 const defaultControls = { muted: false, chatDisabled: false, spotlight: false, recording: false };
 
 function safeChecklist(value) { return Array.isArray(value) ? value.filter((item) => typeof item === 'string').slice(0, 30) : []; }

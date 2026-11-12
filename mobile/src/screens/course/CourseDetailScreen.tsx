@@ -16,6 +16,7 @@ import {
 } from '@/components/course';
 import { useCourseDetail } from '@/hooks/useCourseDetail';
 import { useEnrollments } from '@/hooks/useEnrollments';
+import { useWishlist } from '@/hooks/useWishlist';
 import { toErrorMessage } from '@/hooks/useAsyncResource';
 import type { ScreenProps } from '@/navigation/types';
 import {radii, spacing, typography} from '@/theme/tokens';
@@ -50,6 +51,7 @@ export function CourseDetailScreen({
   } = useCourseDetail(courseId, moduleId);
 
   const { getEnrollment, enrollCourse } = useEnrollments();
+  const { isSaved, toggle: toggleWishlist } = useWishlist();
   const enrollment = getEnrollment(courseId);
 
   const [isEnrolling, setIsEnrolling] = useState(false);
@@ -229,6 +231,20 @@ export function CourseDetailScreen({
       </ScrollView>
 
       <View style={styles.footer} testID="course-detail-footer">
+        <Pressable
+          accessibilityLabel={
+            isSaved(course.id)
+              ? `Remove ${course.title} from wishlist`
+              : `Save ${course.title} to wishlist`
+          }
+          accessibilityRole="button"
+          onPress={() => toggleWishlist(course.id)}
+          style={styles.wishlistButton}
+          testID="course-detail-wishlist">
+          <Text style={styles.wishlistLabel}>
+            {isSaved(course.id) ? '♥ Saved to wishlist' : '♡ Save to wishlist'}
+          </Text>
+        </Pressable>
         <EnrollButton
           isEnrolled={enrolled}
           isSubmitting={isEnrolling}
@@ -399,6 +415,18 @@ const createStyles = (palette: Palette) => StyleSheet.create({
     borderTopColor: palette.border,
     backgroundColor: palette.surface,
     gap: spacing.xs,
+  },
+  wishlistButton: {
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: palette.brand,
+  },
+  wishlistLabel: {
+    ...typography.label,
+    color: palette.brand,
   },
   relatedLink: {
     ...typography.caption,

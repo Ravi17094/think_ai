@@ -44,7 +44,7 @@ export function MyCoursesScreen({
   route,
 }: ScreenProps<'MyCourses'>) {
   const styles = useThemedStyles(createStyles);
-  const { count: wishlistCount } = useWishlist();
+  const { count: wishlistCount, savedCourseIds, toggle: toggleWishlist } = useWishlist();
   const initialCategory = route.params?.category ?? 'all';
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState<CourseStatusFilter>('all');
@@ -195,6 +195,8 @@ export function MyCoursesScreen({
                 onSelect={(course) =>
                   navigation.navigate('CourseDetail', { courseId: course.id })
                 }
+                savedCourseIds={savedCourseIds}
+                onToggleSave={(course) => toggleWishlist(course.id)}
                 width={contentWidth}
               />
             </View>

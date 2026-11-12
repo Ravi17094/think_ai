@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getRemoteWishlist, saveRemoteWishlist } from '@/api/wishlistApi';
 
 /**
  * Saved-course ("Wishlist") store.
@@ -14,11 +15,13 @@ export const WISHLIST_STORAGE_KEY = 'thinkz_wishlist_v1';
 let ids: string[] = [];
 let hydratePromise: Promise<string[]> | null = null;
 let hydrated = false;
+let mutationVersion = 0;
 
 const listeners = new Set<() => void>();
 
 function publish(next: string[]): void {
   ids = next;
+  mutationVersion += 1;
   listeners.forEach((listener) => listener());
 }
 
@@ -50,6 +53,10 @@ async function persist(next: string[]): Promise<void> {
   }
 }
 
+async function sync(next: string[]): Promise<void> {
+  try { await saveRemoteWishlist(next); } catch { /* Offline writes remain in the local cache and retry on next hydrate. */ }
+}
+
 export function getWishlistIds(): string[] {
   return ids;
 }
@@ -66,10 +73,30 @@ export function subscribeToWishlist(listener: () => void): () => void {
 /** Loads the persisted list exactly once per app run. */
 export function hydrateWishlist(): Promise<string[]> {
   if (hydratePromise === null) {
+    const versionAtStart = mutationVersion;
     hydratePromise = AsyncStorage.getItem(WISHLIST_STORAGE_KEY)
-      .then((raw) => {
-        ids = parseStored(raw);
-        return ids;
+      .then(async (raw) => {
+        // A user can tap Save before this asynchronous read completes. Never
+        // replace that newer in-memory change with an older disk snapshot.
+        const cached = mutationVersion === versionAtStart ? parseStored(raw) : ids;
+        try {
+          const remote = await getRemoteWishlist();
+          // The server response may have started before a save/remove tap.
+          // In that case it is stale: the user's most recent local change is
+          // authoritative and must not be undone by merging the old response.
+          if (mutationVersion !== versionAtStart) {
+            void sync(ids);
+            return ids;
+          }
+          const merged = [...new Set([...cached, ...remote])];
+          publish(merged);
+          await persist(merged);
+          if (merged.length !== remote.length || merged.some((id, index) => id !== remote[index])) await sync(merged);
+          return merged;
+        } catch {
+          if (mutationVersion === versionAtStart) publish(cached);
+          return ids;
+        }
       })
       .catch(() => ids)
       .finally(() => {
@@ -86,6 +113,7 @@ export function toggleWishlist(courseId: string): string[] {
     : [courseId, ...ids];
   publish(next);
   void persist(next);
+  void sync(next);
   return next;
 }
 
@@ -96,6 +124,7 @@ export function addToWishlist(courseId: string): string[] {
   const next = [courseId, ...ids];
   publish(next);
   void persist(next);
+  void sync(next);
   return next;
 }
 
@@ -106,6 +135,7 @@ export function removeFromWishlist(courseId: string): string[] {
   const next = ids.filter((id) => id !== courseId);
   publish(next);
   void persist(next);
+  void sync(next);
   return next;
 }
 
@@ -114,5 +144,6 @@ export function __resetWishlistForTests(): void {
   ids = [];
   hydratePromise = null;
   hydrated = false;
+  mutationVersion = 0;
   listeners.clear();
 }

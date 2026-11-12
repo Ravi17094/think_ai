@@ -92,7 +92,42 @@ function assertStringId(value, message) {
 
 function getSession(sessionId) {
     const id = assertStringId(sessionId, "Session id is required");
-    return repository.getSession(id).then(serializeSession);
+    return repository.getSession(id).then((session) => {
+        if (!session) {
+            const error = new Error("Live session not found");
+            error.code = "NOT_FOUND";
+            throw error;
+        }
+        return serializeSession(session);
+    });
+}
+
+function listSessions() {
+    return repository.listSessions().then((sessions) => sessions.map(serializeSession));
+}
+
+async function createSession({ id, title, hostId, scheduledAt }) {
+    const sessionId = assertStringId(id, "Session id is required");
+    const cleanTitle = String(title || "").trim();
+    if (!cleanTitle) {
+        const error = new Error("Session title is required");
+        error.code = "VALIDATION";
+        throw error;
+    }
+    if (await repository.getSession(sessionId)) {
+        const error = new Error("A live session with this id already exists");
+        error.code = "CONFLICT";
+        throw error;
+    }
+    const parsedSchedule = scheduledAt ? new Date(scheduledAt) : null;
+    if (scheduledAt && Number.isNaN(parsedSchedule.getTime())) {
+        const error = new Error("Choose a valid session date and time");
+        error.code = "VALIDATION";
+        throw error;
+    }
+    await repository.upsertSession({ id: sessionId, title: cleanTitle, hostId: String(hostId), status: parsedSchedule ? "scheduled" : "live" });
+    if (parsedSchedule) await repository.updateSessionStatus(sessionId, "scheduled", parsedSchedule);
+    return getSession(sessionId);
 }
 
 function getSessionRecord(sessionId) {
@@ -100,22 +135,10 @@ function getSessionRecord(sessionId) {
     return repository.getSession(id);
 }
 
-/**
- * Return the default seed session when present, otherwise materialize it.
- * Keeps the existing demo session ("s1") available on first run.
- */
-async function ensureSession(sessionId) {
-    const id = assertStringId(sessionId, "Session id is required");
-    let session = await repository.getSession(id);
-    if (!session) {
-        session = await repository.upsertSession({
-            id,
-            title: "React Hooks Deep Dive — Live Class",
-            hostId: "u1",
-            status: "live"
-        });
-    }
-    return serializeSession(await repository.getSession(id));
+// Reads, joins and writes must never create an implicit demo session. A
+// session is materialised only by the explicit Instructor/Admin create route.
+function ensureSession(sessionId) {
+    return getSession(sessionId);
 }
 
 function joinSession(sessionId, user) {
@@ -156,7 +179,7 @@ async function updateSessionStatus(sessionId, status, scheduledAt) {
         throw error;
     }
 
-    await ensureSession(id);
+    await getSession(id);
     return serializeSession(await repository.updateSessionStatus(id, nextStatus, parsedSchedule));
 }
 
@@ -200,7 +223,7 @@ function deleteMessage(sessionId, user, messageId) {
         error.code = "VALIDATION";
         throw error;
     }
-    return repository.softDeleteMessage(id, message);
+    return ensureSession(id).then(() => repository.softDeleteMessage(id, message));
 }
 
 function createPoll(sessionId, user, { question, options }) {
@@ -253,7 +276,7 @@ function createBreakoutRoom(sessionId, name) {
         error.code = "VALIDATION";
         throw error;
     }
-    return repository.createBreakoutRoom(id, cleanName).then((room) =>
+    return ensureSession(id).then(() => repository.createBreakoutRoom(id, cleanName)).then((room) =>
         serializeBreakoutRooms([room])[0]
     );
 }
@@ -289,6 +312,8 @@ module.exports = {
     serializeSession,
     serializePoll,
     getSession,
+    listSessions,
+    createSession,
     getSessionRecord,
     ensureSession,
     joinSession,

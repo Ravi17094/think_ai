@@ -28,6 +28,8 @@ const codeExecutionRoutes = require("./routes/codeExecutionRoutes");
 const attendanceRoutes = require("./routes/attendanceRoutes");
 const taRoutes = require("./routes/taRoutes");
 const instructorControlRoutes = require("./routes/instructorControlRoutes");
+const reportRoutes = require("./routes/reportRoutes");
+const wishlistRoutes = require("./routes/wishlistRoutes");
 
 const auditLogRoutes = require("./routes/auditLog");
 const analyticsRoutes = require("./routes/analytics");
@@ -224,6 +226,8 @@ app.use("/api/attendance", attendanceRoutes);
 
 app.use("/api/ta", taRoutes);
 app.use("/api/instructor-controls", instructorControlRoutes);
+app.use("/api/reports", reportRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 
 app.use("/api/code", codeExecutionRoutes);
 

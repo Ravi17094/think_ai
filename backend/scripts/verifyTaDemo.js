@@ -21,8 +21,12 @@ async function verify() {
   if (!learner || learner.role !== "Learner") errors.push("Learner account is missing or has the wrong role.");
   if (!enrollment) errors.push("Active learner enrollment is missing.");
   if (enrollment?.batch.course.title !== courseTitle) errors.push("Demo course is missing or not linked to the learner.");
-  const submission = enrollment?.assessmentSubmissions.find((item) => item.assessment.title === assessmentTitle);
-  if (!submission || submission.status !== "SUBMITTED") errors.push("Demo assessment submission is missing.");
+  // A learner can have older graded attempts. Select the outstanding submitted
+  // attempt required for the TA queue, rather than the first attempt returned.
+  const submission = enrollment?.assessmentSubmissions.find(
+    (item) => item.assessment.title === assessmentTitle && item.status === "SUBMITTED"
+  );
+  if (!submission) errors.push("Demo assessment submission is missing.");
 
   if (errors.length) {
     console.error("TA demo verification failed:");

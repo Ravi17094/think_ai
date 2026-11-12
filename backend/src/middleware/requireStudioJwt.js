@@ -8,9 +8,12 @@ module.exports = function requireStudioJwt(req, res, next) {
         return res.status(401).json({ success: false, message: "A valid login token is required" });
     }
     try {
-        // Keep Studio authentication aligned with the main login controller in
-        // local development. Production must provide JWT_SECRET explicitly.
-        const decoded = jwt.verify(authorization.slice(7), process.env.JWT_SECRET || "fallback_secret");
+        // The normal login controller prefers ACCESS_TOKEN_SECRET. Studio must
+        // verify with the exact same secret or valid mobile logins are rejected.
+        const decoded = jwt.verify(
+            authorization.slice(7),
+            process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET || "fallback_secret"
+        );
         req.user = {
             id: String(decoded.id || decoded.userId || decoded.sub),
             name: decoded.name || decoded.email || "Participant",

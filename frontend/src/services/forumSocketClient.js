@@ -44,6 +44,20 @@ function resolveServerUrl() {
   }
 }
 
+// Production must expose an honest disconnected state instead of simulated
+// forum activity. Mock sockets remain opt-in for development and tests.
+function allowMockSockets() {
+  return Boolean(import.meta.env.DEV || import.meta.env.VITE_ENABLE_SOCKET_MOCKS === "true");
+}
+
+class DisconnectedForumSocket {
+  constructor() { this.mode = "disconnected"; this.connected = false; }
+  on() {}
+  off() {}
+  emit() {}
+  disconnect() {}
+}
+
 /** In-browser mock used when no live backend is available. */
 class MockForumSocket {
   constructor({ userId }) {
@@ -121,8 +135,12 @@ export function createForumSocket({ userId = readDefaultUserId(), token = null }
       } catch {
         /* never connected */
       }
-      const mock = new MockForumSocket({ userId }).connect();
-      resolve({ socket: mock, mode: "mock" });
+      if (allowMockSockets()) {
+        const mock = new MockForumSocket({ userId }).connect();
+        resolve({ socket: mock, mode: "mock" });
+      } else {
+        resolve({ socket: new DisconnectedForumSocket(), mode: "disconnected" });
+      }
     };
 
     const fallbackTimer = setTimeout(settleWithMock, 2500);
