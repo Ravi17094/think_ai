@@ -9,6 +9,9 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "updates": {
+      "enabled": false
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.thinkzai.mobile"
@@ -25,7 +28,9 @@
     "plugins": [
       "expo-notifications",
       "./plugins/withPatanDownloads",
-      "expo-video"
+      "expo-video",
+      "@react-native-community/datetimepicker",
+      "expo-sharing"
     ]
   }
 }

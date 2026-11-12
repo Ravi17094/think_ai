@@ -4,10 +4,19 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { apiData } from '@/api/http';
 
-Notifications.setNotificationHandler({ handleNotification: async () => ({ shouldShowBanner: true, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false }) });
-
+try {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+} catch {}
 /** Requests permission and stores the physical-device token on the LMS API. */
 export async function registerPushNotifications(): Promise<string | null> {
+  try {
   if (!Device.isDevice) return null;
   const current = await Notifications.getPermissionsAsync();
   const final = current.status === 'granted' ? current : await Notifications.requestPermissionsAsync();
@@ -17,6 +26,9 @@ export async function registerPushNotifications(): Promise<string | null> {
   const token = projectId ? (await Notifications.getExpoPushTokenAsync({ projectId })).data : (await Notifications.getExpoPushTokenAsync()).data;
   await apiData('/notifications/device-token', { method: 'PUT', body: { expoPushToken: token, platform: Platform.OS } });
   return token;
+} catch {
+  return null;
+}
 }
 
 /** Route notification taps through the existing app deep-link listener. */

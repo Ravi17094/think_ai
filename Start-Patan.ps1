@@ -54,7 +54,7 @@ $patanDbUrl = [uri]$patanDbLine.Substring('DATABASE_URL='.Length)
 if ($patanDbUrl.Host -ne '127.0.0.1' -or $patanDbUrl.Port -ne 55444 -or $patanDbUrl.AbsolutePath -ne '/patan_local') { throw 'The launcher only manages its separate local patan_local database.' }
 $patanPassword = $patanDbUrl.UserInfo.Split(':',2)[1]
 if (-not (Test-Path -LiteralPath (Join-Path $patanMobile '.env'))) {
-    "EXPO_PUBLIC_API_URL=http://localhost:5000/api`nEXPO_PUBLIC_APP_URL=http://localhost:8081" | Set-Content -LiteralPath (Join-Path $patanMobile '.env')
+   "EXPO_PUBLIC_API_URL=http://192.168.1" | Set-Content -LiteralPath $patanMobileUrlFile
 }
 if (-not (Test-Path -LiteralPath "$patanData\PG_VERSION")) {
     $patanPwFile = Join-Path $patanRuntime 'init-password.txt'

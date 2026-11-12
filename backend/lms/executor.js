@@ -1,4 +1,4 @@
-const { LmsError, check } = require("./errors");
+const { lmsError, check } = require("./errors");
 const { execute: schema } = require("./schemas");
 const LANGUAGES = Object.freeze({
   python: 71,

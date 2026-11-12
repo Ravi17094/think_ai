@@ -100,7 +100,7 @@ function startLmsWorker(app, io) {
   const tick = () =>
     Promise.all([
       app.locals.lmsService
-        .gradePending()
+        ?.gradePending()
         .catch((e) => console.error("[lms-worker]", e.message)),
       app.locals.lmsReportDelivery
         ?.tick()

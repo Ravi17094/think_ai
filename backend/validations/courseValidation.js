@@ -11,7 +11,11 @@ const VALID_STATUSES = new Set([
  */
 
 const isValidPositiveInteger = (value) => {
-
+const {
+  validateCourseId,
+  validateCourseCreate,
+  validateCourseUpdate
+} = require("../validations/courseValidation");
     if (
         value === undefined ||
         value === null ||
